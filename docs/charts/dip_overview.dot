@@ -1,0 +1,58 @@
+// dot docs/charts/dip_overview.dot -Tpng > docs/charts/dip_overview.png
+// requires installation of GraphViz (brew install graphviz, or
+// http://www.graphviz.org/Download..php if that doesn't work)
+
+digraph G {
+  label="Discovery Index";
+  labelloc=t;
+  node [style=filled];
+
+  aleph[label="Aleph", color=grey]
+  alephExporter[label="Aleph Metadata Exporter", color=green]
+  s3[label="AWS S3 Bucket", color=darkorange]
+  processor[label="Data Processor", color=green]
+  index[label="ElasticSearch", color=darkorange]
+  archives[label="Archival Metadata", color=grey]
+  archivesExporter[label="Archival Metadata Exporter", color=yellow]
+  futureData[label="Source X, Y, Z, etc", color=grey]
+  futureExporter[label="Source X, Y, Z, etc Metadata Exporter", color=yellow]
+  websites[label="Library Websites / Guides", color=grey]
+  websitesCrawler[label="Crawler", color=yellow]
+  api[label="Local Discovery API", color=green]
+  eds[label="EDS", color=grey]
+  bento[label="Bento", color=grey]
+  magic[label="?", color=grey]
+
+  aleph -> alephExporter
+  alephExporter -> s3
+
+  s3 -> processor
+  processor -> index
+
+  archives -> archivesExporter
+  archivesExporter -> s3
+
+  futureData -> futureExporter
+  futureExporter -> s3
+
+  websites -> websitesCrawler
+  websitesCrawler -> s3
+
+  index -> api
+  api -> bento
+  api -> magic
+
+  eds -> bento
+
+  subgraph clusterLegend {
+    label="Key";
+    {
+     k4[label="Future Project", color=yellow];
+     k3[label="Cloud Service", color=darkorange];
+     k2[label="Current Project", color=green];
+     k1[label="Existing System", color=grey];
+     k1 -> k2 -> k3 -> k4 [style=invis]
+     }
+  }
+
+}
