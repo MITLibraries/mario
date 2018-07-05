@@ -14,7 +14,7 @@ sources and write to Elasticsearch.
 ## Architecture Decision Records
 
 This repository contains Architecture Decision Records in the
-[docs/architecture-decisions directory](docs/architecture_decisions).
+[docs/architecture-decisions directory](docs/architecture-decisions).
 
 [adr-tools](https://github.com/npryce/adr-tools) should allow easy creation of
 additional records with a standardized template.
