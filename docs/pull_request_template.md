@@ -25,9 +25,6 @@ Delete this section if it isn't applicable to the PR.
 
 Delete this section if it isn't applicable to the PR.
 
-#### Requires Database Schema Changes?
-YES | NO
-
 #### Requires Full Reindexing of all Sources?
 YES | NO
 
