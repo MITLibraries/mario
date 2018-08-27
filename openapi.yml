@@ -1,0 +1,73 @@
+openapi: 3.0.1
+info:
+  version: 0.0.1
+  title: MIT Libraries Discovery API
+paths:
+  /search:
+    get:
+      responses:
+        '200':
+          description: A list of search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Results'
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+  /record/{id}:
+    get:
+      responses:
+        '200':
+          description: A single record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullRecord'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: query
+  schemas:
+    Record:
+      description: An abbreviated representation of a record
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+    FullRecord:
+      description: A full representation of a record
+      allOf:
+        - $ref: '#/components/schemas/Record'
+        - type: object
+          properties:
+            available:
+              type: boolean
+    Results:
+      type: array
+      items:
+        $ref: '#/components/schemas/Record'
+security:
+  - api_key: []
