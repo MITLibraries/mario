@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  version: 0.0.1
+  version: 0.0.2
   title: MIT Libraries Discovery API
 paths:
   /search:
@@ -46,6 +46,44 @@ components:
       name: api_key
       in: query
   schemas:
+    Holding:
+      description: location holdings information
+      type: object
+      properties:
+        location:
+          type: string
+        call_number:
+          type: string
+        status:
+          type: string
+    Identifiers:
+      description: standardized identifiers
+      type: object
+      properties:
+        isbns:
+          type: array
+          items:
+            type: string
+        issns:
+          type: array
+          items:
+            type: string
+        doi:
+          type: string
+    Link:
+      description: a url related to this item
+      type: object
+      properties:
+        text:
+          type: string
+        url:
+          type: string
+          format: uri
+        restrictions:
+          type: string
+        kind:
+          description: what kind of link this is, such as full_text, restricted_full_text, sfx, unknown
+          type: string
     Record:
       description: An abbreviated representation of a record
       type: object
@@ -55,16 +93,84 @@ components:
       properties:
         id:
           type: string
+        content_type:
+            description: High level categorization of the type of content, such as text, still image, audio, etc.
+            type: string
+        format:
+            description: High level categorization of the content format, such as online resource, CD, book, etc.
+            type: string
+        source_link:
+          type: string
+          format: uri
+        realtime_holdings_link:
+          type: string
+          format: uri
+        sfx_link:
+          type: string
+          format: uri
+        year:
+          type: string
         title:
+          type: string
+        full_text_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        authors:
+          type: array
+          items:
+            type: string
+        subjects:
+          type: array
+          items:
+            type: string
+        thumbnail:
+          type: string
+          format: uri
+        summary_holdings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+        source:
+          type: string
+        full_record_link:
+          description: link to the full record in this API
+          type: string
+          format: uri
+        citation:
           type: string
     FullRecord:
       description: A full representation of a record
       allOf:
         - $ref: '#/components/schemas/Record'
+        - $ref: '#/components/schemas/Identifiers'
         - type: object
           properties:
             available:
               type: boolean
+            uniform_title:
+              type: string
+            alternate_title:
+              type: string
+            summary:
+              type: string
+            imprint:
+              type: string
+            language:
+              type: string
+            physical_description:
+              type: string
+            abstract:
+              type: string
+            content_notes:
+              type: string
+            notes:
+              type: string
+            edition:
+              type: string
+            publication_frequency:
+              type: string
+
     Results:
       type: array
       items:
