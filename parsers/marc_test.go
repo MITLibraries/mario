@@ -1,4 +1,4 @@
-package main
+package marc
 
 import (
 	"os"
@@ -125,7 +125,4 @@ func TestMarcToRecord(t *testing.T) {
 	if item.url != nil {
 		t.Error("Expected no matches, got", item.url)
 	}
-
-	// spew.Dump(item)
-	// spew.Dump(record)
 }
