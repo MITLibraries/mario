@@ -1,6 +1,7 @@
 package marc
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"os"
@@ -17,12 +18,49 @@ type record struct {
 	contributor []string
 	url         []string
 	subject     []string
+	isbn        []string
+}
+
+const marcRules = "../fixtures/marc_rules.json"
+
+// Rules defines where the rules are in JSON
+type Rules struct {
+	Field     string `json:"field"`
+	Tag       string `json:"tag"`
+	Subfields string `json:"subfields"`
+}
+
+// RetrieveRules for parsing MARC
+func RetrieveRules(rulefile string) ([]*Rules, error) {
+	// Open the file.
+	file, err := os.Open(rulefile)
+	if err != nil {
+		return nil, err
+	}
+
+	// Schedule the file to be closed once
+	// the function returns.
+	defer file.Close()
+
+	// Decode the file into a slice of pointers
+	// to Feed values.
+	var rules []*Rules
+	err = json.NewDecoder(file).Decode(&rules)
+
+	// We don't need to check for errors, the caller can do this.
+	return rules, err
 }
 
 // Process kicks off the MARC processing
-func Process() {
+func Process(rulesfile string) {
 
 	var records []record
+
+	rules, err := RetrieveRules(rulesfile)
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
 
 	// loop over all records
 	count := 0
@@ -47,46 +85,44 @@ func Process() {
 		// close it when we are done. Or something. Channels?
 		// For now I'm just throwing everything into a slice and dumping it because
 		// :shrug:
-		records = append(records, marcToRecord(record))
+		records = append(records, marcToRecord(record, rules))
 	}
 	spew.Dump(records)
 	log.Println("Processed ", count, "records")
 }
 
-func marcToRecord(marcRecord *marc21.Record) record {
-	var subfields []byte
+func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
 	r := record{}
 
 	r.identifier = marcRecord.Identifier()
 
 	// main entry
-	subfields = []byte{'a', 'b', 'f', 'g', 'k', 'n', 'p', 's'}
-	r.title = concatSubfields("245", subfields, marcRecord)[0]
+	rule := rules[0]
+	r.title = concatSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0]
 
 	// author
-	subfields = []byte{'a', 'b', 'c', 'd', 'e', 'q'}
-	r.author = append(r.author, concatSubfields("100", subfields, marcRecord)...)
+	r.author = toRecord(r.author, rules[1], marcRecord)
 
 	// contributors
-	subfields = []byte{'a', 'b', 'c', 'd', 'e', 'q'}
-	r.contributor = append(r.contributor, concatSubfields("700", subfields, marcRecord)...)
+	r.contributor = toRecord(r.contributor, rules[2], marcRecord)
 
-	// 856 $u
-	urls := marcRecord.GetFields("856")
-	for _, url := range urls {
-		keep := []byte{'a', 'b', 'c', 'd', 'e', 'q'}
-		r.url = append(r.url, stringifySelectSubfields(url.GetSubfields(), keep))
-	}
+	// urls
+	r.url = toRecord(r.url, rules[3], marcRecord)
 
-	subfields = []byte{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z'}
-	r.subject = append(r.subject, concatSubfields("600", subfields, marcRecord)...)
-	r.subject = append(r.subject, concatSubfields("610", subfields, marcRecord)...)
+	// subjects
+	r.subject = toRecord(r.subject, rules[4], marcRecord)
+	r.subject = toRecord(r.subject, rules[5], marcRecord)
+	r.subject = toRecord(r.subject, rules[6], marcRecord)
+	r.subject = toRecord(r.subject, rules[7], marcRecord)
 
-	subfields = []byte{'a', 'v', 'x', 'y', 'z'}
-	r.subject = append(r.subject, concatSubfields("650", subfields, marcRecord)...)
-	r.subject = append(r.subject, concatSubfields("651", subfields, marcRecord)...)
-
+	//isbn
+	r.isbn = toRecord(r.isbn, rules[8], marcRecord)
 	return r
+}
+
+func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
+	field = append(field, concatSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)...)
+	return field
 }
 
 // takes a mark field tag and subfields of interest for a supplied marc record and returns them concatenated

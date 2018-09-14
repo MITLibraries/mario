@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/MITLibraries/marc21"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestContains(t *testing.T) {
@@ -99,7 +100,13 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error(err)
 	}
 
-	item := marcToRecord(record)
+	rules, err := RetrieveRules("../fixtures/marc_rules.json")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	item := marcToRecord(record, rules)
 
 	if item.author[0] != "Sandburg, Carl, 1878-1967." {
 		t.Error("Expected match, got", item.author)

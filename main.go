@@ -4,5 +4,5 @@ import "github.com/MITLibraries/mario/parsers"
 
 // go run . < fixtures/test.mrc
 func main() {
-	marc.Process()
+	marc.Process("fixtures/marc_rules.json")
 }
