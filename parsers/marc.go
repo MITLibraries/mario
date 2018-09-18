@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/MITLibraries/marc21"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -127,22 +126,25 @@ func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
 
 // takes a mark field tag and subfields of interest for a supplied marc record and returns them concatenated
 func concatSubfields(marcfield string, subfields []byte, marcrecord *marc21.Record) []string {
-	x := marcrecord.GetFields(marcfield)
+	fields := marcrecord.GetFields(marcfield)
 	var r []string
-	for _, y := range x {
-		r = append(r, stringifySelectSubfields(y.GetSubfields(), subfields))
+	for _, f := range fields {
+		r = append(r, stringifySelectSubfields(f, subfields))
 	}
 	return r
 }
 
-// Returns specified subfields concatenated in order they appear in the field
-func stringifySelectSubfields(subs []*marc21.SubField, keep []byte) string {
+func stringifySelectSubfields(field marc21.Field, subfields []byte) string {
 	var stringified []string
-	for _, f := range subs {
-		if !Contains(keep, f.Code) {
-			continue
+	switch f := field.(type) {
+	case *marc21.DataField:
+		for _, s := range f.SubFields {
+			if Contains(subfields, s.Code) {
+				stringified = append(stringified, s.Value)
+			}
 		}
-		stringified = append(stringified, f.Value)
+	case *marc21.ControlField:
+		stringified = append(stringified, f.Data)
 	}
 	return strings.Join(stringified, " ")
 }

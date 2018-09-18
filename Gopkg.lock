@@ -10,6 +10,14 @@
   revision = "6cb435ad7d2fd5ebb772ca19390ad81e1e9ecca1"
 
 [[projects]]
+  branch = "DIP-125_initial_marc_parsing"
+  digest = "1:8aaf29b21159baa537707db650f2e7eee2821b212460e0490d115b9c60beb930"
+  name = "github.com/MITLibraries/mario"
+  packages = ["parsers"]
+  pruneopts = "UT"
+  revision = "12599def6f62ea250ce0375524582c7bc2c752b0"
+
+[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -21,7 +29,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/MITLibraries/marc21",
+    "github.com/MITLibraries/mario/parsers",
     "github.com/davecgh/go-spew/spew",
   ]
   solver-name = "gps-cdcl"

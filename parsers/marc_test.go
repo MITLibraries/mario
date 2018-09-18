@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/MITLibraries/marc21"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -69,22 +68,21 @@ func TestStringifySelectSubfields(t *testing.T) {
 	}
 
 	x := record.GetFields("245")
-	subfield := x[0].GetSubfields()
 
 	subs := []byte{'a'}
-	stringified := stringifySelectSubfields(subfield, subs)
+	stringified := stringifySelectSubfields(x[0], subs)
 	if stringified != "Arithmetic /" {
 		t.Error("Expected match, got", stringified)
 	}
 
 	subs = []byte{'a', 'c'}
-	stringified = stringifySelectSubfields(subfield, subs)
+	stringified = stringifySelectSubfields(x[0], subs)
 	if stringified != "Arithmetic / Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
 		t.Error("Expected match, got", stringified)
 	}
 
 	subs = []byte{'c'}
-	stringified = stringifySelectSubfields(subfield, subs)
+	stringified = stringifySelectSubfields(x[0], subs)
 	if stringified != "Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
 		t.Error("Expected match, got", stringified)
 	}

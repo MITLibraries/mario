@@ -28,7 +28,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  branch = "add_getsubfields_to_field_interface"
-  name = "github.com/MITLibraries/marc21"
