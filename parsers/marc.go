@@ -98,7 +98,7 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
 
 	// main entry
 	rule := rules[0]
-	r.title = concatSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0]
+	r.title = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0]
 
 	// author
 	r.author = toRecord(r.author, rules[1], marcRecord)
@@ -121,12 +121,12 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
 }
 
 func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
-	field = append(field, concatSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)...)
+	field = append(field, collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)...)
 	return field
 }
 
-// takes a mark field tag and subfields of interest for a supplied marc record and returns them concatenated
-func concatSubfields(marcfield string, subfields []byte, marcrecord *marc21.Record) []string {
+// takes a mark field tag and subfields of interest for a supplied marc record and returns a slice of stringified representations of them
+func collectSubfields(marcfield string, subfields []byte, marcrecord *marc21.Record) []string {
 	fields := marcrecord.GetFields(marcfield)
 	var r []string
 	for _, f := range fields {

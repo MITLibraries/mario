@@ -22,7 +22,7 @@ func TestContains(t *testing.T) {
 	}
 }
 
-func TestConcatSubfields(t *testing.T) {
+func TestCollectSubfields(t *testing.T) {
 	file, err := os.Open("../fixtures/record1.mrc")
 	if err != nil {
 		t.Error(err)
@@ -34,17 +34,17 @@ func TestConcatSubfields(t *testing.T) {
 
 	var subfields []string
 
-	subfields = concatSubfields("245", []byte{'a'}, record)
+	subfields = collectSubfields("245", []byte{'a'}, record)
 	if subfields[0] != "Arithmetic /" {
 		t.Error("Expected match got", subfields[0])
 	}
 
-	subfields = concatSubfields("245", []byte{'a', 'c'}, record)
+	subfields = collectSubfields("245", []byte{'a', 'c'}, record)
 	if subfields[0] != "Arithmetic / Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
 		t.Error("Expected match got", subfields[0])
 	}
 
-	subfields = concatSubfields("650", []byte{'a', 'x'}, record)
+	subfields = collectSubfields("650", []byte{'a', 'x'}, record)
 	if len(subfields) != 5 {
 		t.Error("Expected 5 got", len(subfields))
 	}
