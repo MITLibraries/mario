@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/miku/marc21"
 )
 
 type record struct {

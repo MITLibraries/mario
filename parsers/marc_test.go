@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/miku/marc21"
 )
 
 func TestContains(t *testing.T) {

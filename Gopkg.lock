@@ -2,22 +2,6 @@
 
 
 [[projects]]
-  branch = "add_getsubfields_to_field_interface"
-  digest = "1:629e957005e8a159a9fb0e56578fa746fc94c7f0afd0299c1232757fa35e7247"
-  name = "github.com/MITLibraries/marc21"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6cb435ad7d2fd5ebb772ca19390ad81e1e9ecca1"
-
-[[projects]]
-  branch = "DIP-125_initial_marc_parsing"
-  digest = "1:8aaf29b21159baa537707db650f2e7eee2821b212460e0490d115b9c60beb930"
-  name = "github.com/MITLibraries/mario"
-  packages = ["parsers"]
-  pruneopts = "UT"
-  revision = "12599def6f62ea250ce0375524582c7bc2c752b0"
-
-[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -28,9 +12,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = [
-    "github.com/MITLibraries/mario/parsers",
-    "github.com/davecgh/go-spew/spew",
-  ]
+  input-imports = ["github.com/davecgh/go-spew/spew"]
   solver-name = "gps-cdcl"
   solver-version = 1
