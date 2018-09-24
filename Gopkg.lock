@@ -9,9 +9,20 @@
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
 
+[[projects]]
+  branch = "master"
+  digest = "1:a21b0341d1c8cd522235e6b39e4bec263572d9cf1825a3bc548f6618d48a0a27"
+  name = "github.com/miku/marc21"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "03a360545cd2fdc1b872fc3f929186df81b3a4a5"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/davecgh/go-spew/spew"]
+  input-imports = [
+    "github.com/davecgh/go-spew/spew",
+    "github.com/miku/marc21",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
