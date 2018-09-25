@@ -52,7 +52,7 @@ func RetrieveRules(rulefile string) ([]*Rules, error) {
 }
 
 // Process kicks off the MARC processing
-func Process(rulesfile string) {
+func Process(marcfile io.Reader, rulesfile string) {
 
 	var records []record
 
@@ -65,7 +65,7 @@ func Process(rulesfile string) {
 	// loop over all records
 	count := 0
 	for {
-		record, err := marc21.ReadRecord(os.Stdin)
+		record, err := marc21.ReadRecord(marcfile)
 
 		// if we get an error, log it
 		if err != nil {
