@@ -43,5 +43,10 @@
     "field":"isbn",
     "tag":"020",
     "subfields":"aq"
+  },
+  {
+    "field":"year",
+    "tag":"008",
+    "subfields":"a"
   }
 ]
