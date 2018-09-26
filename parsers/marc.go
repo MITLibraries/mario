@@ -12,16 +12,16 @@ import (
 )
 
 type record struct {
-	identifier  string
-	title       string
-	author      []string
-	contributor []string
-	url         []string
-	subject     []string
-	isbn        []string
+	identifier   string
+	title        string
+	author       []string
+	contributor  []string
+	url          []string
+	subject      []string
+	isbn         []string
+	year         string
+	content_type string
 }
-
-const marcRules = "../fixtures/marc_rules.json"
 
 // Rules defines where the rules are in JSON
 type Rules struct {
@@ -97,27 +97,49 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
 	r.identifier = marcRecord.Identifier()
 
 	// main entry
-	rule := rules[0]
+	rule := getRule(rules, "245")
 	r.title = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0]
 
 	// author
-	r.author = toRecord(r.author, rules[1], marcRecord)
+	r.author = toRecord(r.author, getRule(rules, "100"), marcRecord)
 
 	// contributors
-	r.contributor = toRecord(r.contributor, rules[2], marcRecord)
+	r.contributor = toRecord(r.contributor, getRule(rules, "700"), marcRecord)
 
-	// urls
-	r.url = toRecord(r.url, rules[3], marcRecord)
+	// urls 856:4[0|1] $u
+	// only take 856 fields where first indicator is 4
+	// only take 856 fields where second indicator is 0 or 1
+	// possibly filter out any matches where $3 or $z is "table of contents" or "Publisher description"
+	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
+	r.url = toRecord(r.url, getRule(rules, "856"), marcRecord)
 
 	// subjects
-	r.subject = toRecord(r.subject, rules[4], marcRecord)
-	r.subject = toRecord(r.subject, rules[5], marcRecord)
-	r.subject = toRecord(r.subject, rules[6], marcRecord)
-	r.subject = toRecord(r.subject, rules[7], marcRecord)
+	r.subject = toRecord(r.subject, getRule(rules, "600"), marcRecord)
+	r.subject = toRecord(r.subject, getRule(rules, "610"), marcRecord)
+	r.subject = toRecord(r.subject, getRule(rules, "650"), marcRecord)
+	r.subject = toRecord(r.subject, getRule(rules, "651"), marcRecord)
 
 	//isbn
-	r.isbn = toRecord(r.isbn, rules[8], marcRecord)
+	r.isbn = toRecord(r.isbn, getRule(rules, "020"), marcRecord)
+
+	// publication year
+	// Go to 008 field, 7th byte, grab 4 characters
+	rule = getRule(rules, "008")
+	r.year = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0][7:11]
+
+	// content type LDR/06:1
+	r.content_type = contentType(marcRecord.Leader.Type)
 	return r
+}
+
+// returns the first Rule that matches the supplied tag. does not yet gracefully handle errors.
+func getRule(rules []*Rules, tag string) *Rules {
+	for _, v := range rules {
+		if v.Tag == tag {
+			return v
+		}
+	}
+	return nil
 }
 
 func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
@@ -158,4 +180,38 @@ func Contains(a []byte, x byte) bool {
 		}
 	}
 	return false
+}
+
+// Content type mappings
+func contentType(x byte) string {
+	var t string
+	switch x {
+	case 'c':
+		t = "Musical score"
+	case 'd':
+		t = "Musical score"
+	case 'e':
+		t = "Cartographic material"
+	case 'f':
+		t = "Cartographic material"
+	case 'g':
+		t = "Moving image"
+	case 'i':
+		t = "Sound recording"
+	case 'j':
+		t = "Sound recording"
+	case 'k':
+		t = "Still image"
+	case 'm':
+		t = "Computer file"
+	case 'o':
+		t = "Kit"
+	case 'p':
+		t = "Mixed materials"
+	case 'r':
+		t = "Object"
+	default:
+		t = "Text"
+	}
+	return t
 }

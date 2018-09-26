@@ -131,4 +131,51 @@ func TestMarcToRecord(t *testing.T) {
 	if item.url != nil {
 		t.Error("Expected no matches, got", item.url)
 	}
+
+	if item.year != "1993" {
+		t.Error("Expected match, got", item.year)
+	}
+}
+
+var contenttypetests = []struct {
+	in  byte
+	out string
+}{
+	{'a', "Text"},
+	{'b', "Text"},
+	{'c', "Musical score"},
+	{'d', "Musical score"},
+	{'e', "Cartographic material"},
+	{'f', "Cartographic material"},
+	{'g', "Moving image"},
+	{'h', "Text"},
+	{'i', "Sound recording"},
+	{'j', "Sound recording"},
+	{'k', "Still image"},
+	{'l', "Text"},
+	{'m', "Computer file"},
+	{'n', "Text"},
+	{'o', "Kit"},
+	{'p', "Mixed materials"},
+	{'q', "Text"},
+	{'r', "Object"},
+	{'s', "Text"},
+	{'t', "Text"},
+	{'u', "Text"},
+	{'v', "Text"},
+	{'w', "Text"},
+	{'x', "Text"},
+	{'y', "Text"},
+	{'z', "Text"},
+}
+
+func TestContentType(t *testing.T) {
+	for _, ct := range contenttypetests {
+		t.Run(string(ct.in), func(t *testing.T) {
+			ctCase := contentType(ct.in)
+			if ctCase != ct.out {
+				t.Errorf("got %q, want %q", ctCase, ct.out)
+			}
+		})
+	}
 }
