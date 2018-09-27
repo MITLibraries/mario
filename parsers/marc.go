@@ -87,8 +87,18 @@ func Process(marcfile io.Reader, rulesfile string) {
 		// :shrug:
 		records = append(records, marcToRecord(record, rules))
 	}
-	spew.Dump(records)
+	// spew.Dump(records)
 	log.Println("Processed ", count, "records")
+}
+
+// returns slice of string representations of a given marc field taking into account the rules for which subfields we care about as defined in marc_rules.json
+func getFields(marcRecord *marc21.Record, rules []*Rules, field string) []string {
+	fieldRules := getRules(rules, field)
+	var things []string
+	for _, x := range fieldRules {
+		things = toRecord(things, x, marcRecord)
+	}
+	return things
 }
 
 func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
@@ -96,50 +106,46 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
 
 	r.identifier = marcRecord.Identifier()
 
-	// main entry
-	rule := getRule(rules, "245")
-	r.title = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0]
-
-	// author
-	r.author = toRecord(r.author, getRule(rules, "100"), marcRecord)
-
-	// contributors
-	r.contributor = toRecord(r.contributor, getRule(rules, "700"), marcRecord)
+	title := getFields(marcRecord, rules, "title")
+	if title != nil {
+		r.title = title[0]
+	}
+	r.author = getFields(marcRecord, rules, "author")
+	r.contributor = getFields(marcRecord, rules, "contributor")
 
 	// urls 856:4[0|1] $u
 	// only take 856 fields where first indicator is 4
 	// only take 856 fields where second indicator is 0 or 1
 	// possibly filter out any matches where $3 or $z is "table of contents" or "Publisher description"
 	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
-	r.url = toRecord(r.url, getRule(rules, "856"), marcRecord)
+	r.url = getFields(marcRecord, rules, "url")
 
-	// subjects
-	r.subject = toRecord(r.subject, getRule(rules, "600"), marcRecord)
-	r.subject = toRecord(r.subject, getRule(rules, "610"), marcRecord)
-	r.subject = toRecord(r.subject, getRule(rules, "650"), marcRecord)
-	r.subject = toRecord(r.subject, getRule(rules, "651"), marcRecord)
+	r.subject = getFields(marcRecord, rules, "subject")
 
 	//isbn
-	r.isbn = toRecord(r.isbn, getRule(rules, "020"), marcRecord)
+	r.isbn = getFields(marcRecord, rules, "isbn")
 
 	// publication year
-	// Go to 008 field, 7th byte, grab 4 characters
-	rule = getRule(rules, "008")
-	r.year = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0][7:11]
+	// Go to 008 field, 7th byte, grab 4 characters\
+	year := getFields(marcRecord, rules, "year")
+	if year != nil {
+		r.year = year[0][7:11]
+	}
 
 	// content type LDR/06:1
 	r.content_type = contentType(marcRecord.Leader.Type)
 	return r
 }
 
-// returns the first Rule that matches the supplied tag. does not yet gracefully handle errors.
-func getRule(rules []*Rules, tag string) *Rules {
+// returns all rules that match a supplied field
+func getRules(rules []*Rules, field string) []*Rules {
+	var r []*Rules
 	for _, v := range rules {
-		if v.Tag == tag {
-			return v
+		if v.Field == field {
+			r = append(r, v)
 		}
 	}
-	return nil
+	return r
 }
 
 func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
