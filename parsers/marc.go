@@ -13,20 +13,25 @@ import (
 )
 
 type record struct {
-	identifier   string
-	title        string
-	creator      []string
-	contributor  []string
-	url          []string
-	subject      []string
-	isbn         []string
-	year         string
-	content_type string
+	identifier      string
+	title           string
+	alternateTitles []string
+	creator         []string
+	contributor     []string
+	url             []string
+	subject         []string
+	isbn            []string
+	issn            []string
+	doi             []string
+	country         string
+	language        []string
+	year            string
+	contentType     string
+	callNumber      []string
 }
 
 // Rules defines where the rules are in JSON
 type Rule struct {
-	Name   string   `json:"name"`
 	Label  string   `json:"label"`
 	Array  bool     `json:"array"`
 	Fields []*Field `json:"fields"`
@@ -118,8 +123,9 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 	if title != nil {
 		r.title = title[0]
 	}
-	r.creator = getFields(marcRecord, rules, "creator")
-	r.contributor = getFields(marcRecord, rules, "contributor")
+	r.alternateTitles = getFields(marcRecord, rules, "alternate_titles")
+	r.creator = getFields(marcRecord, rules, "creators")
+	r.contributor = getFields(marcRecord, rules, "contributors")
 
 	// urls 856:4[0|1] $u
 	// only take 856 fields where first indicator is 4
@@ -128,28 +134,37 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
 	r.url = getFields(marcRecord, rules, "url")
 
-	r.subject = getFields(marcRecord, rules, "subject")
+	r.subject = getFields(marcRecord, rules, "subjects")
 
 	//isbn
-	r.isbn = getFields(marcRecord, rules, "isbn")
+	r.isbn = getFields(marcRecord, rules, "isbns")
+	r.issn = getFields(marcRecord, rules, "issns")
+	r.doi = getFields(marcRecord, rules, "dois")
+
+	country := getFields(marcRecord, rules, "country_of_publication")
+	if country != nil {
+		r.country = country[0]
+	}
+
+	r.language = getFields(marcRecord, rules, "languages")
+	r.callNumber = getFields(marcRecord, rules, "call_numbers")
 
 	// publication year
-	// Go to 008 field, 7th byte, grab 4 characters\
 	year := getFields(marcRecord, rules, "year")
 	if year != nil {
 		r.year = year[0]
 	}
 
 	// content type LDR/06:1
-	r.content_type = contentType(marcRecord.Leader.Type)
+	r.contentType = contentType(marcRecord.Leader.Type)
 	return r
 }
 
 // returns all rules that match a supplied fieldname
-func getRules(rules []*Rule, fieldname string) []*Rule {
+func getRules(rules []*Rule, label string) []*Rule {
 	var r []*Rule
 	for _, v := range rules {
-		if v.Name == fieldname {
+		if v.Label == label {
 			r = append(r, v)
 		}
 	}

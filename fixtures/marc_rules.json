@@ -1,95 +1,165 @@
 [
-  {
-      "name": "title",
-      "label": "title",
-      "array": false,
-      "fields": [{
-          "subfields": "abfgknps",
-          "tag": "245"
-        }
+   {
+      "label":"title",
+      "array":false,
+      "fields":[
+         {
+            "subfields":"abfgknps",
+            "tag":"245"
+         }
       ]
-    },
-    { "name": "titleOther",
-      "label": "alternate_titles",
-      "array": true,
-      "fields": [{
-          "tag": "130",
-          "subfields": "adfghklmnoprst"
-        },
-        {
-          "tag": "240",
-          "subfields": "adfghklmnoprs"
-        },
-        {
-          "tag": "246",
-          "subfields": "abfghinp"
-        },
-        {
-          "tag": "730",
-          "subfields": "adfghiklmnoprst"
-        },
-        {
-          "tag": "740",
-          "subfields": "anp"
-        }
+   },
+   {
+      "label":"alternate_titles",
+      "array":true,
+      "fields":[
+         {
+            "tag":"130",
+            "subfields":"adfghklmnoprst"
+         },
+         {
+            "tag":"240",
+            "subfields":"adfghklmnoprs"
+         },
+         {
+            "tag":"246",
+            "subfields":"abfghinp"
+         },
+         {
+            "tag":"730",
+            "subfields":"adfghiklmnoprst"
+         },
+         {
+            "tag":"740",
+            "subfields":"anp"
+         }
       ]
-    },
-    { "name": "isbn",
-      "label": "isbns",
-      "array": true,
-      "fields": [
-        {
-          "tag": "020",
-          "subfields": "aq"
-        }
+   },
+   {
+      "label":"isbns",
+      "array":true,
+      "fields":[
+         {
+            "tag":"020",
+            "subfields":"aq"
+         }
       ]
-    },
-    { "name": "year",
-      "label": "year",
-      "array": false,
-      "fields": [{
-          "subfields": "a",
-          "tag": "008",
-          "bytes": "7:4"
-        }
+   },
+   {
+      "label":"issns",
+      "array":true,
+      "fields":[
+         {
+            "tag":"022",
+            "subfields":"a"
+         }
       ]
-    },
-    { "name": "creator",
-      "label": "creator",
-      "array": true,
-      "fields": [{
-          "subfields": "abcdeq",
-          "tag": "100"
-        }
+   },
+   {
+      "label":"dois",
+      "array":true,
+      "fields":[
+         {
+            "tag":"024",
+            "subfields":"aq2"
+         }
       ]
-    },
-    { "name": "contributor",
-      "label": "contributor",
-      "array": true,
-      "fields": [{
-                  "subfields": "abcdeq",
-                  "tag": "700"
-                }]
-    },
-    { "name": "subject",
-      "label": "subject",
-      "array": true,
-      "fields": [{
-          "subfields": "abcdefghjklmnopqrstuvxyz",
-          "tag": "600"
-        },
-        {
-          "subfields": "abcdefghjklmnopqrstuvxyz",
-          "tag": "610"
-        },
-        {
-          "subfields": "avxyz",
-          "tag": "650"
-        },
-        {
-        "subfields": "avxyz",
-        "tag": "651"
-        }
+   },
+   {
+      "label":"country_of_publication",
+      "array":false,
+      "fields":[
+         {
+            "tag":"008",
+            "subfields":"a",
+            "bytes":"15:3"
+         }
       ]
-    }
+   },
+   {
+      "label":"languages",
+      "array":true,
+      "fields":[
+         {
+            "tag":"008",
+            "subfields":"a",
+            "bytes":"35:3"
+         },
+         {
+            "tag":"041",
+            "subfields":"abdefghjkmn"
+         },
+         {
+            "tag":"546",
+            "subfields":"a"
+         }
+      ]
+   },
+   {
+      "label":"call_numbers",
+      "array":true,
+      "fields":[
+         {
+            "tag":"050",
+            "subfields":"a"
+         },
+         {
+            "tag":"082",
+            "subfields":"a"
+         }
+      ]
+   },
+   {
+      "label":"year",
+      "array":false,
+      "fields":[
+         {
+            "subfields":"a",
+            "tag":"008",
+            "bytes":"7:4"
+         }
+      ]
+   },
+   {
+      "label":"creators",
+      "array":true,
+      "fields":[
+         {
+            "subfields":"abcdeq",
+            "tag":"100"
+         }
+      ]
+   },
+   {
+      "label":"contributors",
+      "array":true,
+      "fields":[
+         {
+            "subfields":"abcdeq",
+            "tag":"700"
+         }
+      ]
+   },
+   {
+      "label":"subjects",
+      "array":true,
+      "fields":[
+         {
+            "subfields":"abcdefghjklmnopqrstuvxyz",
+            "tag":"600"
+         },
+         {
+            "subfields":"abcdefghjklmnopqrstuvxyz",
+            "tag":"610"
+         },
+         {
+            "subfields":"avxyz",
+            "tag":"650"
+         },
+         {
+            "subfields":"avxyz",
+            "tag":"651"
+         }
+      ]
+   }
 ]
