@@ -25,11 +25,11 @@ type record struct {
 }
 
 // Rules defines where the rules are in JSON
-type Rules struct {
-	Name   string  `json:"name"`
-	Label  string  `json:"label"`
-	Array  bool    `json:"array"`
-	Fields []Field `json:"fields"`
+type Rule struct {
+	Name   string   `json:"name"`
+	Label  string   `json:"label"`
+	Array  bool     `json:"array"`
+	Fields []*Field `json:"fields"`
 }
 
 type Field struct {
@@ -39,7 +39,7 @@ type Field struct {
 }
 
 // RetrieveRules for parsing MARC
-func RetrieveRules(rulefile string) ([]*Rules, error) {
+func RetrieveRules(rulefile string) ([]*Rule, error) {
 	// Open the file.
 	file, err := os.Open(rulefile)
 	if err != nil {
@@ -52,7 +52,7 @@ func RetrieveRules(rulefile string) ([]*Rules, error) {
 
 	// Decode the file into a slice of pointers
 	// to Feed values.
-	var rules []*Rules
+	var rules []*Rule
 	err = json.NewDecoder(file).Decode(&rules)
 	// We don't need to check for errors, the caller can do this.
 	return rules, err
@@ -100,7 +100,7 @@ func Process(marcfile io.Reader, rulesfile string) {
 }
 
 // returns slice of string representations of a given marc field taking into account the rules for which subfields we care about as defined in marc_rules.json
-func getFields(marcRecord *marc21.Record, rules []*Rules, field string) []string {
+func getFields(marcRecord *marc21.Record, rules []*Rule, field string) []string {
 	fieldRules := getRules(rules, field)
 	var things []string
 	for _, x := range fieldRules {
@@ -109,7 +109,7 @@ func getFields(marcRecord *marc21.Record, rules []*Rules, field string) []string
 	return things
 }
 
-func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 	r := record{}
 
 	r.identifier = marcRecord.Identifier()
@@ -146,8 +146,8 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
 }
 
 // returns all rules that match a supplied fieldname
-func getRules(rules []*Rules, fieldname string) []*Rules {
-	var r []*Rules
+func getRules(rules []*Rule, fieldname string) []*Rule {
+	var r []*Rule
 	for _, v := range rules {
 		if v.Name == fieldname {
 			r = append(r, v)
@@ -156,21 +156,21 @@ func getRules(rules []*Rules, fieldname string) []*Rules {
 	return r
 }
 
-func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
+func toRecord(field []string, rule *Rule, marcRecord *marc21.Record) []string {
 	for _, r := range rule.Fields {
-		field = append(field, collectSubfields(r.Tag, []byte(r.Subfields), r.Bytes, marcRecord)...)
+		field = append(field, collectSubfields(r, marcRecord)...)
 	}
 	return field
 }
 
 // takes a mark field tag and subfields of interest for a supplied marc record and returns a slice of stringified representations of them
-func collectSubfields(marcfield string, subfields []byte, filter string, marcrecord *marc21.Record) []string {
-	fields := marcrecord.GetFields(marcfield)
+func collectSubfields(field *Field, marcrecord *marc21.Record) []string {
+	fields := marcrecord.GetFields(field.Tag)
 	var r []string
 	for _, f := range fields {
-		subs := stringifySelectSubfields(f, subfields)
-		if filter != "" && subs != "" {
-			f := strings.Split(filter, ":")
+		subs := stringifySelectSubfields(f, []byte(field.Subfields))
+		if field.Bytes != "" && subs != "" {
+			f := strings.Split(field.Bytes, ":")
 			first, _ := strconv.Atoi(f[0])
 			take, _ := strconv.Atoi(f[1])
 			r = append(r, subs[first:(first+take)])

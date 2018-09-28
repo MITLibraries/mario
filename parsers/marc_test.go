@@ -34,17 +34,24 @@ func TestCollectSubfields(t *testing.T) {
 
 	var subfields []string
 
-	subfields = collectSubfields("245", []byte{'a'}, "", record)
+	f := new(Field)
+	f.Tag = "245"
+	f.Subfields = "a"
+
+	subfields = collectSubfields(f, record)
 	if subfields[0] != "Arithmetic /" {
 		t.Error("Expected match got", subfields[0])
 	}
 
-	subfields = collectSubfields("245", []byte{'a', 'c'}, "", record)
+	f.Subfields = "ac"
+	subfields = collectSubfields(f, record)
 	if subfields[0] != "Arithmetic / Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
 		t.Error("Expected match got", subfields[0])
 	}
 
-	subfields = collectSubfields("650", []byte{'a', 'x'}, "", record)
+	f.Tag = "650"
+	f.Subfields = "ax"
+	subfields = collectSubfields(f, record)
 	if len(subfields) != 5 {
 		t.Error("Expected 5 got", len(subfields))
 	}
@@ -99,7 +106,7 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error(err)
 	}
 
-	rules, err := RetrieveRules("../fixtures/marc_rules_new.json")
+	rules, err := RetrieveRules("../fixtures/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 		return
