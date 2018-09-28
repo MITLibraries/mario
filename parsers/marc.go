@@ -30,13 +30,14 @@ type record struct {
 	callNumber      []string
 }
 
-// Rules defines where the rules are in JSON
+// Rule defines where the rules are in JSON
 type Rule struct {
 	Label  string   `json:"label"`
 	Array  bool     `json:"array"`
 	Fields []*Field `json:"fields"`
 }
 
+// Field defines where the Fields within a Rule are in JSON
 type Field struct {
 	Tag       string `json:"tag"`
 	Subfields string `json:"subfields"`
