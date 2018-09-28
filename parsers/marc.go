@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
@@ -12,26 +13,39 @@ import (
 )
 
 type record struct {
-	identifier   string
-	title        string
-	author       []string
-	contributor  []string
-	url          []string
-	subject      []string
-	isbn         []string
-	year         string
-	content_type string
+	identifier      string
+	title           string
+	alternateTitles []string
+	creator         []string
+	contributor     []string
+	url             []string
+	subject         []string
+	isbn            []string
+	issn            []string
+	doi             []string
+	country         string
+	language        []string
+	year            string
+	contentType     string
+	callNumber      []string
 }
 
-// Rules defines where the rules are in JSON
-type Rules struct {
-	Field     string `json:"field"`
+// Rule defines where the rules are in JSON
+type Rule struct {
+	Label  string   `json:"label"`
+	Array  bool     `json:"array"`
+	Fields []*Field `json:"fields"`
+}
+
+// Field defines where the Fields within a Rule are in JSON
+type Field struct {
 	Tag       string `json:"tag"`
 	Subfields string `json:"subfields"`
+	Bytes     string `json:"bytes"`
 }
 
 // RetrieveRules for parsing MARC
-func RetrieveRules(rulefile string) ([]*Rules, error) {
+func RetrieveRules(rulefile string) ([]*Rule, error) {
 	// Open the file.
 	file, err := os.Open(rulefile)
 	if err != nil {
@@ -44,9 +58,8 @@ func RetrieveRules(rulefile string) ([]*Rules, error) {
 
 	// Decode the file into a slice of pointers
 	// to Feed values.
-	var rules []*Rules
+	var rules []*Rule
 	err = json.NewDecoder(file).Decode(&rules)
-
 	// We don't need to check for errors, the caller can do this.
 	return rules, err
 }
@@ -86,73 +99,100 @@ func Process(marcfile io.Reader, rulesfile string) {
 		// For now I'm just throwing everything into a slice and dumping it because
 		// :shrug:
 		records = append(records, marcToRecord(record, rules))
+		// spew.Dump(record)
+		spew.Dump(records[len(records)-1])
 	}
-	spew.Dump(records)
 	log.Println("Processed ", count, "records")
 }
 
-func marcToRecord(marcRecord *marc21.Record, rules []*Rules) record {
+// returns slice of string representations of a given marc field taking into account the rules for which subfields we care about as defined in marc_rules.json
+func getFields(marcRecord *marc21.Record, rules []*Rule, field string) []string {
+	fieldRules := getRules(rules, field)
+	var things []string
+	for _, x := range fieldRules {
+		things = toRecord(things, x, marcRecord)
+	}
+	return things
+}
+
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 	r := record{}
 
 	r.identifier = marcRecord.Identifier()
 
-	// main entry
-	rule := getRule(rules, "245")
-	r.title = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0]
-
-	// author
-	r.author = toRecord(r.author, getRule(rules, "100"), marcRecord)
-
-	// contributors
-	r.contributor = toRecord(r.contributor, getRule(rules, "700"), marcRecord)
+	title := getFields(marcRecord, rules, "title")
+	if title != nil {
+		r.title = title[0]
+	}
+	r.alternateTitles = getFields(marcRecord, rules, "alternate_titles")
+	r.creator = getFields(marcRecord, rules, "creators")
+	r.contributor = getFields(marcRecord, rules, "contributors")
 
 	// urls 856:4[0|1] $u
 	// only take 856 fields where first indicator is 4
 	// only take 856 fields where second indicator is 0 or 1
 	// possibly filter out any matches where $3 or $z is "table of contents" or "Publisher description"
 	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
-	r.url = toRecord(r.url, getRule(rules, "856"), marcRecord)
+	r.url = getFields(marcRecord, rules, "url")
 
-	// subjects
-	r.subject = toRecord(r.subject, getRule(rules, "600"), marcRecord)
-	r.subject = toRecord(r.subject, getRule(rules, "610"), marcRecord)
-	r.subject = toRecord(r.subject, getRule(rules, "650"), marcRecord)
-	r.subject = toRecord(r.subject, getRule(rules, "651"), marcRecord)
+	r.subject = getFields(marcRecord, rules, "subjects")
 
 	//isbn
-	r.isbn = toRecord(r.isbn, getRule(rules, "020"), marcRecord)
+	r.isbn = getFields(marcRecord, rules, "isbns")
+	r.issn = getFields(marcRecord, rules, "issns")
+	r.doi = getFields(marcRecord, rules, "dois")
+
+	country := getFields(marcRecord, rules, "country_of_publication")
+	if country != nil {
+		r.country = country[0]
+	}
+
+	r.language = getFields(marcRecord, rules, "languages")
+	r.callNumber = getFields(marcRecord, rules, "call_numbers")
 
 	// publication year
-	// Go to 008 field, 7th byte, grab 4 characters
-	rule = getRule(rules, "008")
-	r.year = collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)[0][7:11]
+	year := getFields(marcRecord, rules, "year")
+	if year != nil {
+		r.year = year[0]
+	}
 
 	// content type LDR/06:1
-	r.content_type = contentType(marcRecord.Leader.Type)
+	r.contentType = contentType(marcRecord.Leader.Type)
 	return r
 }
 
-// returns the first Rule that matches the supplied tag. does not yet gracefully handle errors.
-func getRule(rules []*Rules, tag string) *Rules {
+// returns all rules that match a supplied fieldname
+func getRules(rules []*Rule, label string) []*Rule {
+	var r []*Rule
 	for _, v := range rules {
-		if v.Tag == tag {
-			return v
+		if v.Label == label {
+			r = append(r, v)
 		}
 	}
-	return nil
+	return r
 }
 
-func toRecord(field []string, rule *Rules, marcRecord *marc21.Record) []string {
-	field = append(field, collectSubfields(rule.Tag, []byte(rule.Subfields), marcRecord)...)
+func toRecord(field []string, rule *Rule, marcRecord *marc21.Record) []string {
+	for _, r := range rule.Fields {
+		field = append(field, collectSubfields(r, marcRecord)...)
+	}
 	return field
 }
 
 // takes a mark field tag and subfields of interest for a supplied marc record and returns a slice of stringified representations of them
-func collectSubfields(marcfield string, subfields []byte, marcrecord *marc21.Record) []string {
-	fields := marcrecord.GetFields(marcfield)
+func collectSubfields(field *Field, marcrecord *marc21.Record) []string {
+	fields := marcrecord.GetFields(field.Tag)
 	var r []string
 	for _, f := range fields {
-		r = append(r, stringifySelectSubfields(f, subfields))
+		subs := stringifySelectSubfields(f, []byte(field.Subfields))
+		if field.Bytes != "" && subs != "" {
+			f := strings.Split(field.Bytes, ":")
+			first, _ := strconv.Atoi(f[0])
+			take, _ := strconv.Atoi(f[1])
+			r = append(r, subs[first:(first+take)])
+		} else {
+			r = append(r, subs)
+		}
 	}
 	return r
 }
