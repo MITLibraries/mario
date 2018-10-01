@@ -13,3 +13,5 @@
 
 # Don't include vendored libraries
 vendor/
+debug
+.debug_config

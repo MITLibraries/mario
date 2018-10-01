@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/miku/marc21"
@@ -91,19 +92,43 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 	return rules, err
 }
 
+var wg sync.WaitGroup
+var ingestedCount int
+var consumedCount int
+var recordChannel = make(chan *record)
+var done = make(chan bool, 1)
+
 // Process kicks off the MARC processing
 func Process(marcfile io.Reader, rulesfile string) {
-
-	var records []record
-
 	rules, err := RetrieveRules(rulesfile)
+
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	// loop over all records
-	count := 0
+	wg.Add(1)
+
+	go makeRecords(marcfile, rules)
+
+	// temp standin to read from record channel and print titles
+	go ConsumeRecords(recordChannel)
+
+	go func() {
+		wg.Wait()
+
+		// Close the channel to signal completion to ConsumeRecords
+		close(recordChannel)
+	}()
+
+	// wait until the ConsumeRecords routine reports it is done via `done` channel
+	<-done
+
+	log.Println("Ingested ", ingestedCount, "records")
+	log.Println("Finished", consumedCount, "records")
+}
+
+func makeRecords(marcfile io.Reader, rules []*Rule) {
 	for {
 		record, err := marc21.ReadRecord(marcfile)
 
@@ -113,28 +138,33 @@ func Process(marcfile io.Reader, rulesfile string) {
 				break
 			}
 
-			log.Println("An error occured processing the", count, "record.")
+			log.Println("An error occured processing the", ingestedCount, "record.")
 			log.Fatal(err)
 		}
 
-		count++
+		ingestedCount++
 
-		// we probably don't want to make this in memory representation of the
-		// combined data but instead will probably want to open a JSON file for
-		// writing at the start of the loop, write to it on each iteration, and
-		// close it when we are done. Or something. Channels?
-		// For now I'm just throwing everything into a slice and dumping it because
-		// :shrug:
-		records = append(records, marcToRecord(record, rules))
-		spew.Dump(record)
-		spew.Dump(records[len(records)-1])
+		recordChannel <- marcToRecord(record, rules)
 	}
-	log.Println("Processed ", count, "records")
+
+	// inform waitgroup the work is done
+	wg.Done()
+}
+
+// ConsumeRecords currently just prints record titles
+func ConsumeRecords(rec <-chan *record) {
+	for r := range rec {
+		consumedCount++
+		log.Println(r.title)
+	}
+
+	// indicate over done channel this routine is complete
+	done <- true
 }
 
 // trasforms a single marc21 record into our internal record struct
-func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
-	r := record{}
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule) *record {
+	r := new(record)
 
 	r.identifier = marcRecord.Identifier()
 
