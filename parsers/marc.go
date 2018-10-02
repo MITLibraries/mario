@@ -157,7 +157,7 @@ func ConsumeRecords(rec <-chan record, done chan<- bool) {
 
 // trasforms a single marc21 record into our internal record struct
 func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
-	r := new(record)
+	r := record{}
 
 	r.identifier = marcRecord.Identifier()
 
@@ -199,7 +199,7 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 
 	// content type LDR/06:1
 	r.contentType = contentType(marcRecord.Leader.Type)
-	return *r
+	return r
 }
 
 // returns slice of string representations of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
