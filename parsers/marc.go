@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/miku/marc21"
@@ -92,11 +91,35 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 	return rules, err
 }
 
-var wg sync.WaitGroup
-var ingestedCount int
-var consumedCount int
-var recordChannel = make(chan *record)
-var done = make(chan bool, 1)
+var consumed int
+var ingested int
+
+type MarcParser struct {
+	file  io.Reader
+	rules []*Rule
+	out   chan record
+}
+
+func (m *MarcParser) Parse() {
+	for {
+		record, err := marc21.ReadRecord(m.file)
+
+		// if we get an error, log it
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			log.Println("An error occured processing the", ingested, "record.")
+			log.Fatal(err)
+		}
+
+		ingested++
+
+		m.out <- marcToRecord(record, m.rules)
+	}
+	close(m.out)
+}
 
 // Process kicks off the MARC processing
 func Process(marcfile io.Reader, rulesfile string) {
@@ -107,54 +130,24 @@ func Process(marcfile io.Reader, rulesfile string) {
 		return
 	}
 
-	wg.Add(1)
+	out := make(chan record)
+	done := make(chan bool, 1)
 
-	go makeRecords(marcfile, rules)
-
-	// temp standin to read from record channel and print titles
-	go ConsumeRecords(recordChannel)
-
-	go func() {
-		wg.Wait()
-
-		// Close the channel to signal completion to ConsumeRecords
-		close(recordChannel)
-	}()
+	p := MarcParser{file: marcfile, rules: rules, out: out}
+	go p.Parse()
+	go ConsumeRecords(out, done)
 
 	// wait until the ConsumeRecords routine reports it is done via `done` channel
 	<-done
 
-	log.Println("Ingested ", ingestedCount, "records")
-	log.Println("Finished", consumedCount, "records")
-}
-
-func makeRecords(marcfile io.Reader, rules []*Rule) {
-	for {
-		record, err := marc21.ReadRecord(marcfile)
-
-		// if we get an error, log it
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
-			log.Println("An error occured processing the", ingestedCount, "record.")
-			log.Fatal(err)
-		}
-
-		ingestedCount++
-
-		recordChannel <- marcToRecord(record, rules)
-	}
-
-	// inform waitgroup the work is done
-	wg.Done()
+	log.Println("Ingested ", ingested, "records")
+	log.Println("Finished", consumed, "records")
 }
 
 // ConsumeRecords currently just prints record titles
-func ConsumeRecords(rec <-chan *record) {
+func ConsumeRecords(rec <-chan record, done chan<- bool) {
 	for r := range rec {
-		consumedCount++
+		consumed++
 		log.Println(r.title)
 	}
 
@@ -163,7 +156,7 @@ func ConsumeRecords(rec <-chan *record) {
 }
 
 // trasforms a single marc21 record into our internal record struct
-func marcToRecord(marcRecord *marc21.Record, rules []*Rule) *record {
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 	r := new(record)
 
 	r.identifier = marcRecord.Identifier()
@@ -206,7 +199,7 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) *record {
 
 	// content type LDR/06:1
 	r.contentType = contentType(marcRecord.Leader.Type)
-	return r
+	return *r
 }
 
 // returns slice of string representations of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
