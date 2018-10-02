@@ -34,17 +34,24 @@ func TestCollectSubfields(t *testing.T) {
 
 	var subfields []string
 
-	subfields = collectSubfields("245", []byte{'a'}, record)
+	f := new(Field)
+	f.Tag = "245"
+	f.Subfields = "a"
+
+	subfields = collectSubfields(f, record)
 	if subfields[0] != "Arithmetic /" {
 		t.Error("Expected match got", subfields[0])
 	}
 
-	subfields = collectSubfields("245", []byte{'a', 'c'}, record)
+	f.Subfields = "ac"
+	subfields = collectSubfields(f, record)
 	if subfields[0] != "Arithmetic / Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
 		t.Error("Expected match got", subfields[0])
 	}
 
-	subfields = collectSubfields("650", []byte{'a', 'x'}, record)
+	f.Tag = "650"
+	f.Subfields = "ax"
+	subfields = collectSubfields(f, record)
 	if len(subfields) != 5 {
 		t.Error("Expected 5 got", len(subfields))
 	}
@@ -107,8 +114,8 @@ func TestMarcToRecord(t *testing.T) {
 
 	item := marcToRecord(record, rules)
 
-	if item.author[0] != "Sandburg, Carl, 1878-1967." {
-		t.Error("Expected match, got", item.author)
+	if item.creator[0] != "Sandburg, Carl, 1878-1967." {
+		t.Error("Expected match, got", item.creator)
 	}
 
 	// yeah, this should be fixed
@@ -120,8 +127,8 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error("Expected match, got", item.title)
 	}
 
-	if item.contributor[0] != "Rand, Ted, ill." {
-		t.Error("Expected match, got", item.contributor[0])
+	if item.contributor[0].value[0] != "Rand, Ted, ill." {
+		t.Error("Expected match, got", item.contributor[0].value[0])
 	}
 
 	if item.subject[0] != "Arithmetic Juvenile poetry." {
