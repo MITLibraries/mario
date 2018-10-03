@@ -1,176 +1,456 @@
 [
-   {
-      "label":"title",
-      "array":false,
-      "fields":[
-         {
-            "subfields":"abfgknps",
-            "tag":"245"
-         }
-      ]
-   },
-   {
-      "label":"alternate_titles",
-      "array":true,
-      "fields":[
-         {
-            "tag":"130",
-            "subfields":"adfghklmnoprst"
-         },
-         {
-            "tag":"240",
-            "subfields":"adfghklmnoprs"
-         },
-         {
-            "tag":"246",
-            "subfields":"abfghinp"
-         },
-         {
-            "tag":"730",
-            "subfields":"adfghiklmnoprst"
-         },
-         {
-            "tag":"740",
-            "subfields":"anp"
-         }
-      ]
-   },
-   {
-      "label":"isbns",
-      "array":true,
-      "fields":[
-         {
-            "tag":"020",
-            "subfields":"aq"
-         }
-      ]
-   },
-   {
-      "label":"issns",
-      "array":true,
-      "fields":[
-         {
-            "tag":"022",
-            "subfields":"a"
-         }
-      ]
-   },
-   {
-      "label":"dois",
-      "array":true,
-      "fields":[
-         {
-            "tag":"024",
-            "subfields":"aq2"
-         }
-      ]
-   },
-   {
-      "label":"country_of_publication",
-      "array":false,
-      "fields":[
-         {
-            "tag":"008",
-            "subfields":"a",
-            "bytes":"15:3"
-         }
-      ]
-   },
-   {
-      "label":"languages",
-      "array":true,
-      "fields":[
-         {
-            "tag":"008",
-            "subfields":"a",
-            "bytes":"35:3"
-         },
-         {
-            "tag":"041",
-            "subfields":"abdefghjkmn"
-         },
-         {
-            "tag":"546",
-            "subfields":"a"
-         }
-      ]
-   },
-   {
-      "label":"call_numbers",
-      "array":true,
-      "fields":[
-         {
-            "tag":"050",
-            "subfields":"a"
-         },
-         {
-            "tag":"082",
-            "subfields":"a"
-         }
-      ]
-   },
-   {
-      "label":"year",
-      "array":false,
-      "fields":[
-         {
-            "subfields":"a",
-            "tag":"008",
-            "bytes":"7:4"
-         }
-      ]
-   },
-   {
-      "label":"creators",
-      "array":true,
-      "fields":[
-         {
-            "subfields":"abcdeq",
-            "tag":"100"
-         }
-      ]
-   },
-   {
-      "label":"contributors",
-      "array":true,
-      "fields":[
-         {
-            "subfields":"abcdeq",
-            "tag":"700",
-            "kind": "added_entry"
-         },
-         {
-            "subfields":"abcde",
-            "tag":"710",
-            "kind": "cb_added_entry"
-         },
-         {
-            "subfields":"acdefgjq",
-            "tag":"711",
-            "kind": "contributor_conf_added_entry"
-         }
-      ]
-   },
-   {
-      "label":"subjects",
-      "array":true,
-      "fields":[
-         {
-            "subfields":"abcdefghjklmnopqrstuvxyz",
-            "tag":"600"
-         },
-         {
-            "subfields":"abcdefghjklmnopqrstuvxyz",
-            "tag":"610"
-         },
-         {
-            "subfields":"avxyz",
-            "tag":"650"
-         },
-         {
-            "subfields":"avxyz",
-            "tag":"651"
-         }
-      ]
-   }
+  {
+    "label": "title",
+    "array": false,
+    "fields": [
+      {
+        "tag": "245",
+        "subfields": "abfgknps"
+      }
+    ]
+  },
+  {
+    "label": "alternate_titles",
+    "array": true,
+    "fields": [
+      {
+        "tag": "130",
+        "subfields": "adfghklmnoprst"
+      },
+      {
+        "tag": "240",
+        "subfields": "adfghklmnoprs"
+      },
+      {
+        "tag": "246",
+        "subfields": "abfghinp"
+      },
+      {
+        "tag": "730",
+        "subfields": "adfghiklmnoprst"
+      },
+      {
+        "tag": "740",
+        "subfields": "anp"
+      }
+    ]
+  },
+  {
+    "label": "isbns",
+    "array": true,
+    "fields": [
+      {
+        "tag": "020",
+        "subfields": "aq"
+      }
+    ]
+  },
+  {
+    "label": "issns",
+    "array": true,
+    "fields": [
+      {
+        "tag": "022",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "dois",
+    "array": true,
+    "fields": [
+      {
+        "tag": "024",
+        "subfields": "aq2"
+      }
+    ]
+  },
+  {
+    "label": "year",
+    "array": false,
+    "fields": [
+      {
+        "tag": "008",
+        "subfields": "a",
+        "bytes": "7:4"
+      }
+    ]
+  },
+  {
+    "label": "country_of_publication",
+    "array": false,
+    "fields": [
+      {
+        "tag": "008",
+        "subfields": "a",
+        "bytes": "15:3",
+        "notes": "Values governed by table: https://www.loc.gov/marc/countries/countries_code.html"
+      }
+    ]
+  },
+  {
+    "label": "languages",
+    "array": true,
+    "fields": [
+      {
+        "tag": "008",
+        "subfields": "a",
+        "bytes": "35:3",
+        "notes": "Values governed by table: https://www.loc.gov/marc/languages/language_code.html or: http://id.loc.gov/vocabulary/languages.html"
+      },
+      {
+        "tag": "041",
+        "subfields": "a",
+        "notes": "Values governed by table: https://www.loc.gov/marc/languages/language_code.html or: http://id.loc.gov/vocabulary/languages.html"
+      },
+      {
+        "tag": "041",
+        "subfields": "b"
+      },
+      {
+        "tag": "041",
+        "subfields": "d"
+      },
+      {
+        "tag": "041",
+        "subfields": "e"
+      },
+      {
+        "tag": "041",
+        "subfields": "f"
+      },
+      {
+        "tag": "041",
+        "subfields": "g"
+      },
+      {
+        "tag": "041",
+        "subfields": "h"
+      },
+      {
+        "tag": "041",
+        "subfields": "j"
+      },
+      {
+        "tag": "041",
+        "subfields": "k"
+      },
+      {
+        "tag": "041",
+        "subfields": "m"
+      },
+      {
+        "tag": "041",
+        "subfields": "n"
+      },
+      {
+        "tag": "546",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "call_numbers",
+    "array": true,
+    "fields": [
+      {
+        "tag": "050",
+        "subfields": "a"
+      },
+      {
+        "tag": "082",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "edition",
+    "array": false,
+    "fields": [
+      {
+        "tag": "250",
+        "subfields": "ab"
+      }
+    ]
+  },
+  {
+    "label": "imprint",
+    "array": true,
+    "fields": [
+      {
+        "tag": "260",
+        "subfields": "abcdef"
+      },
+      {
+        "tag": "264",
+        "subfields": "abc"
+      }
+    ]
+  },
+  {
+    "label": "physical_description",
+    "array": false,
+    "fields": [
+      {
+        "tag": "300",
+        "subfields": "abcefg"
+      }
+    ]
+  },
+  {
+    "label": "publication_frequency",
+    "array": true,
+    "fields": [
+      {
+        "tag": "310",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "notes",
+    "array": true,
+    "fields": [
+      {
+        "tag": "245",
+        "subfields": "c"
+      },
+      {
+        "tag": "500",
+        "subfields": "a"
+      },
+      {
+        "tag": "502",
+        "subfields": "abcdg"
+      },
+      {
+        "tag": "504",
+        "subfields": "a"
+      },
+      {
+        "tag": "508",
+        "subfields": "a"
+      },
+      {
+        "tag": "511",
+        "subfields": "a"
+      },
+      {
+        "tag": "515",
+        "subfields": "a"
+      },
+      {
+        "tag": "522",
+        "subfields": "a"
+      },
+      {
+        "tag": "533",
+        "subfields": "abcdefmn"
+      },
+      {
+        "tag": "534",
+        "subfields": "abcefklmnoptxz"
+      }
+    ]
+  },
+  {
+    "label": "contents",
+    "array": true,
+    "fields": [
+      {
+        "tag": "505",
+        "subfields": "agtr"
+      }
+    ]
+  },
+  {
+    "label": "summary",
+    "array": true,
+    "fields": [
+      {
+        "tag": "520",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "subjects",
+    "array": true,
+    "fields": [
+      {
+        "tag": "600",
+        "subfields": "0abcdefghjklmnopqrstuvxyz"
+      },
+      {
+        "tag": "610",
+        "subfields": "0abcdefghklmnoprstuvxyz"
+      },
+      {
+        "tag": "650",
+        "subfields": "0avxyz"
+      },
+      {
+        "tag": "651",
+        "subfields": "0avxyz"
+      }
+    ]
+  },
+  {
+    "label": "format",
+    "array": true,
+    "fields": [
+      {
+        "tag": "852",
+        "subfields": "bk",
+        "notes": "Lookup table required to translate values from those fields"
+      }
+    ]
+  },
+  {
+    "label": "content_type",
+    "array": true,
+    "fields": [
+      {
+        "tag": "LDR",
+        "bytes": "06:1",
+        "notes": "get this from the marc21 library directly"
+      }
+    ]
+  },
+  {
+    "label": "creators",
+    "array": true,
+    "fields": [
+      {
+        "tag": "100",
+        "subfields": "abcdeq"
+      },
+      {
+        "tag": "110",
+        "subfields": "abcde"
+      },
+      {
+        "tag": "111",
+        "subfields": "abcdefgjq"
+      }
+    ]
+  },
+  {
+    "label": "contributors",
+    "array": true,
+    "fields": [
+      {
+        "tag": "700",
+        "subfields": "abcdeq",
+        "kind": "contributor added entry"
+      },
+      {
+        "tag": "710",
+        "subfields": "abcde",
+        "kind": "creator CB added entry"
+      },
+      {
+        "tag": "711",
+        "subfields": "acdefgjq",
+        "kind": "contributor conf added entry"
+      }
+    ]
+  },
+  {
+    "label": "related_place",
+    "array": true,
+    "fields": [
+      {
+        "tag": "751",
+        "subfields": "a"
+      },
+      {
+        "tag": "752",
+        "subfields": "abcdefgh"
+      }
+    ]
+  },
+  {
+    "label": "related_items",
+    "array": true,
+    "fields": [
+      {
+        "tag": "765",
+        "subfields": "abcdghikmnorstuwxyz",
+        "kind": "original language version"
+      },
+      {
+        "tag": "770",
+        "subfields": "abcdghikmnorstuwxyz",
+        "kind": "has supplement"
+      },
+      {
+        "tag": "772",
+        "subfields": "abcdghikmnorstuwxyz",
+        "kind": "supplement to"
+      },
+      {
+        "tag": "780",
+        "subfields": "abcdghikmnorstuwxyz",
+        "kind": "previous title"
+      },
+      {
+        "tag": "785",
+        "subfields": "abcdghikmnorstuwxyz",
+        "kind": "subsequent title"
+      },
+      {
+        "tag": "787",
+        "subfields": "abcdghikmnorstuwxyz",
+        "kind": "related"
+      },
+      {
+        "tag": "830",
+        "subfields": "adfghklmnoprstvwx",
+        "kind": "in series"
+      }
+    ]
+  },
+  {
+    "label": "oclc_number",
+    "array": true,
+    "fields": [
+      {
+        "tag": "035",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "lccn",
+    "array": true,
+    "fields": [
+      {
+        "tag": "010",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
+    "label": "in_bibliography",
+    "array": true,
+    "fields": [
+      {
+        "tag": "581",
+        "subfields": "az"
+      }
+    ]
+  },
+  {
+    "label": "url",
+    "array": true,
+    "fields": [
+      {
+        "tag": "856",
+        "subfields": "u",
+        "indicator1": "0",
+        "indicator2": "1"
+      }
+    ]
+  }
 ]
