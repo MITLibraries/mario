@@ -22,6 +22,11 @@ func main() {
 					Value: "fixtures/marc_rules.json",
 					Usage: "Path to marc rules file",
 				},
+				cli.StringFlag{
+					Name:  "consumer, c",
+					Value: "es",
+					Usage: "Consumer to use (es or json, default is es)",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				var file *os.File
@@ -42,7 +47,7 @@ func main() {
 
 				defer file.Close()
 
-				Process(file, c.String("rules"))
+				Process(file, c.String("rules"), c.String("consumer"))
 				return nil
 			},
 		},

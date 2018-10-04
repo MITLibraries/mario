@@ -123,7 +123,7 @@ func (m *MarcParser) Parse() {
 }
 
 // Process kicks off the MARC processing
-func Process(marcfile io.Reader, rulesfile string) {
+func Process(marcfile io.Reader, rulesfile string, consumer_type string) {
 	rules, err := RetrieveRules(rulesfile)
 
 	if err != nil {
@@ -143,7 +143,12 @@ func Process(marcfile io.Reader, rulesfile string) {
 	}
 	defer es.Close()
 
-	consumer := ESConsumer{Index: "timdex", RType: "marc", p: es}
+	var consumer Consumer
+	if consumer_type == "json" {
+		consumer = &JSONConsumer{Output: "log"}
+	} else {
+		consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
+	}
 
 	out := make(chan Record)
 	done := make(chan bool, 1)
