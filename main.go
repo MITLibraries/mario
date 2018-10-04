@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/mitlibraries/mario/parsers"
 	"github.com/urfave/cli"
 )
 
@@ -41,7 +40,7 @@ func main() {
 
 				defer file.Close()
 
-				marc.Process(file, c.String("rules"))
+				Process(file, c.String("rules"))
 				return nil
 			},
 		},

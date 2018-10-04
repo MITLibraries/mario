@@ -1,4 +1,4 @@
-package marc
+package main
 
 import (
 	"os"
@@ -23,7 +23,7 @@ func TestContains(t *testing.T) {
 }
 
 func TestCollectSubfields(t *testing.T) {
-	file, err := os.Open("../fixtures/record1.mrc")
+	file, err := os.Open("fixtures/record1.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -66,7 +66,7 @@ func TestCollectSubfields(t *testing.T) {
 }
 
 func TestStringifySelectSubfields(t *testing.T) {
-	file, err := os.Open("../fixtures/record1.mrc")
+	file, err := os.Open("fixtures/record1.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,7 +97,7 @@ func TestStringifySelectSubfields(t *testing.T) {
 }
 
 func TestMarcToRecord(t *testing.T) {
-	file, err := os.Open("../fixtures/record1.mrc")
+	file, err := os.Open("fixtures/record1.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -106,7 +106,7 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error(err)
 	}
 
-	rules, err := RetrieveRules("../fixtures/marc_rules.json")
+	rules, err := RetrieveRules("fixtures/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 		return

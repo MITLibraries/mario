@@ -1,4 +1,4 @@
-package marc
+package main
 
 import (
 	"encoding/json"
