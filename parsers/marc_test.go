@@ -114,33 +114,33 @@ func TestMarcToRecord(t *testing.T) {
 
 	item := marcToRecord(record, rules)
 
-	if item.creator[0] != "Sandburg, Carl, 1878-1967." {
-		t.Error("Expected match, got", item.creator)
+	if item.Creator[0] != "Sandburg, Carl, 1878-1967." {
+		t.Error("Expected match, got", item.Creator)
 	}
 
 	// yeah, this should be fixed
-	if item.identifier != "   92005291 " {
-		t.Error("Expected match, got", item.identifier)
+	if item.Identifier != "   92005291 " {
+		t.Error("Expected match, got", item.Identifier)
 	}
 
-	if item.title != "Arithmetic /" {
-		t.Error("Expected match, got", item.title)
+	if item.Title != "Arithmetic /" {
+		t.Error("Expected match, got", item.Title)
 	}
 
-	if item.contributor[0].value[0] != "Rand, Ted, ill." {
-		t.Error("Expected match, got", item.contributor[0].value[0])
+	if item.Contributor[0].Value[0] != "Rand, Ted, ill." {
+		t.Error("Expected match, got", item.Contributor[0].Value[0])
 	}
 
-	if item.subject[0] != "Arithmetic Juvenile poetry." {
-		t.Error("Expected match, got", item.subject[0])
+	if item.Subject[0] != "Arithmetic Juvenile poetry." {
+		t.Error("Expected match, got", item.Subject[0])
 	}
 
-	if item.url != nil {
-		t.Error("Expected no matches, got", item.url)
+	if item.Url != nil {
+		t.Error("Expected no matches, got", item.Url)
 	}
 
-	if item.year != "1993" {
-		t.Error("Expected match, got", item.year)
+	if item.Year != "1993" {
+		t.Error("Expected match, got", item.Year)
 	}
 }
 
