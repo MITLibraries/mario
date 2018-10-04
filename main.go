@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/olivere/elastic"
 	"github.com/urfave/cli"
 )
 
@@ -41,6 +43,24 @@ func main() {
 				defer file.Close()
 
 				Process(file, c.String("rules"))
+				return nil
+			},
+		},
+		{
+			Name: "create",
+			Action: func(c *cli.Context) error {
+				client, err := elastic.NewSimpleClient()
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				created, err := client.CreateIndex("timdex").Do(ctx)
+				if err != nil {
+					return err
+				}
+				if !created.Acknowledged {
+					fmt.Println("Elasticsearch couldn't create the index")
+				}
 				return nil
 			},
 		},
