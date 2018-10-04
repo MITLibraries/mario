@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/miku/marc21"
+	"github.com/olivere/elastic"
 )
 
 type Record struct {
@@ -91,7 +93,6 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 	return rules, err
 }
 
-var consumed int
 var ingested int
 
 type MarcParser struct {
@@ -130,29 +131,31 @@ func Process(marcfile io.Reader, rulesfile string) {
 		return
 	}
 
+	client, err := elastic.NewSimpleClient()
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+	es, err := client.BulkProcessor().Name("MyBackgroundWorker-1").Do(context.Background())
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+	defer es.Close()
+
+	consumer := ESConsumer{Index: "timdex", RType: "marc", p: es}
+
 	out := make(chan Record)
 	done := make(chan bool, 1)
 
 	p := MarcParser{file: marcfile, rules: rules, out: out}
 	go p.Parse()
-	go ConsumeRecords(out, done)
+	go consumer.Consume(out, done)
 
 	// wait until the ConsumeRecords routine reports it is done via `done` channel
 	<-done
 
 	log.Println("Ingested ", ingested, "records")
-	log.Println("Finished", consumed, "records")
-}
-
-// ConsumeRecords currently just prints record titles
-func ConsumeRecords(rec <-chan Record, done chan<- bool) {
-	for r := range rec {
-		consumed++
-		log.Println(r.Title)
-	}
-
-	// indicate over done channel this routine is complete
-	done <- true
 }
 
 // trasforms a single marc21 record into our internal record struct

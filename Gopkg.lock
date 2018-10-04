@@ -11,11 +11,44 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:aa3d8d42865c42626b5c1add193692d045b3188b1479f0a0a88690d21fe20083"
+  name = "github.com/mailru/easyjson"
+  packages = [
+    ".",
+    "buffer",
+    "jlexer",
+    "jwriter",
+  ]
+  pruneopts = "UT"
+  revision = "60711f1a8329503b04e1c88535f419d0bb440bff"
+
+[[projects]]
+  branch = "master"
   digest = "1:a21b0341d1c8cd522235e6b39e4bec263572d9cf1825a3bc548f6618d48a0a27"
   name = "github.com/miku/marc21"
   packages = ["."]
   pruneopts = "UT"
   revision = "03a360545cd2fdc1b872fc3f929186df81b3a4a5"
+
+[[projects]]
+  digest = "1:e01edb58fc507572461d56a8d24632c99af04686005dd5b411ec4b0029a24151"
+  name = "github.com/olivere/elastic"
+  packages = [
+    ".",
+    "config",
+    "uritemplates",
+  ]
+  pruneopts = "UT"
+  revision = "bd115a1132ece51519151c33b5d74e1387d3265a"
+  version = "v6.2.8"
+
+[[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
@@ -31,6 +64,7 @@
   input-imports = [
     "github.com/davecgh/go-spew/spew",
     "github.com/miku/marc21",
+    "github.com/olivere/elastic",
     "github.com/urfave/cli",
   ]
   solver-name = "gps-cdcl"
