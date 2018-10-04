@@ -12,48 +12,48 @@ import (
 	"github.com/miku/marc21"
 )
 
-type record struct {
-	identifier      string
-	title           string
-	alternateTitles []string
-	creator         []string
-	contributor     []*contributor
-	url             []string
-	subject         []string
-	isbn            []string
-	issn            []string
-	doi             []string
-	country         string
-	language        []string
-	year            string
-	contentType     string
-	callNumber      []string
-	relatedItems    []relatedItem
-	links           []link
-	holdings        []holdings
+type Record struct {
+	Identifier      string
+	Title           string
+	AlternateTitles []string
+	Creator         []string
+	Contributor     []*Contributor
+	Url             []string
+	Subject         []string
+	Isbn            []string
+	Issn            []string
+	Doi             []string
+	Country         string
+	Language        []string
+	Year            string
+	ContentType     string
+	CallNumber      []string
+	RelatedItems    []RelatedItem
+	Links           []Link
+	Holdings        []Holdings
 }
 
-type contributor struct {
-	kind  string
-	value []string
+type Contributor struct {
+	Kind  string
+	Value []string
 }
 
-type relatedItem struct {
-	kind  string
-	value string
+type RelatedItem struct {
+	Kind  string
+	Value string
 }
 
-type link struct {
-	kind         string
-	text         string
-	url          string
-	restrictions string
+type Link struct {
+	Kind         string
+	Text         string
+	Url          string
+	Restrictions string
 }
 
-type holdings struct {
-	location   string
-	callNumber string
-	status     string
+type Holdings struct {
+	Location   string
+	CallNumber string
+	Status     string
 }
 
 // Rule defines where the rules are in JSON
@@ -97,7 +97,7 @@ var ingested int
 type MarcParser struct {
 	file  io.Reader
 	rules []*Rule
-	out   chan record
+	out   chan Record
 }
 
 func (m *MarcParser) Parse() {
@@ -130,7 +130,7 @@ func Process(marcfile io.Reader, rulesfile string) {
 		return
 	}
 
-	out := make(chan record)
+	out := make(chan Record)
 	done := make(chan bool, 1)
 
 	p := MarcParser{file: marcfile, rules: rules, out: out}
@@ -145,10 +145,10 @@ func Process(marcfile io.Reader, rulesfile string) {
 }
 
 // ConsumeRecords currently just prints record titles
-func ConsumeRecords(rec <-chan record, done chan<- bool) {
+func ConsumeRecords(rec <-chan Record, done chan<- bool) {
 	for r := range rec {
 		consumed++
-		log.Println(r.title)
+		log.Println(r.Title)
 	}
 
 	// indicate over done channel this routine is complete
@@ -156,18 +156,18 @@ func ConsumeRecords(rec <-chan record, done chan<- bool) {
 }
 
 // trasforms a single marc21 record into our internal record struct
-func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
-	r := record{}
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
+	r := Record{}
 
-	r.identifier = marcRecord.Identifier()
+	r.Identifier = marcRecord.Identifier()
 
 	title := getFields(marcRecord, rules, "title")
 	if title != nil {
-		r.title = title[0]
+		r.Title = title[0]
 	}
-	r.alternateTitles = getFields(marcRecord, rules, "alternate_titles")
-	r.creator = getFields(marcRecord, rules, "creators")
-	r.contributor = getContributors(marcRecord, rules, "contributors")
+	r.AlternateTitles = getFields(marcRecord, rules, "alternate_titles")
+	r.Creator = getFields(marcRecord, rules, "creators")
+	r.Contributor = getContributors(marcRecord, rules, "contributors")
 
 	// urls 856:4[0|1] $u
 	// only take 856 fields where first indicator is 4
@@ -176,29 +176,29 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) record {
 	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
 	// r.url = getFields(marcRecord, rules, "url")
 
-	r.subject = getFields(marcRecord, rules, "subjects")
+	r.Subject = getFields(marcRecord, rules, "subjects")
 
 	//isbn
-	r.isbn = getFields(marcRecord, rules, "isbns")
-	r.issn = getFields(marcRecord, rules, "issns")
-	r.doi = getFields(marcRecord, rules, "dois")
+	r.Isbn = getFields(marcRecord, rules, "isbns")
+	r.Issn = getFields(marcRecord, rules, "issns")
+	r.Doi = getFields(marcRecord, rules, "dois")
 
 	country := getFields(marcRecord, rules, "country_of_publication")
 	if country != nil {
-		r.country = country[0]
+		r.Country = country[0]
 	}
 
-	r.language = getFields(marcRecord, rules, "languages")
-	r.callNumber = getFields(marcRecord, rules, "call_numbers")
+	r.Language = getFields(marcRecord, rules, "languages")
+	r.CallNumber = getFields(marcRecord, rules, "call_numbers")
 
 	// publication year
 	year := getFields(marcRecord, rules, "year")
 	if year != nil {
-		r.year = year[0]
+		r.Year = year[0]
 	}
 
 	// content type LDR/06:1
-	r.contentType = contentType(marcRecord.Leader.Type)
+	r.ContentType = contentType(marcRecord.Leader.Type)
 	return r
 }
 
@@ -209,14 +209,14 @@ func getFields(marcRecord *marc21.Record, rules []*Rule, field string) []string 
 }
 
 // returns slice of contributors of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
-func getContributors(marcRecord *marc21.Record, rules []*Rule, field string) []*contributor {
+func getContributors(marcRecord *marc21.Record, rules []*Rule, field string) []*Contributor {
 	recordFieldRule := getRules(rules, field)
-	var c []*contributor
+	var c []*Contributor
 	for _, r := range recordFieldRule.Fields {
-		y := new(contributor)
-		y.kind = r.Kind
-		y.value = collectSubfields(r, marcRecord)
-		if y.value != nil {
+		y := new(Contributor)
+		y.Kind = r.Kind
+		y.Value = collectSubfields(r, marcRecord)
+		if y.Value != nil {
 			c = append(c, y)
 		}
 	}
