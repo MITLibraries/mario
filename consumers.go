@@ -2,11 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/olivere/elastic"
 )
 
+// Consumer defines an interface to be implemented by various consumers
 type Consumer interface {
 	Consume(<-chan Record, chan<- bool)
 }
@@ -30,12 +32,30 @@ type JSONConsumer struct {
 }
 
 func (js *JSONConsumer) Consume(recs <-chan Record, done chan<- bool) {
+	fmt.Println("[")
+	var i int
 	for r := range recs {
 		b, err := json.MarshalIndent(r, "", "    ")
 		if err != nil {
 			log.Println(err)
 		}
-		log.Println(string(b))
+		if i != 0 {
+			fmt.Println(",")
+		}
+		fmt.Println(string(b))
+		i++
 	}
+	fmt.Println("]")
+	done <- true
+}
+
+type TitleConsumer struct {
+}
+
+func (ti *TitleConsumer) Consume(recs <-chan Record, done chan<- bool) {
+	for r := range recs {
+		fmt.Println(r.Title)
+	}
+
 	done <- true
 }

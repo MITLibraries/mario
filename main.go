@@ -25,7 +25,7 @@ func main() {
 				cli.StringFlag{
 					Name:  "consumer, c",
 					Value: "es",
-					Usage: "Consumer to use (es or json, default is es)",
+					Usage: "Consumer to use (es, json or title; default is es)",
 				},
 			},
 			Action: func(c *cli.Context) error {

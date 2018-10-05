@@ -146,6 +146,8 @@ func Process(marcfile io.Reader, rulesfile string, consumer_type string) {
 	var consumer Consumer
 	if consumer_type == "json" {
 		consumer = &JSONConsumer{Output: "log"}
+	} else if consumer_type == "title" {
+		consumer = &TitleConsumer{}
 	} else {
 		consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
 	}
