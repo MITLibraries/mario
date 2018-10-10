@@ -198,28 +198,28 @@ func TestMarcParser(t *testing.T) {
 		return
 	}
 
-	marcfile, err := os.Open("fixtures/mit_test_records.mrc")
+	marcfile, err := os.Open("fixtures/test.mrc")
 	if err != nil {
 		t.Error(err)
 	}
 
 	out := make(chan Record)
 
-	p := MarcParser{file: marcfile, rules: rules, out: out}
-	go p.Parse()
+	p := MarcParser{file: marcfile, rules: rules}
+	go p.Parse(out)
 
 	var chanLength int
 	for _ = range out {
 		chanLength++
 	}
 
-	if chanLength != 1962 {
+	if chanLength != 85 {
 		t.Error("Expected match, got", chanLength)
 	}
 }
 
 func TestMarcProcess(t *testing.T) {
-	marcfile, err := os.Open("fixtures/mit_test_records.mrc")
+	marcfile, err := os.Open("fixtures/test.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -227,10 +227,16 @@ func TestMarcProcess(t *testing.T) {
 	log.SetOutput(&buf)
 	tmp := os.Stdout
 	os.Stdout, _ = os.Open(os.DevNull)
-	Process(marcfile, "fixtures/marc_rules.json", "title")
+	out := make(chan Record)
+	done := make(chan bool, 1)
+
+	consumer := &TitleConsumer{out: os.Stdout}
+	p := MarcProcessor{marcfile: marcfile, rulesfile: "fixtures/marc_rules.json", consumer: consumer, out: out, done: done}
+	p.Process()
+
 	log.SetOutput(os.Stderr)
 	os.Stdout = tmp
-	if !strings.Contains(buf.String(), "Ingested  1962 records") {
+	if !strings.Contains(buf.String(), "Ingested  85 records") {
 		t.Error("Expected match, got", buf.String())
 	}
 }

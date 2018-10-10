@@ -27,6 +27,11 @@ func main() {
 					Value: "es",
 					Usage: "Consumer to use (es, json or title; default is es)",
 				},
+				cli.StringFlag{
+					Name:  "type, t",
+					Value: "marc",
+					Usage: "Type of file to process (default is marc)",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				var file *os.File
@@ -47,7 +52,39 @@ func main() {
 
 				defer file.Close()
 
-				Process(file, c.String("rules"), c.String("consumer"))
+				out := make(chan Record)
+				done := make(chan bool, 1)
+
+				var consumer Consumer
+
+				client, err := elastic.NewSimpleClient()
+				if err != nil {
+					return err
+				}
+				es, err := client.BulkProcessor().Name("MyBackgroundWorker-1").Do(context.Background())
+				if err != nil {
+					return err
+				}
+				defer es.Close()
+
+				if c.String("consumer") == "json" {
+					consumer = &JSONConsumer{out: os.Stdout}
+				} else if c.String("consumer") == "title" {
+					consumer = &TitleConsumer{out: os.Stdout}
+				} else {
+					consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
+				}
+
+				if c.String("type") == "marc" {
+					p := MarcProcessor{marcfile: file, rulesfile: c.String("rules"), consumer: consumer, out: out, done: done}
+					p.Process()
+				} else if c.String("type") == "json" {
+					p := JSONProcessor{file: file, consumer: consumer, out: out, done: done}
+					p.Process()
+				} else {
+					log.Println("no valid type provided")
+				}
+
 				return nil
 			},
 		},

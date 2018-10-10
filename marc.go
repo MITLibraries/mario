@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -11,87 +10,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/miku/marc21"
-	"github.com/olivere/elastic"
 )
-
-// Record struct stores our internal mappings of data and is used to when
-// mapping various external data sources before sending to elasticsearch
-type Record struct {
-	Identifier           string
-	Title                string
-	AlternateTitles      []string
-	Creator              []string
-	Contributor          []*Contributor
-	URL                  []string
-	Subject              []string
-	Isbn                 []string
-	Issn                 []string
-	Doi                  []string
-	OclcNumber           []string
-	Lccn                 string
-	Country              string
-	Language             []string
-	PublicationDate      string
-	ContentType          string
-	CallNumber           []string
-	Edition              string
-	Imprint              []string
-	PhysicalDescription  string
-	PublicationFrequency []string
-	Numbering            string
-	Notes                []string
-	Contents             []string
-	Summary              []string
-	Format               []string
-	LiteraryForm         string
-	RelatedPlace         []string
-	InBibliography       []string
-	RelatedItems         []*RelatedItem
-	Links                []Link
-	Holdings             []Holdings
-}
-
-// Contributor is a port of a Record
-type Contributor struct {
-	Kind  string
-	Value []string
-}
-
-// RelatedItem is a port of a Record
-type RelatedItem struct {
-	Kind  string
-	Value []string
-}
-
-// Link is a port of a Record
-type Link struct {
-	Kind         string
-	Text         string
-	URL          string
-	Restrictions string
-}
-
-// Holdings is a port of a Record
-type Holdings struct {
-	Location   string
-	CallNumber string
-	Status     string
-}
-
-// Rule defines where the rules are in JSON
-type Rule struct {
-	Label  string   `json:"label"`
-	Array  bool     `json:"array"`
-	Fields []*Field `json:"fields"`
-}
-
-// Field defines where the Fields within a Rule are in JSON
-type Field struct {
-	Tag       string `json:"tag"`
-	Subfields string `json:"subfields"`
-	Bytes     string `json:"bytes"`
-	Kind      string `json:"kind"`
-}
 
 // RetrieveRules for parsing MARC
 func RetrieveRules(rulefile string) ([]*Rule, error) {
@@ -113,15 +32,20 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 	return rules, err
 }
 
-var ingested int
-
 type MarcParser struct {
 	file  io.Reader
 	rules []*Rule
-	out   chan Record
 }
 
-func (m *MarcParser) Parse() {
+type MarcProcessor struct {
+	marcfile  io.Reader
+	rulesfile string
+	consumer  Consumer
+	out       chan Record
+	done      chan bool
+}
+
+func (m *MarcParser) Parse(out chan Record) {
 	for {
 		record, err := marc21.ReadRecord(m.file)
 
@@ -137,52 +61,28 @@ func (m *MarcParser) Parse() {
 
 		ingested++
 
-		m.out <- marcToRecord(record, m.rules)
+		out <- marcToRecord(record, m.rules)
 	}
-	close(m.out)
+	close(out)
 }
 
 // Process kicks off the MARC processing
-func Process(marcfile io.Reader, rulesfile string, consumerType string) {
+func (m *MarcProcessor) Process() {
 	ingested = 0
 
-	rules, err := RetrieveRules(rulesfile)
+	rules, err := RetrieveRules(m.rulesfile)
 
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	client, err := elastic.NewSimpleClient()
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-	es, err := client.BulkProcessor().Name("MyBackgroundWorker-1").Do(context.Background())
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-	defer es.Close()
+	p := MarcParser{file: m.marcfile, rules: rules}
+	go p.Parse(m.out)
+	go m.consumer.Consume(m.out, m.done)
 
-	var consumer Consumer
-	if consumerType == "json" {
-		consumer = &JSONConsumer{out: os.Stdout}
-	} else if consumerType == "title" {
-		consumer = &TitleConsumer{out: os.Stdout}
-	} else {
-		consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
-	}
-
-	out := make(chan Record)
-	done := make(chan bool, 1)
-
-	p := MarcParser{file: marcfile, rules: rules, out: out}
-	go p.Parse()
-	go consumer.Consume(out, done)
-
-	// wait until the ConsumeRecords routine reports it is done via `done` channel
-	<-done
+	// wait until the Consume routine reports `done` channel
+	<-m.done
 
 	log.Println("Ingested ", ingested, "records")
 }
