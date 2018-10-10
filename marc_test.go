@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"log"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -135,12 +138,12 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error("Expected match, got", item.Subject[0])
 	}
 
-	if item.Url != nil {
-		t.Error("Expected no matches, got", item.Url)
+	if item.URL != nil {
+		t.Error("Expected no matches, got", item.URL)
 	}
 
-	if item.Year != "1993" {
-		t.Error("Expected match, got", item.Year)
+	if item.PublicationDate != "1993" {
+		t.Error("Expected match, got", item.PublicationDate)
 	}
 }
 
@@ -184,5 +187,50 @@ func TestContentType(t *testing.T) {
 				t.Errorf("got %q, want %q", ctCase, ct.out)
 			}
 		})
+	}
+}
+
+func TestMarcParser(t *testing.T) {
+	rules, err := RetrieveRules("fixtures/marc_rules.json")
+
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	marcfile, err := os.Open("fixtures/mit_test_records.mrc")
+	if err != nil {
+		t.Error(err)
+	}
+
+	out := make(chan Record)
+
+	p := MarcParser{file: marcfile, rules: rules, out: out}
+	go p.Parse()
+
+	var chanLength int
+	for _ = range out {
+		chanLength++
+	}
+
+	if chanLength != 1962 {
+		t.Error("Expected match, got", chanLength)
+	}
+}
+
+func TestMarcProcess(t *testing.T) {
+	marcfile, err := os.Open("fixtures/mit_test_records.mrc")
+	if err != nil {
+		t.Error(err)
+	}
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	tmp := os.Stdout
+	os.Stdout, _ = os.Open(os.DevNull)
+	Process(marcfile, "fixtures/marc_rules.json", "title")
+	log.SetOutput(os.Stderr)
+	os.Stdout = tmp
+	if !strings.Contains(buf.String(), "Ingested  1962 records") {
+		t.Error("Expected match, got", buf.String())
 	}
 }

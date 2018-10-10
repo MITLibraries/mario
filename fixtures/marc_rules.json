@@ -66,7 +66,7 @@
     ]
   },
   {
-    "label": "year",
+    "label": "publication_date",
     "array": false,
     "fields": [
       {
@@ -208,6 +208,16 @@
     ]
   },
   {
+    "label": "numbering",
+    "array": false,
+    "fields": [
+      {
+        "tag": "362",
+        "subfields": "a"
+      }
+    ]
+  },
+  {
     "label": "notes",
     "array": true,
     "fields": [
@@ -250,6 +260,14 @@
       {
         "tag": "534",
         "subfields": "abcefklmnoptxz"
+      },
+      {
+        "tag": "588",
+        "subfields": "a"
+      },
+      {
+        "tag": "590",
+        "subfields": "a"
       }
     ]
   },
@@ -301,7 +319,18 @@
     "fields": [
       {
         "tag": "852",
-        "subfields": "bk",
+        "subfields": "b",
+        "notes": "Lookup table required to translate values from those fields"
+      }
+    ]
+  },
+  {
+    "label": "format",
+    "array": true,
+    "fields": [
+      {
+        "tag": "852",
+        "subfields": "k",
         "notes": "Lookup table required to translate values from those fields"
       }
     ]
@@ -313,7 +342,18 @@
       {
         "tag": "LDR",
         "bytes": "06:1",
-        "notes": "get this from the marc21 library directly"
+        "notes": "get this from the marc21 library directly; lookup table required."
+      }
+    ]
+  },
+  {
+    "label": "literary_form",
+    "array": true,
+    "fields": [
+      {
+        "tag": "008",
+        "bytes": "33:1",
+        "notes": "0, s, e = nonfiction ; all other (except empty) = fiction; empty = don't include this field"
       }
     ]
   },

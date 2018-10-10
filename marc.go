@@ -14,44 +14,64 @@ import (
 	"github.com/olivere/elastic"
 )
 
+// Record struct stores our internal mappings of data and is used to when
+// mapping various external data sources before sending to elasticsearch
 type Record struct {
-	Identifier      string
-	Title           string
-	AlternateTitles []string
-	Creator         []string
-	Contributor     []*Contributor
-	Url             []string
-	Subject         []string
-	Isbn            []string
-	Issn            []string
-	Doi             []string
-	Country         string
-	Language        []string
-	Year            string
-	ContentType     string
-	CallNumber      []string
-	RelatedItems    []RelatedItem
-	Links           []Link
-	Holdings        []Holdings
+	Identifier           string
+	Title                string
+	AlternateTitles      []string
+	Creator              []string
+	Contributor          []*Contributor
+	URL                  []string
+	Subject              []string
+	Isbn                 []string
+	Issn                 []string
+	Doi                  []string
+	OclcNumber           []string
+	Lccn                 string
+	Country              string
+	Language             []string
+	PublicationDate      string
+	ContentType          string
+	CallNumber           []string
+	Edition              string
+	Imprint              []string
+	PhysicalDescription  string
+	PublicationFrequency []string
+	Numbering            string
+	Notes                []string
+	Contents             []string
+	Summary              []string
+	Format               []string
+	LiteraryForm         string
+	RelatedPlace         []string
+	InBibliography       []string
+	RelatedItems         []*RelatedItem
+	Links                []Link
+	Holdings             []Holdings
 }
 
+// Contributor is a port of a Record
 type Contributor struct {
 	Kind  string
 	Value []string
 }
 
+// RelatedItem is a port of a Record
 type RelatedItem struct {
 	Kind  string
-	Value string
+	Value []string
 }
 
+// Link is a port of a Record
 type Link struct {
 	Kind         string
 	Text         string
-	Url          string
+	URL          string
 	Restrictions string
 }
 
+// Holdings is a port of a Record
 type Holdings struct {
 	Location   string
 	CallNumber string
@@ -123,7 +143,9 @@ func (m *MarcParser) Parse() {
 }
 
 // Process kicks off the MARC processing
-func Process(marcfile io.Reader, rulesfile string, consumer_type string) {
+func Process(marcfile io.Reader, rulesfile string, consumerType string) {
+	ingested = 0
+
 	rules, err := RetrieveRules(rulesfile)
 
 	if err != nil {
@@ -144,10 +166,10 @@ func Process(marcfile io.Reader, rulesfile string, consumer_type string) {
 	defer es.Close()
 
 	var consumer Consumer
-	if consumer_type == "json" {
-		consumer = &JSONConsumer{Output: "log"}
-	} else if consumer_type == "title" {
-		consumer = &TitleConsumer{}
+	if consumerType == "json" {
+		consumer = &JSONConsumer{out: os.Stdout}
+	} else if consumerType == "title" {
+		consumer = &TitleConsumer{out: os.Stdout}
 	} else {
 		consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
 	}
@@ -170,6 +192,12 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
 	r := Record{}
 
 	r.Identifier = marcRecord.Identifier()
+	r.OclcNumber = getFields(marcRecord, rules, "oclc_number")
+
+	lccn := getFields(marcRecord, rules, "lccn")
+	if lccn != nil {
+		r.Lccn = lccn[0]
+	}
 
 	title := getFields(marcRecord, rules, "title")
 	if title != nil {
@@ -179,6 +207,12 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
 	r.Creator = getFields(marcRecord, rules, "creators")
 	r.Contributor = getContributors(marcRecord, rules, "contributors")
 
+	r.RelatedPlace = getFields(marcRecord, rules, "related_place")
+
+	r.RelatedItems = getRelatedItems(marcRecord, rules, "related_items")
+
+	r.InBibliography = getFields(marcRecord, rules, "in_bibliography")
+
 	// urls 856:4[0|1] $u
 	// only take 856 fields where first indicator is 4
 	// only take 856 fields where second indicator is 0 or 1
@@ -186,9 +220,10 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
 	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
 	// r.url = getFields(marcRecord, rules, "url")
 
+	// TODO: Links may be best represented by extracting a few values from 856 and _not_ contatanating them but instead filtering on some values and storing them in the Link structs
+
 	r.Subject = getFields(marcRecord, rules, "subjects")
 
-	//isbn
 	r.Isbn = getFields(marcRecord, rules, "isbns")
 	r.Issn = getFields(marcRecord, rules, "issns")
 	r.Doi = getFields(marcRecord, rules, "dois")
@@ -198,17 +233,50 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
 		r.Country = country[0]
 	}
 
+	// TODO: use lookup tables to translate returned codes to values
 	r.Language = getFields(marcRecord, rules, "languages")
+
 	r.CallNumber = getFields(marcRecord, rules, "call_numbers")
 
-	// publication year
-	year := getFields(marcRecord, rules, "year")
-	if year != nil {
-		r.Year = year[0]
+	edition := getFields(marcRecord, rules, "edition")
+	if edition != nil {
+		r.Edition = edition[0]
 	}
 
-	// content type LDR/06:1
+	r.Imprint = getFields(marcRecord, rules, "imprint")
+
+	description := getFields(marcRecord, rules, "physical_description")
+	if description != nil {
+		r.PhysicalDescription = description[0]
+	}
+
+	r.PublicationFrequency = getFields(marcRecord, rules, "publication_frequency")
+
+	// publication year
+	date := getFields(marcRecord, rules, "publication_date")
+	if date != nil {
+		r.PublicationDate = date[0]
+	}
+
+	numbering := getFields(marcRecord, rules, "numbering")
+	if numbering != nil {
+		r.Numbering = numbering[0]
+	}
+
+	r.Notes = getFields(marcRecord, rules, "notes")
+
+	r.Contents = getFields(marcRecord, rules, "contents")
+
+	r.Summary = getFields(marcRecord, rules, "summary")
+
+	// TODO: use lookup tables to translate returned codes to values
+	r.Format = getFields(marcRecord, rules, "format")
+
+	// TODO: use lookup tables to translate returned codes to values
 	r.ContentType = contentType(marcRecord.Leader.Type)
+
+	lf := getFields(marcRecord, rules, "literary_form")
+	r.LiteraryForm = literaryForm(lf)
 	return r
 }
 
@@ -224,6 +292,21 @@ func getContributors(marcRecord *marc21.Record, rules []*Rule, field string) []*
 	var c []*Contributor
 	for _, r := range recordFieldRule.Fields {
 		y := new(Contributor)
+		y.Kind = r.Kind
+		y.Value = collectSubfields(r, marcRecord)
+		if y.Value != nil {
+			c = append(c, y)
+		}
+	}
+	return c
+}
+
+// returns slice of related items of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
+func getRelatedItems(marcRecord *marc21.Record, rules []*Rule, field string) []*RelatedItem {
+	recordFieldRule := getRules(rules, field)
+	var c []*RelatedItem
+	for _, r := range recordFieldRule.Fields {
+		y := new(RelatedItem)
 		y.Kind = r.Kind
 		y.Value = collectSubfields(r, marcRecord)
 		if y.Value != nil {
@@ -294,6 +377,20 @@ func Contains(a []byte, x byte) bool {
 		}
 	}
 	return false
+}
+
+func literaryForm(x []string) string {
+	var t string
+	if x == nil {
+		return ""
+	}
+	switch x[0] {
+	case "0", "s", "e":
+		t = "nonfiction"
+	default:
+		t = "fiction"
+	}
+	return t
 }
 
 // Content type mappings
