@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/olivere/elastic"
@@ -28,11 +29,11 @@ func (es *ESConsumer) Consume(recs <-chan Record, done chan<- bool) {
 }
 
 type JSONConsumer struct {
-	Output string
+	out io.Writer
 }
 
 func (js *JSONConsumer) Consume(recs <-chan Record, done chan<- bool) {
-	fmt.Println("[")
+	fmt.Fprintln(js.out, "[")
 	var i int
 	for r := range recs {
 		b, err := json.MarshalIndent(r, "", "    ")
@@ -40,21 +41,22 @@ func (js *JSONConsumer) Consume(recs <-chan Record, done chan<- bool) {
 			log.Println(err)
 		}
 		if i != 0 {
-			fmt.Println(",")
+			fmt.Fprintln(js.out, ",")
 		}
-		fmt.Println(string(b))
+		fmt.Fprintln(js.out, string(b))
 		i++
 	}
-	fmt.Println("]")
+	fmt.Fprintln(js.out, "]")
 	done <- true
 }
 
 type TitleConsumer struct {
+	out io.Writer
 }
 
 func (ti *TitleConsumer) Consume(recs <-chan Record, done chan<- bool) {
 	for r := range recs {
-		fmt.Println(r.Title)
+		fmt.Fprintln(ti.out, r.Title)
 	}
 
 	done <- true
