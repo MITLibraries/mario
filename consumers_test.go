@@ -23,8 +23,8 @@ func TestTitleConsumerConsume(t *testing.T) {
 	done := make(chan bool, 1)
 	out := make(chan Record)
 
-	p := MarcParser{file: marcfile, rules: rules, out: out}
-	go p.Parse()
+	p := MarcParser{file: marcfile, rules: rules}
+	go p.Parse(out)
 
 	var b bytes.Buffer
 	consumer := &TitleConsumer{out: &b}
@@ -46,15 +46,15 @@ func TestTitleJsonConsume(t *testing.T) {
 		return
 	}
 
-	marcfile, err := os.Open("fixtures/mit_test_records.mrc")
+	marcfile, err := os.Open("fixtures/test.mrc")
 	if err != nil {
 		t.Error(err)
 	}
 	done := make(chan bool, 1)
 	out := make(chan Record)
 
-	p := MarcParser{file: marcfile, rules: rules, out: out}
-	go p.Parse()
+	p := MarcParser{file: marcfile, rules: rules}
+	go p.Parse(out)
 
 	var b bytes.Buffer
 	consumer := &JSONConsumer{out: &b}
@@ -66,10 +66,10 @@ func TestTitleJsonConsume(t *testing.T) {
 	var records []*Record
 	json.NewDecoder(&b).Decode(&records)
 
-	if records[0].Title != "Black Panther adventures." {
+	if records[0].Title != "Diagnostic histochemistry" {
 		t.Error("Expected match, got", records[0].Title)
 	}
-	if records[0].Identifier != "002621216" {
+	if records[0].Identifier != "50001" {
 		t.Error("Expected match, got", records[0].Identifier)
 	}
 }
