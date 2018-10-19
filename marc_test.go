@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bytes"
-	"log"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -205,11 +202,11 @@ func TestMarcParser(t *testing.T) {
 
 	out := make(chan Record)
 
-	p := MarcParser{file: marcfile, rules: rules}
-	go p.Parse(out)
+	p := marcparser{file: marcfile, rules: rules}
+	go p.parse(out)
 
 	var chanLength int
-	for _ = range out {
+	for range out {
 		chanLength++
 	}
 
@@ -223,20 +220,13 @@ func TestMarcProcess(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var buf bytes.Buffer
-	log.SetOutput(&buf)
-	tmp := os.Stdout
-	os.Stdout, _ = os.Open(os.DevNull)
-	out := make(chan Record)
-	done := make(chan bool, 1)
-
-	consumer := &TitleConsumer{out: os.Stdout}
-	p := MarcProcessor{marcfile: marcfile, rulesfile: "fixtures/marc_rules.json", consumer: consumer, out: out, done: done}
-	p.Process()
-
-	log.SetOutput(os.Stderr)
-	os.Stdout = tmp
-	if !strings.Contains(buf.String(), "Ingested  85 records") {
-		t.Error("Expected match, got", buf.String())
+	p := MarcGenerator{marcfile: marcfile, rulesfile: "fixtures/marc_rules.json"}
+	out := p.Generate()
+	var i int
+	for range out {
+		i++
+	}
+	if i != 85 {
+		t.Error("Expected match, got", i)
 	}
 }

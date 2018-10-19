@@ -32,20 +32,32 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 	return rules, err
 }
 
-type MarcParser struct {
+type marcparser struct {
 	file  io.Reader
 	rules []*Rule
 }
 
-type MarcProcessor struct {
+//MarcGenerator parses binary MARC records.
+type MarcGenerator struct {
 	marcfile  io.Reader
 	rulesfile string
-	consumer  Consumer
-	out       chan Record
-	done      chan bool
 }
 
-func (m *MarcParser) Parse(out chan Record) {
+//Generate a channel of Records.
+func (m *MarcGenerator) Generate() <-chan Record {
+	rules, err := RetrieveRules(m.rulesfile)
+
+	if err != nil {
+		spew.Dump(err)
+	}
+
+	out := make(chan Record)
+	p := marcparser{file: m.marcfile, rules: rules}
+	go p.parse(out)
+	return out
+}
+
+func (m *marcparser) parse(out chan Record) {
 	for {
 		record, err := marc21.ReadRecord(m.file)
 
@@ -54,37 +66,12 @@ func (m *MarcParser) Parse(out chan Record) {
 			if err == io.EOF {
 				break
 			}
-
-			log.Println("An error occured processing the", ingested, "record.")
 			log.Fatal(err)
 		}
-
-		ingested++
 
 		out <- marcToRecord(record, m.rules)
 	}
 	close(out)
-}
-
-// Process kicks off the MARC processing
-func (m *MarcProcessor) Process() {
-	ingested = 0
-
-	rules, err := RetrieveRules(m.rulesfile)
-
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
-	p := MarcParser{file: m.marcfile, rules: rules}
-	go p.Parse(m.out)
-	go m.consumer.Consume(m.out, m.done)
-
-	// wait until the Consume routine reports `done` channel
-	<-m.done
-
-	log.Println("Ingested ", ingested, "records")
 }
 
 // trasforms a single marc21 record into our internal record struct
