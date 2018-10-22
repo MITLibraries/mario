@@ -9,55 +9,69 @@ import (
 	"github.com/olivere/elastic"
 )
 
-// Consumer defines an interface to be implemented by various consumers
-type Consumer interface {
-	Consume(<-chan Record, chan<- bool)
-}
-
+//ESConsumer adds Records to ElasticSearch.
 type ESConsumer struct {
 	Index string
 	RType string
 	p     *elastic.BulkProcessor
 }
 
-func (es *ESConsumer) Consume(recs <-chan Record, done chan<- bool) {
-	for r := range recs {
-		d := elastic.NewBulkIndexRequest().Index(es.Index).Type(es.RType).Doc(r)
-		es.p.Add(d)
-	}
-	done <- true
+//Consume the records.
+func (es *ESConsumer) Consume(in <-chan Record) <-chan bool {
+	out := make(chan bool)
+	go func() {
+		for r := range in {
+			d := elastic.NewBulkIndexRequest().Index(es.Index).Type(es.RType).Doc(r)
+			es.p.Add(d)
+		}
+		close(out)
+	}()
+	return out
 }
 
+//JSONConsumer outputs Records as JSON. The Records will be written
+//to JSONConsumer.out.
 type JSONConsumer struct {
 	out io.Writer
 }
 
-func (js *JSONConsumer) Consume(recs <-chan Record, done chan<- bool) {
-	fmt.Fprintln(js.out, "[")
-	var i int
-	for r := range recs {
-		b, err := json.MarshalIndent(r, "", "    ")
-		if err != nil {
-			log.Println(err)
+//Consume the records.
+func (js *JSONConsumer) Consume(in <-chan Record) <-chan bool {
+	out := make(chan bool)
+	go func() {
+		fmt.Fprintln(js.out, "[")
+		var i int
+		for r := range in {
+			b, err := json.MarshalIndent(r, "", "    ")
+			if err != nil {
+				log.Println(err)
+			}
+			if i != 0 {
+				fmt.Fprintln(js.out, ",")
+			}
+			fmt.Fprintln(js.out, string(b))
+			i++
 		}
-		if i != 0 {
-			fmt.Fprintln(js.out, ",")
-		}
-		fmt.Fprintln(js.out, string(b))
-		i++
-	}
-	fmt.Fprintln(js.out, "]")
-	done <- true
+		fmt.Fprintln(js.out, "]")
+		close(out)
+	}()
+	return out
 }
 
+//TitleConsumer just outputs the title of Records. The titles will be
+//written to TitleConsumer.out.
 type TitleConsumer struct {
 	out io.Writer
 }
 
-func (ti *TitleConsumer) Consume(recs <-chan Record, done chan<- bool) {
-	for r := range recs {
-		fmt.Fprintln(ti.out, r.Title)
-	}
-
-	done <- true
+//Consume the records.
+func (t *TitleConsumer) Consume(in <-chan Record) <-chan bool {
+	out := make(chan bool)
+	go func() {
+		for r := range in {
+			fmt.Fprintln(t.out, r.Title)
+		}
+		close(out)
+	}()
+	return out
 }

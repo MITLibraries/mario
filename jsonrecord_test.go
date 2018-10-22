@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bytes"
-	"log"
 	"os"
-	"strings"
 	"testing"
 )
 
@@ -16,11 +13,11 @@ func TestJsonParser(t *testing.T) {
 
 	out := make(chan Record)
 
-	p := JSONParser{file: jsonfile}
-	go p.Parse(out)
+	p := jsonparser{file: jsonfile}
+	go p.parse(out)
 
 	var chanLength int
-	for _ = range out {
+	for range out {
 		chanLength++
 	}
 
@@ -34,20 +31,14 @@ func TestJsonProcess(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var buf bytes.Buffer
-	log.SetOutput(&buf)
-	tmp := os.Stdout
-	os.Stdout, _ = os.Open(os.DevNull)
-	out := make(chan Record)
-	done := make(chan bool, 1)
 
-	consumer := &TitleConsumer{out: os.Stdout}
-	p := JSONProcessor{file: jsonfile, consumer: consumer, out: out, done: done}
-	p.Process()
+	var i int
+	p := JSONGenerator{file: jsonfile}
+	for range p.Generate() {
+		i++
+	}
 
-	log.SetOutput(os.Stderr)
-	os.Stdout = tmp
-	if !strings.Contains(buf.String(), "Ingested  1962 records") {
-		t.Error("Expected match, got", buf.String())
+	if i != 1962 {
+		t.Error("Expected match, got", i)
 	}
 }

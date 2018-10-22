@@ -52,39 +52,38 @@ func main() {
 
 				defer file.Close()
 
-				out := make(chan Record)
-				done := make(chan bool, 1)
-
-				var consumer Consumer
-
-				client, err := elastic.NewSimpleClient()
-				if err != nil {
-					return err
-				}
-				es, err := client.BulkProcessor().Name("MyBackgroundWorker-1").Do(context.Background())
-				if err != nil {
-					return err
-				}
-				defer es.Close()
+				p := Pipeline{}
 
 				if c.String("consumer") == "json" {
-					consumer = &JSONConsumer{out: os.Stdout}
+					p.consumer = &JSONConsumer{out: os.Stdout}
 				} else if c.String("consumer") == "title" {
-					consumer = &TitleConsumer{out: os.Stdout}
+					p.consumer = &TitleConsumer{out: os.Stdout}
 				} else {
-					consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
+					client, err := elastic.NewSimpleClient()
+					if err != nil {
+						return err
+					}
+					es, err := client.BulkProcessor().Name("MyBackgroundWorker-1").Do(context.Background())
+					if err != nil {
+						return err
+					}
+					defer es.Close()
+					p.consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
 				}
 
 				if c.String("type") == "marc" {
-					p := MarcProcessor{marcfile: file, rulesfile: c.String("rules"), consumer: consumer, out: out, done: done}
-					p.Process()
+					p.generator = &MarcGenerator{
+						marcfile:  file,
+						rulesfile: c.String("rules"),
+					}
 				} else if c.String("type") == "json" {
-					p := JSONProcessor{file: file, consumer: consumer, out: out, done: done}
-					p.Process()
+					p.generator = &JSONGenerator{file: file}
 				} else {
 					log.Println("no valid type provided")
 				}
 
+				out := p.Run()
+				<-out
 				return nil
 			},
 		},

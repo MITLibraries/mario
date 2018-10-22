@@ -6,18 +6,16 @@ import (
 	"log"
 )
 
-type JSONParser struct {
+type jsonparser struct {
 	file io.Reader
 }
 
-type JSONProcessor struct {
-	file     io.Reader
-	consumer Consumer
-	out      chan Record
-	done     chan bool
+//JSONGenerator parses JSON records.
+type JSONGenerator struct {
+	file io.Reader
 }
 
-func (j *JSONParser) Parse(out chan Record) {
+func (j *jsonparser) parse(out chan Record) {
 	ingested = 0
 	decoder := json.NewDecoder(j.file)
 
@@ -46,13 +44,10 @@ func (j *JSONParser) Parse(out chan Record) {
 	close(out)
 }
 
-func (j *JSONProcessor) Process() {
-	p := JSONParser{file: j.file}
-	go p.Parse(j.out)
-	go j.consumer.Consume(j.out, j.done)
-
-	// wait until the Consume routine reports `done` channel
-	<-j.done
-
-	log.Println("Ingested ", ingested, "records")
+//Generate creates a channel of Records.
+func (j *JSONGenerator) Generate() <-chan Record {
+	out := make(chan Record)
+	p := jsonparser{file: j.file}
+	go p.parse(out)
+	return out
 }
