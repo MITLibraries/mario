@@ -73,7 +73,9 @@ func main() {
 					url := c.String("url")
 					index := c.String("index")
 
-					client, err := elastic.NewClient(elastic.SetURL(url))
+					client, err := elastic.NewClient(
+						elastic.SetURL(url),
+						elastic.SetSniff(false))
 					if err != nil {
 						return err
 					}
@@ -120,7 +122,9 @@ func main() {
 			Action: func(c *cli.Context) error {
 				url := c.String("url")
 				index := c.String("index")
-				client, err := elastic.NewClient(elastic.SetURL(url))
+				client, err := elastic.NewClient(
+					elastic.SetURL(url),
+					elastic.SetSniff(false))
 				if err != nil {
 					return err
 				}
