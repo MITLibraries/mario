@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -15,6 +14,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:      "parse",
+			Usage:     "Parse and ingest the input file",
 			ArgsUsage: "[filepath or - to use stdin]",
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -25,12 +25,22 @@ func main() {
 				cli.StringFlag{
 					Name:  "consumer, c",
 					Value: "es",
-					Usage: "Consumer to use (es, json or title; default is es)",
+					Usage: "Consumer to use (es, json or title)",
 				},
 				cli.StringFlag{
 					Name:  "type, t",
 					Value: "marc",
-					Usage: "Type of file to process (default is marc)",
+					Usage: "Type of file to process",
+				},
+				cli.StringFlag{
+					Name:  "url, u",
+					Value: "http://127.0.0.1:9200",
+					Usage: "URL for the Elasticsearch cluster",
+				},
+				cli.StringFlag{
+					Name:  "index, i",
+					Value: "timdex",
+					Usage: "Name of the Elasticsearch index",
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -54,12 +64,18 @@ func main() {
 
 				p := Pipeline{}
 
+				//Configure the pipeline consumer
 				if c.String("consumer") == "json" {
 					p.consumer = &JSONConsumer{out: os.Stdout}
 				} else if c.String("consumer") == "title" {
 					p.consumer = &TitleConsumer{out: os.Stdout}
 				} else {
-					client, err := elastic.NewSimpleClient()
+					url := c.String("url")
+					index := c.String("index")
+
+					client, err := elastic.NewClient(
+						elastic.SetURL(url),
+						elastic.SetSniff(false))
 					if err != nil {
 						return err
 					}
@@ -68,9 +84,10 @@ func main() {
 						return err
 					}
 					defer es.Close()
-					p.consumer = &ESConsumer{Index: "timdex", RType: "marc", p: es}
+					p.consumer = &ESConsumer{Index: index, RType: "marc", p: es}
 				}
 
+				//Configure the pipeline input
 				if c.String("type") == "marc" {
 					p.generator = &MarcGenerator{
 						marcfile:  file,
@@ -88,27 +105,37 @@ func main() {
 			},
 		},
 		{
-			Name: "create",
+			Name:  "create",
+			Usage: "Create an Elasticsearch index",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "url, u",
+					Value: "http://127.0.0.1:9200",
+					Usage: "URL for the Elasticsearch cluster",
+				},
+				cli.StringFlag{
+					Name:  "index, i",
+					Value: "timdex",
+					Usage: "Name of the Elasticsearch index",
+				},
+			},
 			Action: func(c *cli.Context) error {
-				client, err := elastic.NewSimpleClient()
+				url := c.String("url")
+				index := c.String("index")
+				client, err := elastic.NewClient(
+					elastic.SetURL(url),
+					elastic.SetSniff(false))
 				if err != nil {
 					return err
 				}
 				ctx := context.Background()
-				created, err := client.CreateIndex("timdex").Do(ctx)
+				_, err = client.CreateIndex(index).Do(ctx)
 				if err != nil {
 					return err
-				}
-				if !created.Acknowledged {
-					fmt.Println("Elasticsearch couldn't create the index")
 				}
 				return nil
 			},
 		},
-	}
-	app.Action = func(c *cli.Context) error {
-		fmt.Println("Reserved for λ")
-		return nil
 	}
 
 	err := app.Run(os.Args)
