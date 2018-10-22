@@ -10,7 +10,7 @@ type jsonparser struct {
 	file io.Reader
 }
 
-//JSONGenerator parses JSON-formatted MARC records.
+//JSONGenerator parses JSON records.
 type JSONGenerator struct {
 	file io.Reader
 }
