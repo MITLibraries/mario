@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	var debug bool
+
 	app := cli.NewApp()
 	app.Commands = []cli.Command{
 		{
@@ -41,6 +43,11 @@ func main() {
 					Name:  "index, i",
 					Value: "timdex",
 					Usage: "Name of the Elasticsearch index",
+				},
+				cli.BoolFlag{
+					Name:        "debug",
+					Usage:       "Output debugging information",
+					Destination: &debug,
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -99,8 +106,16 @@ func main() {
 					log.Println("no valid type provided")
 				}
 
+				ctr := &Counter{}
+				p.Next(ctr)
+
 				out := p.Run()
 				<-out
+
+				if debug {
+					log.Printf("Total records ingested: %d", ctr.Count)
+				}
+
 				return nil
 			},
 		},
