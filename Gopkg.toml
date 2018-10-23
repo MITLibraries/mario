@@ -24,6 +24,9 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[constraint]]
+  name = "github.com/olivere/elastic"
+  revision = "b081362bf578a51367a27ca4d4bb5f7997a15b2c"
 
 [prune]
   go-tests = true
