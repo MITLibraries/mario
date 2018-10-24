@@ -112,7 +112,13 @@ func TestMarcToRecord(t *testing.T) {
 		return
 	}
 
-	item := marcToRecord(record, rules)
+	languageCodes, err := RetrieveLanguageCodelist()
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	item := marcToRecord(record, rules, languageCodes)
 
 	if item.Creator[0] != "Sandburg, Carl, 1878-1967." {
 		t.Error("Expected match, got", item.Creator)
@@ -184,6 +190,29 @@ func TestContentType(t *testing.T) {
 				t.Errorf("got %q, want %q", ctCase, ct.out)
 			}
 		})
+	}
+}
+
+func TestTranslateLanguageCodes(t *testing.T) {
+	languageCodes, err := RetrieveLanguageCodelist()
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	in := []string{"abk", "ach", "afa", "aaa", ""}
+	out := []string{"Abkhaz", "Acoli", "Afroasiatic (Other)", "aaa", ""}
+	langs := TranslateLanguageCodes(in, languageCodes)
+
+	if len(langs) != len(out) {
+		t.Errorf("got %q items, want %q", len(langs), len(out))
+		return
+	}
+
+	for i, x := range langs {
+		if x != out[i] {
+			t.Errorf("got %q, want %q", x, out[i])
+		}
 	}
 }
 

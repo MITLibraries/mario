@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"io"
 	"log"
 	"os"
@@ -33,8 +34,9 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 }
 
 type marcparser struct {
-	file  io.Reader
-	rules []*Rule
+	file          io.Reader
+	rules         []*Rule
+	languageCodes map[string]string
 }
 
 //MarcGenerator parses binary MARC records.
@@ -46,13 +48,14 @@ type MarcGenerator struct {
 //Generate a channel of Records.
 func (m *MarcGenerator) Generate() <-chan Record {
 	rules, err := RetrieveRules(m.rulesfile)
+	languageCodes, err := RetrieveLanguageCodelist()
 
 	if err != nil {
 		spew.Dump(err)
 	}
 
 	out := make(chan Record)
-	p := marcparser{file: m.marcfile, rules: rules}
+	p := marcparser{file: m.marcfile, rules: rules, languageCodes: languageCodes}
 	go p.parse(out)
 	return out
 }
@@ -69,13 +72,13 @@ func (m *marcparser) parse(out chan Record) {
 			log.Fatal(err)
 		}
 
-		out <- marcToRecord(record, m.rules)
+		out <- marcToRecord(record, m.rules, m.languageCodes)
 	}
 	close(out)
 }
 
 // trasforms a single marc21 record into our internal record struct
-func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[string]string) Record {
 	r := Record{}
 
 	r.Identifier = marcRecord.Identifier()
@@ -122,6 +125,7 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule) Record {
 
 	// TODO: use lookup tables to translate returned codes to values
 	r.Language = getFields(marcRecord, rules, "languages")
+	r.Language = TranslateLanguageCodes(r.Language, languageCodes)
 
 	r.CallNumber = getFields(marcRecord, rules, "call_numbers")
 
@@ -312,4 +316,50 @@ func contentType(x byte) string {
 		t = "Text"
 	}
 	return t
+}
+
+// RetrieveLanguageCodelist retrieves language codes for parsing MARC languages
+func RetrieveLanguageCodelist() (map[string]string, error) {
+	file, err := os.Open("fixtures/languages.xml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Language struct
+	type Language struct {
+		Name string `xml:"name"`
+		Code string `xml:"code"`
+	}
+
+	decoder := xml.NewDecoder(file)
+	languages := make(map[string]string)
+
+	for {
+		t, _ := decoder.Token()
+		if t == nil {
+			break
+		}
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "language" {
+				var l Language
+				decoder.DecodeElement(&l, &se)
+				languages[l.Code] = l.Name
+			}
+		}
+	}
+	return languages, err
+}
+
+// TranslateLanguageCodes takes an array of MARC language codes and returns the language names.
+func TranslateLanguageCodes(recordCodes []string, languageCodes map[string]string) []string {
+	var languages []string
+	for _, l := range recordCodes {
+		name := languageCodes[l]
+		if name != "" {
+			languages = append(languages, name)
+		} else {
+			languages = append(languages, l)
+		}
+	}
+	return languages
 }
