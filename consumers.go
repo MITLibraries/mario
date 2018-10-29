@@ -21,7 +21,11 @@ func (es *ESConsumer) Consume(in <-chan Record) <-chan bool {
 	out := make(chan bool)
 	go func() {
 		for r := range in {
-			d := elastic.NewBulkIndexRequest().Index(es.Index).Type(es.RType).Doc(r)
+			d := elastic.NewBulkIndexRequest().
+				Index(es.Index).
+				Id(r.Identifier).
+				Type(es.RType).
+				Doc(r)
 			es.p.Add(d)
 		}
 		close(out)

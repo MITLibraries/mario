@@ -103,15 +103,6 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[st
 
 	r.InBibliography = getFields(marcRecord, rules, "in_bibliography")
 
-	// urls 856:4[0|1] $u
-	// only take 856 fields where first indicator is 4
-	// only take 856 fields where second indicator is 0 or 1
-	// possibly filter out any matches where $3 or $z is "table of contents" or "Publisher description"
-	// todo: this does not follow the noted rules yet and instead just grabs anything in 856$u
-	// r.url = getFields(marcRecord, rules, "url")
-
-	// TODO: Links may be best represented by extracting a few values from 856 and _not_ contatanating them but instead filtering on some values and storing them in the Link structs
-
 	r.Subject = getFields(marcRecord, rules, "subjects")
 
 	r.Isbn = getFields(marcRecord, rules, "isbns")

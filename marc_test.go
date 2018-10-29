@@ -141,10 +141,6 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error("Expected match, got", item.Subject[0])
 	}
 
-	if item.URL != nil {
-		t.Error("Expected no matches, got", item.URL)
-	}
-
 	if item.PublicationDate != "1993" {
 		t.Error("Expected match, got", item.PublicationDate)
 	}
