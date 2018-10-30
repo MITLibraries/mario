@@ -91,7 +91,7 @@ func main() {
 						return err
 					}
 					defer es.Close()
-					p.consumer = &ESConsumer{Index: index, RType: "marc", p: es}
+					p.consumer = &ESConsumer{Index: index, RType: "Record", p: es}
 				}
 
 				//Configure the pipeline input
