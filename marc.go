@@ -313,7 +313,7 @@ func contentType(x byte) string {
 
 // RetrieveLanguageCodelist retrieves language codes for parsing MARC languages
 func RetrieveLanguageCodelist() (map[string]string, error) {
-	file, err := os.Open("fixtures/languages.xml")
+	file, err := os.Open("config/languages.xml")
 	if err != nil {
 		log.Fatal(err)
 	}
