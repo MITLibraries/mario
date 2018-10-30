@@ -2,12 +2,56 @@
 
 
 [[projects]]
+  digest = "1:e450b27d1df19c418c863e3df99439750dd5f2e086f2ad395f9012246e207ac7"
+  name = "github.com/aws/aws-sdk-go"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/stscreds",
+    "aws/csm",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/ini",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/sdkuri",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/xml/xmlutil",
+    "service/sts",
+  ]
+  pruneopts = "UT"
+  revision = "c0037b52736b07cea4e0cb6521f7995adef833bc"
+  version = "v1.15.59"
+
+[[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   pruneopts = "UT"
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
+
+[[projects]]
+  digest = "1:e22af8c7518e1eab6f2eab2b7d7558927f816262586cd6ed9f349c97a6c285c4"
+  name = "github.com/jmespath/go-jmespath"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0b12d6b5"
 
 [[projects]]
   branch = "master"
@@ -31,16 +75,16 @@
   revision = "03a360545cd2fdc1b872fc3f929186df81b3a4a5"
 
 [[projects]]
-  digest = "1:e01edb58fc507572461d56a8d24632c99af04686005dd5b411ec4b0029a24151"
+  digest = "1:d15451948e69e6bb97be726d4a44e63be4c93674e047b262daa2fd6edce86d19"
   name = "github.com/olivere/elastic"
   packages = [
     ".",
+    "aws/v4",
     "config",
     "uritemplates",
   ]
   pruneopts = "UT"
-  revision = "bd115a1132ece51519151c33b5d74e1387d3265a"
-  version = "v6.2.8"
+  revision = "b081362bf578a51367a27ca4d4bb5f7997a15b2c"
 
 [[projects]]
   digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
@@ -62,9 +106,14 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/aws/aws-sdk-go/aws/credentials",
+    "github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds",
+    "github.com/aws/aws-sdk-go/aws/ec2metadata",
+    "github.com/aws/aws-sdk-go/aws/session",
     "github.com/davecgh/go-spew/spew",
     "github.com/miku/marc21",
     "github.com/olivere/elastic",
+    "github.com/olivere/elastic/aws/v4",
     "github.com/urfave/cli",
   ]
   solver-name = "gps-cdcl"

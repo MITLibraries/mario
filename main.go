@@ -3,16 +3,46 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/olivere/elastic"
+	aws "github.com/olivere/elastic/aws/v4"
 	"github.com/urfave/cli"
 )
 
 func main() {
 	var debug bool
+	var url, index string
+	var v4 bool
 
 	app := cli.NewApp()
+
+	//Global options
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:        "url, u",
+			Value:       "http://127.0.0.1:9200",
+			Usage:       "URL for the Elasticsearch cluster",
+			Destination: &url,
+		},
+		cli.StringFlag{
+			Name:        "index, i",
+			Value:       "timdex",
+			Usage:       "Name of the Elasticsearch index",
+			Destination: &index,
+		},
+		cli.BoolFlag{
+			Name:        "v4",
+			Usage:       "Use AWS v4 signing",
+			Destination: &v4,
+		},
+	}
+
 	app.Commands = []cli.Command{
 		{
 			Name:      "parse",
@@ -33,16 +63,6 @@ func main() {
 					Name:  "type, t",
 					Value: "marc",
 					Usage: "Type of file to process",
-				},
-				cli.StringFlag{
-					Name:  "url, u",
-					Value: "http://127.0.0.1:9200",
-					Usage: "URL for the Elasticsearch cluster",
-				},
-				cli.StringFlag{
-					Name:  "index, i",
-					Value: "timdex",
-					Usage: "Name of the Elasticsearch index",
 				},
 				cli.BoolFlag{
 					Name:        "debug",
@@ -77,16 +97,11 @@ func main() {
 				} else if c.String("consumer") == "title" {
 					p.consumer = &TitleConsumer{out: os.Stdout}
 				} else {
-					url := c.String("url")
-					index := c.String("index")
-
-					client, err := elastic.NewClient(
-						elastic.SetURL(url),
-						elastic.SetSniff(false))
+					client, err := esClient(url, index, v4)
 					if err != nil {
 						return err
 					}
-					es, err := client.BulkProcessor().Name("MyBackgroundWorker-1").Do(context.Background())
+					es, err := client.BulkProcessor().Name("IngestWorker-1").Do(context.Background())
 					if err != nil {
 						return err
 					}
@@ -122,24 +137,8 @@ func main() {
 		{
 			Name:  "create",
 			Usage: "Create an Elasticsearch index",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "url, u",
-					Value: "http://127.0.0.1:9200",
-					Usage: "URL for the Elasticsearch cluster",
-				},
-				cli.StringFlag{
-					Name:  "index, i",
-					Value: "timdex",
-					Usage: "Name of the Elasticsearch index",
-				},
-			},
 			Action: func(c *cli.Context) error {
-				url := c.String("url")
-				index := c.String("index")
-				client, err := elastic.NewClient(
-					elastic.SetURL(url),
-					elastic.SetSniff(false))
+				client, err := esClient(url, index, v4)
 				if err != nil {
 					return err
 				}
@@ -148,6 +147,7 @@ func main() {
 				if err != nil {
 					return err
 				}
+				log.Println("Index created")
 				return nil
 			},
 		},
@@ -157,4 +157,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func esClient(url string, index string, v4 bool) (*elastic.Client, error) {
+	var client *http.Client
+	if v4 {
+		sess := session.Must(session.NewSession())
+		creds := credentials.NewChainCredentials([]credentials.Provider{
+			&credentials.EnvProvider{},
+			&credentials.SharedCredentialsProvider{},
+			&ec2rolecreds.EC2RoleProvider{
+				Client: ec2metadata.New(sess),
+			},
+		})
+		client = aws.NewV4SigningClient(creds, "us-east-1")
+	} else {
+		client = http.DefaultClient
+	}
+	return elastic.NewClient(
+		elastic.SetURL(url),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheck(false),
+		elastic.SetHttpClient(client),
+	)
 }
