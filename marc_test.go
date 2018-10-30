@@ -106,7 +106,7 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error(err)
 	}
 
-	rules, err := RetrieveRules("fixtures/marc_rules.json")
+	rules, err := RetrieveRules("config/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 		return
@@ -213,7 +213,7 @@ func TestTranslateLanguageCodes(t *testing.T) {
 }
 
 func TestMarcParser(t *testing.T) {
-	rules, err := RetrieveRules("fixtures/marc_rules.json")
+	rules, err := RetrieveRules("config/marc_rules.json")
 
 	if err != nil {
 		spew.Dump(err)
@@ -245,7 +245,7 @@ func TestMarcProcess(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	p := MarcGenerator{marcfile: marcfile, rulesfile: "fixtures/marc_rules.json"}
+	p := MarcGenerator{marcfile: marcfile, rulesfile: "config/marc_rules.json"}
 	out := p.Generate()
 	var i int
 	for range out {

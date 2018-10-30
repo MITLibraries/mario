@@ -20,6 +20,13 @@ Create and configure the index with:
 $ mario create
 ```
 
+The Mario container can be built and used by running:
+
+```
+$ docker build -t mario .
+$ docker run --rm -i mario parse -c title - < fixtures/test.mrc
+```
+
 ## System Overview
 ![alt text](docs/charts/dip_overview.png "Mario system overview chart")
 
