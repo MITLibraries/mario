@@ -82,6 +82,8 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[st
 	r := Record{}
 
 	r.Identifier = marcRecord.Identifier()
+	r.Source = "MIT Aleph"
+	r.SourceLink = "https://library.mit.edu/item/" + r.Identifier
 	r.OclcNumber = getFields(marcRecord, rules, "oclc_number")
 
 	lccn := getFields(marcRecord, rules, "lccn")

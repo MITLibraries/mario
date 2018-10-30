@@ -4,6 +4,8 @@ package main
 // mapping various external data sources before sending to elasticsearch
 type Record struct {
 	Identifier           string         `json:"identifier"`
+	Source               string         `json:"source"`
+	SourceLink           string         `json:"source_link"`
 	Title                string         `json:"title"`
 	AlternateTitles      []string       `json:"alternate_titles,omitempty"`
 	Creator              []string       `json:"creators,omitempty"`
