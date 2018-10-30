@@ -149,6 +149,23 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:  "delete",
+			Usage: "Delete an Elasticsearch index",
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				_, err = client.DeleteIndex(index).Do(ctx)
+				if err != nil {
+					return err
+				}
+				log.Println("Index deleted")
+				return nil
+			},
+		},
 	}
 
 	err := app.Run(os.Args)
