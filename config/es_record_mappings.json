@@ -1,0 +1,204 @@
+{
+	"mappings": {
+		"Record": {
+			"properties": {
+				"alternate_titles" : {
+					 "type" : "text"
+				},
+				"call_numbers": {
+					"type": "text"
+				},
+				"content_type": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"contents" : {
+					"type" : "text"
+				},
+				"contributors": {
+					"properties": {
+						"kind": {
+							"type": "text",
+							"fields": {
+								"keyword": {
+									"type": "keyword",
+									"ignore_above": 256
+								}
+							}
+						},
+						"value": {
+							"type": "text",
+							"fields": {
+								"keyword": {
+									"type": "keyword",
+									"ignore_above": 256
+								}
+							}
+						}
+					}
+				},
+				"country_of_publication": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"creators": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"dois" : {
+					"type" : "text"
+				},
+				"edition": {
+					"type": "text"
+				},
+				"format" : {
+					"type" : "text",
+					"fields" : {
+						"keyword" : {
+							"type" : "keyword",
+							"ignore_above" : 256
+						}
+					}
+				},
+				"identifier": {
+					"type": "text"
+				},
+				"imprint": {
+					"type": "text"
+				},
+				"isbns": {
+					"type": "text"
+				},
+				"languages": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"lccn": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"literary_form": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"notes": {
+					"type": "text"
+				},
+				"numbering" : {
+					"type" : "text"
+				},
+				"oclcs" : {
+					"type" : "text"
+				},
+				"physical_description": {
+					"type": "text"
+				},
+				"publication_date": {
+					"type": "text",
+					"fields": {
+						"date": {
+							"type": "date"
+						}
+					}
+				},
+				"publication_frequency" : {
+					"type" : "text",
+					"fields" : {
+						"keyword" : {
+							"type" : "keyword",
+							"ignore_above" : 256
+						}
+					}
+				},
+				"related_items" : {
+					"properties" : {
+						"kind" : {
+							"type" : "text",
+							"fields" : {
+								"keyword" : {
+									"type" : "keyword",
+									"ignore_above" : 256
+								}
+							}
+						},
+						"value" : {
+							"type" : "text",
+							"fields" : {
+								"keyword" : {
+									"type" : "keyword",
+									"ignore_above" : 256
+								}
+							}
+						}
+					}
+				},
+				"related_place" : {
+					"type" : "text",
+					"fields" : {
+						"keyword" : {
+							"type" : "keyword",
+							"ignore_above" : 256
+						}
+					}
+				},
+				"source": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"source_link": {
+					"type": "text"
+				},
+				"subjects": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"summary": {
+					"type": "text"
+				},
+				"title": {
+					"type": "text"
+				}
+			}
+		}
+	}
+}
