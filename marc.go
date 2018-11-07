@@ -161,6 +161,9 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[st
 
 	lf := getFields(marcRecord, rules, "literary_form")
 	r.LiteraryForm = literaryForm(lf)
+
+	r.Links = getLinks(marcRecord)
+
 	return r
 }
 
@@ -355,4 +358,30 @@ func TranslateLanguageCodes(recordCodes []string, languageCodes map[string]strin
 		}
 	}
 	return languages
+}
+
+// getLinks take a MARC record and eturns an array of Link objects from the 856 field data.
+func getLinks(marcrecord *marc21.Record) []Link {
+	var links []Link
+	marc856 := marcrecord.GetFields("856")
+	if len(marc856) == 0 {
+		return nil
+	}
+	for _, f := range marc856 {
+		switch f := f.(type) {
+		case *marc21.DataField:
+			ind1 := string(f.Ind1)
+			ind2 := string(f.Ind2)
+
+			if ind1 == "4" && (ind2 == "0" || ind2 == "1") {
+				link := Link{
+					Kind:         stringifySelectSubfields(f, []byte("3")),
+					URL:          stringifySelectSubfields(f, []byte("u")),
+					Text:         stringifySelectSubfields(f, []byte("y")),
+					Restrictions: stringifySelectSubfields(f, []byte("z"))}
+				links = append(links, link)
+			}
+		}
+	}
+	return links
 }
