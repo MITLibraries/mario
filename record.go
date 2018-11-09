@@ -52,10 +52,10 @@ type RelatedItem struct {
 
 // Link is a port of a Record
 type Link struct {
-	Kind         string `json:"kind"`
-	Text         string `json:"text"`
+	Kind         string `json:"kind,omitempty"`
+	Text         string `json:"text,omitempty"`
 	URL          string `json:"url"`
-	Restrictions string `json:"restrictions"`
+	Restrictions string `json:"restrictions,omitempty"`
 }
 
 // Holdings is a port of a Record

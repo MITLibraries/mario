@@ -487,9 +487,7 @@
     "fields": [
       {
         "tag": "856",
-        "subfields": "u",
-        "indicator1": "0",
-        "indicator2": "1"
+        "notes": "For this field, if indicator 1 is 4 and indicator 2 is 0 or 1, we take the URL from subfield u, the kind from subfield 3, link text from subfield y, and restrictions from subfield z."
       }
     ]
   }
