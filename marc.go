@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -71,15 +72,20 @@ func (m *marcparser) parse(out chan Record) {
 			}
 			log.Fatal(err)
 		}
-
-		out <- marcToRecord(record, m.rules, m.languageCodes)
+		r, err := marcToRecord(record, m.rules, m.languageCodes)
+		if err != nil {
+			log.Println(err)
+		} else {
+			out <- r
+		}
 	}
 	close(out)
 }
 
 // trasforms a single marc21 record into our internal record struct
-func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[string]string) Record {
-	r := Record{}
+func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[string]string) (r Record, err error) {
+	err = nil
+	r = Record{}
 
 	r.Identifier = marcRecord.Identifier()
 	r.Source = "MIT Aleph"
@@ -94,6 +100,9 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[st
 	title := getFields(marcRecord, rules, "title")
 	if title != nil {
 		r.Title = title[0]
+	} else {
+		err = fmt.Errorf("Record %s has no title, check validity", r.Identifier)
+		return r, err
 	}
 	r.AlternateTitles = getFields(marcRecord, rules, "alternate_titles")
 	r.Creator = getFields(marcRecord, rules, "creators")
@@ -164,7 +173,7 @@ func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[st
 
 	r.Links = getLinks(marcRecord)
 
-	return r
+	return r, err
 }
 
 // returns slice of string representations of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
@@ -233,7 +242,7 @@ func collectSubfields(field *Field, marcrecord *marc21.Record) []string {
 			first, _ := strconv.Atoi(f[0])
 			take, _ := strconv.Atoi(f[1])
 			r = append(r, subs[first:(first+take)])
-		} else {
+		} else if subs != "" {
 			r = append(r, subs)
 		}
 	}

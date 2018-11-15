@@ -118,7 +118,7 @@ func TestMarcToRecord(t *testing.T) {
 		return
 	}
 
-	item := marcToRecord(record, rules, languageCodes)
+	item, _ := marcToRecord(record, rules, languageCodes)
 
 	if item.Creator[0] != "Sandburg, Carl, 1878-1967." {
 		t.Error("Expected match, got", item.Creator)
