@@ -35,7 +35,7 @@ type Record struct {
 	InBibliography       []string       `json:"in_bibliography,omitempty"`
 	RelatedItems         []*RelatedItem `json:"related_items,omitempty"`
 	Links                []Link         `json:"links,omitempty"`
-	Holdings             []Holdings     `json:"holdings,omitempty"`
+	Holdings             []Holding      `json:"holdings,omitempty"`
 }
 
 // Contributor is a port of a Record
@@ -59,10 +59,11 @@ type Link struct {
 }
 
 // Holdings is a port of a Record
-type Holdings struct {
+type Holding struct {
 	Location   string `json:"location"`
 	CallNumber string `json:"call_number"`
-	Status     string `json:"status"`
+	Summary    string `json:"summary"`
+	Notes      string `json:"notes"`
 }
 
 // Rule defines where the rules are in JSON

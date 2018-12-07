@@ -75,6 +75,22 @@
 						}
 					}
 				},
+				"holdings": {
+					"properties": {
+						"call_number": {
+							"type": "keyword"
+						},
+						"location": {
+							"type": "keyword"
+						},
+						"notes": {
+							"type": "text"
+						},
+						"summary": {
+							"type": "text"
+						}
+					}
+				},
 				"identifier": {
 					"type": "text"
 				},
