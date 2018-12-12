@@ -364,6 +364,9 @@ func getLinks(fmlRecord fml.Record) []Link {
 				URL:          subfieldValue(f.SubFields, "u"),
 				Text:         subfieldValue(f.SubFields, "y"),
 				Restrictions: subfieldValue(f.SubFields, "z")}
+			if link.Kind == "" {
+				link.Kind = "unknown"
+			}
 			links = append(links, link)
 		}
 	}
