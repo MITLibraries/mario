@@ -71,7 +71,6 @@
     "fields": [
       {
         "tag": "008",
-        "subfields": "a",
         "bytes": "7:4"
       }
     ]
@@ -82,7 +81,6 @@
     "fields": [
       {
         "tag": "008",
-        "subfields": "a",
         "bytes": "15:3",
         "notes": "Values governed by table: https://www.loc.gov/marc/countries/countries_code.html"
       }
@@ -94,7 +92,6 @@
     "fields": [
       {
         "tag": "008",
-        "subfields": "a",
         "bytes": "35:3",
         "notes": "Values governed by table: https://www.loc.gov/marc/languages/language_code.html or: http://id.loc.gov/vocabulary/languages.html"
       },

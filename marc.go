@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/MITLibraries/fml"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/miku/marc21"
 )
 
 // RetrieveRules for parsing MARC
@@ -49,8 +49,11 @@ type MarcGenerator struct {
 //Generate a channel of Records.
 func (m *MarcGenerator) Generate() <-chan Record {
 	rules, err := RetrieveRules(m.rulesfile)
-	languageCodes, err := RetrieveLanguageCodelist()
+	if err != nil {
+		spew.Dump(err)
+	}
 
+	languageCodes, err := RetrieveLanguageCodelist()
 	if err != nil {
 		spew.Dump(err)
 	}
@@ -62,16 +65,11 @@ func (m *MarcGenerator) Generate() <-chan Record {
 }
 
 func (m *marcparser) parse(out chan Record) {
-	for {
-		record, err := marc21.ReadRecord(m.file)
+	mr := fml.NewMarcIterator(m.file)
 
-		// if we get an error, log it
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			log.Fatal(err)
-		}
+	for mr.Next() {
+		record := mr.Value()
+
 		r, err := marcToRecord(record, m.rules, m.languageCodes)
 		if err != nil {
 			log.Println(err)
@@ -82,129 +80,162 @@ func (m *marcparser) parse(out chan Record) {
 	close(out)
 }
 
-// trasforms a single marc21 record into our internal record struct
-func marcToRecord(marcRecord *marc21.Record, rules []*Rule, languageCodes map[string]string) (r Record, err error) {
+func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]string) (r Record, err error) {
 	err = nil
 	r = Record{}
 
-	r.Identifier = marcRecord.Identifier()
+	r.Identifier = fmlRecord.ControlNum()
+
 	r.Source = "MIT Aleph"
 	r.SourceLink = "https://library.mit.edu/item/" + r.Identifier
-	r.OclcNumber = getFields(marcRecord, rules, "oclc_number")
+	r.OclcNumber = applyRule(fmlRecord, rules, "oclc_number")
 
-	lccn := getFields(marcRecord, rules, "lccn")
+	lccn := applyRule(fmlRecord, rules, "lccn")
 	if lccn != nil {
-		r.Lccn = lccn[0]
+		r.Lccn = strings.TrimSpace(lccn[0])
 	}
 
-	title := getFields(marcRecord, rules, "title")
+	title := applyRule(fmlRecord, rules, "title")
 	if title != nil {
 		r.Title = title[0]
 	} else {
 		err = fmt.Errorf("Record %s has no title, check validity", r.Identifier)
 		return r, err
 	}
-	r.AlternateTitles = getFields(marcRecord, rules, "alternate_titles")
-	r.Creator = getFields(marcRecord, rules, "creators")
-	r.Contributor = getContributors(marcRecord, rules, "contributors")
 
-	r.RelatedPlace = getFields(marcRecord, rules, "related_place")
+	r.AlternateTitles = applyRule(fmlRecord, rules, "alternate_titles")
+	r.Creator = applyRule(fmlRecord, rules, "creators")
+	r.Contributor = getContributors(fmlRecord, rules, "contributors")
 
-	r.RelatedItems = getRelatedItems(marcRecord, rules, "related_items")
+	r.RelatedPlace = applyRule(fmlRecord, rules, "related_place")
+	r.RelatedItems = getRelatedItems(fmlRecord, rules, "related_items")
 
-	r.InBibliography = getFields(marcRecord, rules, "in_bibliography")
+	r.InBibliography = applyRule(fmlRecord, rules, "in_bibliography")
 
-	r.Subject = getFields(marcRecord, rules, "subjects")
+	r.Subject = applyRule(fmlRecord, rules, "subjects")
 
-	r.Isbn = getFields(marcRecord, rules, "isbns")
-	r.Issn = getFields(marcRecord, rules, "issns")
-	r.Doi = getFields(marcRecord, rules, "dois")
+	r.Isbn = applyRule(fmlRecord, rules, "isbns")
+	r.Issn = applyRule(fmlRecord, rules, "issns")
+	r.Doi = applyRule(fmlRecord, rules, "dois")
 
-	country := getFields(marcRecord, rules, "country_of_publication")
+	country := applyRule(fmlRecord, rules, "country_of_publication")
 	if country != nil {
 		r.Country = country[0]
 	}
 
 	// TODO: use lookup tables to translate returned codes to values
-	r.Language = getFields(marcRecord, rules, "languages")
+	r.Language = applyRule(fmlRecord, rules, "languages")
 	r.Language = TranslateLanguageCodes(r.Language, languageCodes)
 
-	r.CallNumber = getFields(marcRecord, rules, "call_numbers")
+	r.CallNumber = applyRule(fmlRecord, rules, "call_numbers")
 
-	edition := getFields(marcRecord, rules, "edition")
+	edition := applyRule(fmlRecord, rules, "edition")
 	if edition != nil {
 		r.Edition = edition[0]
 	}
 
-	r.Imprint = getFields(marcRecord, rules, "imprint")
+	r.Imprint = applyRule(fmlRecord, rules, "imprint")
 
-	description := getFields(marcRecord, rules, "physical_description")
+	description := applyRule(fmlRecord, rules, "physical_description")
 	if description != nil {
 		r.PhysicalDescription = description[0]
 	}
 
-	r.PublicationFrequency = getFields(marcRecord, rules, "publication_frequency")
+	r.PublicationFrequency = applyRule(fmlRecord, rules, "publication_frequency")
 
 	// publication year
-	date := getFields(marcRecord, rules, "publication_date")
+	date := applyRule(fmlRecord, rules, "publication_date")
 	if date != nil {
 		r.PublicationDate = date[0]
 	}
 
-	numbering := getFields(marcRecord, rules, "numbering")
+	numbering := applyRule(fmlRecord, rules, "numbering")
 	if numbering != nil {
 		r.Numbering = numbering[0]
 	}
 
-	r.Notes = getFields(marcRecord, rules, "notes")
+	r.Notes = applyRule(fmlRecord, rules, "notes")
 
-	r.Contents = getFields(marcRecord, rules, "contents")
+	r.Contents = applyRule(fmlRecord, rules, "contents")
 
-	r.Summary = getFields(marcRecord, rules, "summary")
-
-	// TODO: use lookup tables to translate returned codes to values
-	r.Format = getFields(marcRecord, rules, "format")
+	r.Summary = applyRule(fmlRecord, rules, "summary")
 
 	// TODO: use lookup tables to translate returned codes to values
-	r.ContentType = contentType(marcRecord.Leader.Type)
+	r.Format = applyRule(fmlRecord, rules, "format")
 
-	lf := getFields(marcRecord, rules, "literary_form")
+	// TODO: use lookup tables to translate returned codes to values
+	// r.ContentType = contentType(fmlRecord.Leader.Type)
+
+	lf := applyRule(fmlRecord, rules, "literary_form")
 	r.LiteraryForm = literaryForm(lf)
 
-	r.Links = getLinks(marcRecord)
+	r.Links = getLinks(fmlRecord)
 
 	return r, err
 }
 
-// returns slice of string representations of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
-func getFields(marcRecord *marc21.Record, rules []*Rule, field string) []string {
+func applyRule(fmlRecord fml.Record, rules []*Rule, field string) []string {
 	recordFieldRule := getRules(rules, field)
-	return applyRule(recordFieldRule, marcRecord)
+
+	res := extractData(recordFieldRule, fmlRecord)
+	return res
+}
+
+// takes a supplied marc rule and fmlRecord returns an array of stringified subfields
+func extractData(rule *Rule, fmlRecord fml.Record) []string {
+	var field []string
+	for _, r := range rule.Fields {
+		f := filter(fmlRecord, r)
+		for _, y := range f {
+			field = append(field, y)
+		}
+	}
+	return field
+}
+
+func filter(fmlRecord fml.Record, field *Field) []string {
+	var stuff []string
+	values := fmlRecord.Filter(field.Tag + field.Subfields)
+	for _, f := range values {
+		v := strings.Join(f, " ")
+		if field.Bytes != "" {
+			f := strings.Split(field.Bytes, ":")
+			first, _ := strconv.Atoi(f[0])
+			take, _ := strconv.Atoi(f[1])
+			v = v[first:(first + take)]
+		}
+		stuff = append(stuff, v)
+	}
+	return stuff
 }
 
 // returns slice of contributors of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
-func getContributors(marcRecord *marc21.Record, rules []*Rule, field string) []*Contributor {
+func getContributors(fmlRecord fml.Record, rules []*Rule, field string) []*Contributor {
 	recordFieldRule := getRules(rules, field)
 	var c []*Contributor
+
 	for _, r := range recordFieldRule.Fields {
 		y := new(Contributor)
 		y.Kind = r.Kind
-		y.Value = collectSubfields(r, marcRecord)
+
+		y.Value = filter(fmlRecord, r)
+
 		if y.Value != nil {
 			c = append(c, y)
 		}
 	}
+
 	return c
 }
 
 // returns slice of related items of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
-func getRelatedItems(marcRecord *marc21.Record, rules []*Rule, field string) []*RelatedItem {
+func getRelatedItems(fmlRecord fml.Record, rules []*Rule, field string) []*RelatedItem {
 	recordFieldRule := getRules(rules, field)
 	var c []*RelatedItem
 	for _, r := range recordFieldRule.Fields {
 		y := new(RelatedItem)
 		y.Kind = r.Kind
-		y.Value = collectSubfields(r, marcRecord)
+		y.Value = filter(fmlRecord, r)
 		if y.Value != nil {
 			c = append(c, y)
 		}
@@ -220,59 +251,6 @@ func getRules(rules []*Rule, label string) *Rule {
 		}
 	}
 	return nil // TODO: this will lead to a panic and end the world. While this is ultimately an appropriate response to failing to find rules we expect to find, it would be better to handle that explictly and log something that explains it before terminating cleanly.
-}
-
-// takes a supplied marc rule and marcrecord returns an array of stringified subfields
-func applyRule(rule *Rule, marcRecord *marc21.Record) []string {
-	var field []string
-	for _, r := range rule.Fields {
-		field = append(field, collectSubfields(r, marcRecord)...)
-	}
-	return field
-}
-
-// takes our local Field structure that contains our processing rules and a MARC21.Record and returns a slice of stringified representations of the fields we are interested in
-func collectSubfields(field *Field, marcrecord *marc21.Record) []string {
-	fields := marcrecord.GetFields(field.Tag)
-	var r []string
-	for _, f := range fields {
-		subs := stringifySelectSubfields(f, []byte(field.Subfields))
-		if field.Bytes != "" && subs != "" {
-			f := strings.Split(field.Bytes, ":")
-			first, _ := strconv.Atoi(f[0])
-			take, _ := strconv.Atoi(f[1])
-			r = append(r, subs[first:(first+take)])
-		} else if subs != "" {
-			r = append(r, subs)
-		}
-	}
-	return r
-}
-
-// keeps only supplied subfields (effectively filtering out unwanted subfields) while maintaining order of subfields in supplied marc21.Field and returns them by joining them into a string
-func stringifySelectSubfields(field marc21.Field, subfields []byte) string {
-	var keep []string
-	switch f := field.(type) {
-	case *marc21.DataField:
-		for _, s := range f.SubFields {
-			if Contains(subfields, s.Code) {
-				keep = append(keep, s.Value)
-			}
-		}
-	case *marc21.ControlField:
-		keep = append(keep, f.Data)
-	}
-	return strings.Join(keep, " ")
-}
-
-// Contains tells whether a contains x.
-func Contains(a []byte, x byte) bool {
-	for _, n := range a {
-		if x == n {
-			return true
-		}
-	}
-	return false
 }
 
 func literaryForm(x []string) string {
@@ -370,27 +348,36 @@ func TranslateLanguageCodes(recordCodes []string, languageCodes map[string]strin
 }
 
 // getLinks take a MARC record and eturns an array of Link objects from the 856 field data.
-func getLinks(marcrecord *marc21.Record) []Link {
+func getLinks(fmlRecord fml.Record) []Link {
 	var links []Link
-	marc856 := marcrecord.GetFields("856")
+	marc856 := fmlRecord.DataField("856")
 	if len(marc856) == 0 {
 		return nil
 	}
 	for _, f := range marc856 {
-		switch f := f.(type) {
-		case *marc21.DataField:
-			ind1 := string(f.Ind1)
-			ind2 := string(f.Ind2)
+		ind1 := string(f.Indicator1)
+		ind2 := string(f.Indicator2)
 
-			if ind1 == "4" && (ind2 == "0" || ind2 == "1") {
-				link := Link{
-					Kind:         stringifySelectSubfields(f, []byte("3")),
-					URL:          stringifySelectSubfields(f, []byte("u")),
-					Text:         stringifySelectSubfields(f, []byte("y")),
-					Restrictions: stringifySelectSubfields(f, []byte("z"))}
-				links = append(links, link)
+		if ind1 == "4" && (ind2 == "0" || ind2 == "1") {
+			link := Link{
+				Kind:         subfieldValue(f.SubFields, "3"),
+				URL:          subfieldValue(f.SubFields, "u"),
+				Text:         subfieldValue(f.SubFields, "y"),
+				Restrictions: subfieldValue(f.SubFields, "z")}
+			if link.Kind == "" {
+				link.Kind = "unknown"
 			}
+			links = append(links, link)
 		}
 	}
 	return links
+}
+
+func subfieldValue(subs []fml.SubField, code string) string {
+	for _, x := range subs {
+		if x.Code == code {
+			return x.Value
+		}
+	}
+	return ""
 }
