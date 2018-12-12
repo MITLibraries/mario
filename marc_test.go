@@ -4,104 +4,19 @@ import (
 	"os"
 	"testing"
 
+	"github.com/MITLibraries/fml"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/miku/marc21"
 )
-
-func TestContains(t *testing.T) {
-	a := []byte{'a', 'v', 'x', 'y', 'z'}
-
-	shouldContain := Contains(a, 'a')
-	if !shouldContain {
-		t.Error("Expected true, got ", shouldContain)
-	}
-
-	shouldNotContain := Contains(a, 'b')
-	if shouldNotContain {
-		t.Error("Expected true, got ", shouldNotContain)
-	}
-}
-
-func TestCollectSubfields(t *testing.T) {
-	file, err := os.Open("fixtures/record1.mrc")
-	if err != nil {
-		t.Error(err)
-	}
-	record, err := marc21.ReadRecord(file)
-	if err != nil {
-		t.Error(err)
-	}
-
-	var subfields []string
-
-	f := new(Field)
-	f.Tag = "245"
-	f.Subfields = "a"
-
-	subfields = collectSubfields(f, record)
-	if subfields[0] != "Arithmetic /" {
-		t.Error("Expected match got", subfields[0])
-	}
-
-	f.Subfields = "ac"
-	subfields = collectSubfields(f, record)
-	if subfields[0] != "Arithmetic / Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
-		t.Error("Expected match got", subfields[0])
-	}
-
-	f.Tag = "650"
-	f.Subfields = "ax"
-	subfields = collectSubfields(f, record)
-	if len(subfields) != 5 {
-		t.Error("Expected 5 got", len(subfields))
-	}
-
-	if subfields[0] != "Arithmetic Juvenile poetry." {
-		t.Error("Expected match got", subfields[0])
-	}
-
-	if subfields[4] != "Visual perception." {
-		t.Error("Expected match got", subfields[0])
-	}
-}
-
-func TestStringifySelectSubfields(t *testing.T) {
-	file, err := os.Open("fixtures/record1.mrc")
-	if err != nil {
-		t.Error(err)
-	}
-	record, err := marc21.ReadRecord(file)
-	if err != nil {
-		t.Error(err)
-	}
-
-	x := record.GetFields("245")
-
-	subs := []byte{'a'}
-	stringified := stringifySelectSubfields(x[0], subs)
-	if stringified != "Arithmetic /" {
-		t.Error("Expected match, got", stringified)
-	}
-
-	subs = []byte{'a', 'c'}
-	stringified = stringifySelectSubfields(x[0], subs)
-	if stringified != "Arithmetic / Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
-		t.Error("Expected match, got", stringified)
-	}
-
-	subs = []byte{'c'}
-	stringified = stringifySelectSubfields(x[0], subs)
-	if stringified != "Carl Sandburg ; illustrated as an anamorphic adventure by Ted Rand." {
-		t.Error("Expected match, got", stringified)
-	}
-}
 
 func TestMarcToRecord(t *testing.T) {
 	file, err := os.Open("fixtures/record1.mrc")
 	if err != nil {
 		t.Error(err)
 	}
-	record, err := marc21.ReadRecord(file)
+	records := fml.NewMarcIterator(file)
+	_ = records.Next()
+	record := records.Value()
+
 	if err != nil {
 		t.Error(err)
 	}
@@ -124,8 +39,7 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error("Expected match, got", item.Creator)
 	}
 
-	// yeah, this should be fixed
-	if item.Identifier != "   92005291 " {
+	if item.Identifier != "92005291" {
 		t.Error("Expected match, got", item.Identifier)
 	}
 
