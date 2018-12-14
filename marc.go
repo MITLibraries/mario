@@ -68,7 +68,14 @@ func (m *marcparser) parse(out chan Record) {
 	mr := fml.NewMarcIterator(m.file)
 
 	for mr.Next() {
-		record := mr.Value()
+		record, err := mr.Value()
+
+		if err != nil {
+			log.Println("Error parsing MARC record:", record.ControlNum())
+			log.Println(err)
+			log.Println(record)
+			continue
+		}
 
 		r, err := marcToRecord(record, m.rules, m.languageCodes)
 		if err != nil {
