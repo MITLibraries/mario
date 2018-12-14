@@ -15,7 +15,7 @@ func TestMarcToRecord(t *testing.T) {
 	}
 	records := fml.NewMarcIterator(file)
 	_ = records.Next()
-	record := records.Value()
+	record, err := records.Value()
 
 	if err != nil {
 		t.Error(err)

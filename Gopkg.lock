@@ -3,14 +3,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fd61b267501a007d27bd9fd4e9b58ec591bf93bbcc2efada2550ef179ca1dbe6"
+  digest = "1:5ad823f0910a668f507601a1ffc4863a67a84ff7b6592bd6e9c7d51c178b93f0"
   name = "github.com/MITLibraries/fml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e2e07b9454ad481dcca2c64942c1e9bc67963067"
+  revision = "14d8240194b5e930c81260cb6aed316682994657"
 
 [[projects]]
-  digest = "1:9c8778b62e0ac69c3d0dcc2e78a685af7d3180e7779061eeeab2f7b7a508c64a"
+  digest = "1:3c0461b384311c3913ade39dc1b3adbbd36062488d6ef12d451e1632c77d03d8"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -44,8 +44,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "c4e0e593d5f18b478f17ff0e86b56d41a70ced2d"
-  version = "v1.16.2"
+  revision = "056aa960bc0fb3918d8b2101e2a9c92675327ea3"
+  version = "v1.16.5"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -74,14 +74,6 @@
   ]
   pruneopts = "UT"
   revision = "60711f1a8329503b04e1c88535f419d0bb440bff"
-
-[[projects]]
-  branch = "master"
-  digest = "1:a21b0341d1c8cd522235e6b39e4bec263572d9cf1825a3bc548f6618d48a0a27"
-  name = "github.com/miku/marc21"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "03a360545cd2fdc1b872fc3f929186df81b3a4a5"
 
 [[projects]]
   digest = "1:a436b7bbf405c09d85dc5a191bc9c4f3c748f5bef193a79ac575325ee31175ca"
@@ -122,7 +114,6 @@
     "github.com/aws/aws-sdk-go/aws/ec2metadata",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/davecgh/go-spew/spew",
-    "github.com/miku/marc21",
     "github.com/olivere/elastic",
     "github.com/olivere/elastic/aws/v4",
     "github.com/urfave/cli",
