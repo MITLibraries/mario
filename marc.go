@@ -163,8 +163,7 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	// TODO: use lookup tables to translate returned codes to values
 	r.Format = applyRule(fmlRecord, rules, "format")
 
-	// TODO: use lookup tables to translate returned codes to values
-	// r.ContentType = contentType(fmlRecord.Leader.Type)
+	r.ContentType = contentType(fmlRecord.Leader.Type)
 
 	lf := applyRule(fmlRecord, rules, "literary_form")
 	r.LiteraryForm = literaryForm(lf)
