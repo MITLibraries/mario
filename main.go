@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/urfave/cli"
 )
@@ -25,7 +28,6 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "index, i",
-			Value:       "timdex",
 			Usage:       "Name of the Elasticsearch index",
 			Destination: &index,
 		},
@@ -38,7 +40,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:      "parse",
+			Name:      "ingest",
 			Usage:     "Parse and ingest the input file",
 			ArgsUsage: "[filepath or - to use stdin]",
 			Flags: []cli.Flag{
@@ -66,6 +68,12 @@ func main() {
 			Action: func(c *cli.Context) error {
 				var file *os.File
 				var err error
+
+				if index == "" {
+					t := time.Now().UTC()
+					ft := strings.ToLower(t.Format(time.RFC3339))
+					index = fmt.Sprintf("%s-%s", "aleph", ft)
+				}
 
 				// if a file path is passed as a flag
 				if c.Args().Get(0) != "-" {
@@ -138,14 +146,132 @@ func main() {
 			},
 		},
 		{
-			Name:  "create",
-			Usage: "Create an Elasticsearch index",
+			Name:  "indexes",
+			Usage: "List Elasticsearch indexes",
 			Action: func(c *cli.Context) error {
 				client, err := esClient(url, index, v4)
 				if err != nil {
 					return err
 				}
-				createRecordIndex(client, index)
+				ctx := context.Background()
+				indexes, err := client.CatIndices().Do(ctx)
+				if err != nil {
+					return err
+				}
+				for _, i := range indexes {
+					fmt.Printf("Name: %s \n"+
+						"  DocsCount: %d \n"+
+						"  Health: %s \n"+
+						"  Status: %s \n"+
+						"  UUID: %s \n"+
+						"  StoreSize: %s \n\n",
+						i.Index, i.DocsCount, i.Health, i.Status, i.UUID, i.StoreSize)
+				}
+				if len(indexes) == 0 {
+					fmt.Printf("No indexes found.")
+				}
+				return nil
+			},
+		},
+		{
+			Name:  "aliases",
+			Usage: "List Elasticsearch aliases and associated indexes",
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				aliases, err := client.CatAliases().Do(ctx)
+				if err != nil {
+					return err
+				}
+				for _, a := range aliases {
+					fmt.Printf("Alias: %s \n"+
+						"  Index: %s \n\n", a.Alias, a.Index)
+				}
+				if len(aliases) == 0 {
+					fmt.Printf("No aliases found.")
+				}
+				return nil
+			},
+		},
+		{
+			Name:  "ping",
+			Usage: "Ping Elasticsearch",
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				ping, code, err := client.Ping(url).Do(ctx)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Response code: %d \n"+
+					"Name: %s \n"+
+					"Cluster Name: %s \n"+
+					"Tag line: %s \n"+
+					"Version: %s \n"+
+					"BuildHash: %s \n"+
+					"LuceneVersion: %s \n",
+					code, ping.Name, ping.ClusterName, ping.TagLine, ping.Version.Number,
+					ping.Version.BuildHash, ping.Version.LuceneVersion)
+				return nil
+			},
+		},
+		{
+			Name:     "delete",
+			Usage:    "Delete an Elasticsearch index",
+			Category: "Index actions",
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				_, err = client.DeleteIndex(index).Do(ctx)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Index deleted")
+				return nil
+			},
+		},
+		{
+			Name:     "promote",
+			Usage:    "Promote Elasticsearch alias to prod",
+			Category: "Index actions",
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				_, err = client.Alias().Add(index, "production").Do(ctx)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Index %s promoted.", index)
+				return nil
+			},
+		},
+		{
+			Name:     "demote",
+			Usage:    "Demote Elasticsearch alias from prod",
+			Category: "Index actions",
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+				_, err = client.Alias().Remove(index, "production").Do(ctx)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Index %s demoted.", index)
 				return nil
 			},
 		},
