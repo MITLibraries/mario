@@ -176,6 +176,11 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	r.LiteraryForm = literaryForm(lf)
 
 	r.Links = getLinks(fmlRecord)
+	r.Holdings = getHoldings(fmlRecord, "866", []string{"b", "c", "h", "a", "z"})
+
+	if len(r.Holdings) == 0 {
+		r.Holdings = getHoldings(fmlRecord, "852", []string{"b", "c", "h", "a", "z"})
+	}
 
 	return r, err
 }
@@ -377,6 +382,26 @@ func getLinks(fmlRecord fml.Record) []Link {
 		}
 	}
 	return links
+}
+
+// getLocations takes a MARC record and returns an array of Holdings objects.
+// The expecation is to use either an 852 or an 866 field.
+func getHoldings(fmlRecord fml.Record, tag string, subfieldCodes []string) []Holding {
+	var holdings []Holding
+	df := fmlRecord.DataField(tag)
+	if len(df) == 0 {
+		return nil
+	}
+	for _, f := range df {
+		holding := Holding{
+			Location:   subfieldValue(f.SubFields, subfieldCodes[0]),
+			Collection: subfieldValue(f.SubFields, subfieldCodes[1]),
+			CallNumber: subfieldValue(f.SubFields, subfieldCodes[2]),
+			Summary:    subfieldValue(f.SubFields, subfieldCodes[3]),
+			Notes:      subfieldValue(f.SubFields, subfieldCodes[4])}
+		holdings = append(holdings, holding)
+	}
+	return holdings
 }
 
 func subfieldValue(subs []fml.SubField, code string) string {

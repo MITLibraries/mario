@@ -91,6 +91,28 @@
 						}
 					}
 				},
+        "holdings": {
+        	"properties": {
+        		"call_number": {
+        			"type": "keyword",
+              "normalizer": "lowercase"
+        		},
+            "collection": {
+        			"type": "keyword",
+              "normalizer": "lowercase"
+        		},
+        		"location": {
+        			"type": "keyword",
+              "normalizer": "lowercase"
+        		},
+        		"notes": {
+        			"type": "text"
+        		},
+        		"summary": {
+        			"type": "text"
+        		}
+        	}
+        },
 				"identifier": {
 					"type": "text"
 				},

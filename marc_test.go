@@ -60,6 +60,67 @@ func TestMarcToRecord(t *testing.T) {
 	}
 }
 
+func TestMarcHoldings(t *testing.T) {
+	file, err := os.Open("fixtures/holdings_test_records.mrc")
+	if err != nil {
+		t.Error(err)
+	}
+	records := fml.NewMarcIterator(file)
+	_ = records.Next()
+	record, err := records.Value()
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	rules, err := RetrieveRules("config/marc_rules.json")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	languageCodes, err := RetrieveLanguageCodelist()
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	// This record has an 852, but no 866
+	item, _ := marcToRecord(record, rules, languageCodes)
+
+	h := item.Holdings[0]
+	if h.Location != "HUM" {
+		t.Error("Expected match, got", h.Location)
+	}
+	if h.Collection != "GRNVL" {
+		t.Error("Expected match, got", h.Collection)
+	}
+
+	// This record has no 866 or 852 fields
+	_ = records.Next()
+	record, _ = records.Value()
+	item, _ = marcToRecord(record, rules, languageCodes)
+
+	if len(item.Holdings) != 0 {
+		t.Error("Expected no holdings, got", len(item.Holdings))
+	}
+
+	// This record has an 866 field and 852. We use 866.
+	_ = records.Next()
+	record, _ = records.Value()
+	item, _ = marcToRecord(record, rules, languageCodes)
+	h = item.Holdings[0]
+	if h.Location != "Barker Library" {
+		t.Error("Expected match, got", h.Location)
+	}
+	if h.Collection != "Stacks" {
+		t.Error("Expected match, got", h.Collection)
+	}
+	if h.Summary != "1995 and updates" {
+		t.Error("Expected match, got", h.Summary)
+	}
+}
+
 var contenttypetests = []struct {
 	in  byte
 	out string
