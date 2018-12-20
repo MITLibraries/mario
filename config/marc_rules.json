@@ -487,5 +487,21 @@
         "notes": "For this field, if indicator 1 is 4 and indicator 2 is 0 or 1, we take the URL from subfield u, the kind from subfield 3, link text from subfield y, and restrictions from subfield z."
       }
     ]
+  },
+  {
+    "label": "holdings_locations",
+    "array": true,
+    "fields": [
+      {
+        "tag": "866",
+        "subfields": "bcha",
+        "notes": "We can't use our normal rule parsing for this as we need to split the subfields into a structure in a way that doesn't fit our normal expectations."
+      },
+      {
+        "tag": "852",
+        "subfields": "bcha",
+        "notes": "We fall back on 852 if 866 does not exist. We can't use our normal rule parsing for this as we need to split the subfields into a structure in a way that doesn't fit our normal expectations."
+      }
+    ]
   }
 ]
