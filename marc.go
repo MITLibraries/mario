@@ -320,7 +320,7 @@ func contentType(x byte) string {
 	return t
 }
 
-// RetrieveLanguageCodelist retrieves language codes for parsing MARC languages
+// RetrieveCodelist retrieves language codes for parsing MARC languages
 func RetrieveCodelist(codeType string, filePath string) (map[string]string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
