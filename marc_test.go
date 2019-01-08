@@ -27,13 +27,19 @@ func TestMarcToRecord(t *testing.T) {
 		return
 	}
 
-	languageCodes, err := RetrieveLanguageCodelist()
+	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	item, _ := marcToRecord(record, rules, languageCodes)
+	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
 
 	if item.Creator[0] != "Sandburg, Carl, 1878-1967." {
 		t.Error("Expected match, got", item.Creator)
@@ -79,14 +85,20 @@ func TestMarcHoldings(t *testing.T) {
 		return
 	}
 
-	languageCodes, err := RetrieveLanguageCodelist()
+	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
 	// This record has an 852, but no 866
-	item, _ := marcToRecord(record, rules, languageCodes)
+	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
 
 	h := item.Holdings[0]
 	if h.Location != "HUM" {
@@ -99,7 +111,7 @@ func TestMarcHoldings(t *testing.T) {
 	// This record has no 866 or 852 fields
 	_ = records.Next()
 	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes)
+	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
 
 	if len(item.Holdings) != 0 {
 		t.Error("Expected no holdings, got", len(item.Holdings))
@@ -108,7 +120,7 @@ func TestMarcHoldings(t *testing.T) {
 	// This record has an 866 field and 852. We use 866.
 	_ = records.Next()
 	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes)
+	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
 	h = item.Holdings[0]
 	if h.Location != "Barker Library" {
 		t.Error("Expected match, got", h.Location)
@@ -165,7 +177,7 @@ func TestContentType(t *testing.T) {
 }
 
 func TestTranslateLanguageCodes(t *testing.T) {
-	languageCodes, err := RetrieveLanguageCodelist()
+	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
@@ -173,7 +185,7 @@ func TestTranslateLanguageCodes(t *testing.T) {
 
 	in := []string{"abk", "ach", "afa", "aaa", ""}
 	out := []string{"Abkhaz", "Acoli", "Afroasiatic (Other)", "aaa", ""}
-	langs := TranslateLanguageCodes(in, languageCodes)
+	langs := TranslateCodes(in, languageCodes)
 
 	if len(langs) != len(out) {
 		t.Errorf("got %q items, want %q", len(langs), len(out))
