@@ -10,7 +10,7 @@
   revision = "14d8240194b5e930c81260cb6aed316682994657"
 
 [[projects]]
-  digest = "1:3c0461b384311c3913ade39dc1b3adbbd36062488d6ef12d451e1632c77d03d8"
+  digest = "1:05074f25c83604e6fd00d3b5904ae6cac7f3c6a58f9f2d90f3b927652d3b005d"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -44,8 +44,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "056aa960bc0fb3918d8b2101e2a9c92675327ea3"
-  version = "v1.16.5"
+  revision = "62936e15518acb527a1a9cb4a39d96d94d0fd9a2"
+  version = "v1.16.15"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -76,7 +76,7 @@
   revision = "60711f1a8329503b04e1c88535f419d0bb440bff"
 
 [[projects]]
-  digest = "1:a436b7bbf405c09d85dc5a191bc9c4f3c748f5bef193a79ac575325ee31175ca"
+  digest = "1:a4685fac9d8029adf81c4c05331d4be3a6b8f5b4680831ae38bf26dc3ecab543"
   name = "github.com/olivere/elastic"
   packages = [
     ".",
@@ -85,16 +85,16 @@
     "uritemplates",
   ]
   pruneopts = "UT"
-  revision = "1619150b007041b6dba8aa447f0e2d151cc2b4c5"
-  version = "v6.2.14"
+  revision = "f5738570b28a4b5fab39442e3a5b5ffc599a562c"
+  version = "v6.2.15"
 
 [[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"

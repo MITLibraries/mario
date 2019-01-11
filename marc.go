@@ -38,6 +38,7 @@ type marcparser struct {
 	file          io.Reader
 	rules         []*Rule
 	languageCodes map[string]string
+	countryCodes  map[string]string
 }
 
 //MarcGenerator parses binary MARC records.
@@ -53,13 +54,19 @@ func (m *MarcGenerator) Generate() <-chan Record {
 		spew.Dump(err)
 	}
 
-	languageCodes, err := RetrieveLanguageCodelist()
+	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	if err != nil {
+		spew.Dump(err)
+	}
+
+	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
 	if err != nil {
 		spew.Dump(err)
 	}
 
 	out := make(chan Record)
-	p := marcparser{file: m.marcfile, rules: rules, languageCodes: languageCodes}
+	p := marcparser{file: m.marcfile, rules: rules, languageCodes: languageCodes,
+		countryCodes: countryCodes}
 	go p.parse(out)
 	return out
 }
@@ -77,7 +84,7 @@ func (m *marcparser) parse(out chan Record) {
 			continue
 		}
 
-		r, err := marcToRecord(record, m.rules, m.languageCodes)
+		r, err := marcToRecord(record, m.rules, m.languageCodes, m.countryCodes)
 		if err != nil {
 			log.Println(err)
 		} else {
@@ -87,7 +94,7 @@ func (m *marcparser) parse(out chan Record) {
 	close(out)
 }
 
-func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]string) (r Record, err error) {
+func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]string, countryCodes map[string]string) (r Record, err error) {
 	err = nil
 	r = Record{}
 
@@ -127,12 +134,13 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 
 	country := applyRule(fmlRecord, rules, "country_of_publication")
 	if country != nil {
-		r.Country = country[0]
+		country[0] = strings.Trim(country[0], " |")
+		r.Country = TranslateCodes(country, countryCodes)[0]
 	}
 
 	// TODO: use lookup tables to translate returned codes to values
 	r.Language = applyRule(fmlRecord, rules, "languages")
-	r.Language = TranslateLanguageCodes(r.Language, languageCodes)
+	r.Language = TranslateCodes(r.Language, languageCodes)
 
 	r.CallNumber = applyRule(fmlRecord, rules, "call_numbers")
 
@@ -312,20 +320,20 @@ func contentType(x byte) string {
 	return t
 }
 
-// RetrieveLanguageCodelist retrieves language codes for parsing MARC languages
-func RetrieveLanguageCodelist() (map[string]string, error) {
-	file, err := os.Open("config/languages.xml")
+// RetrieveCodelist retrieves language codes for parsing MARC languages
+func RetrieveCodelist(codeType string, filePath string) (map[string]string, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Language struct
-	type Language struct {
+	type CodeMap struct {
 		Name string `xml:"name"`
 		Code string `xml:"code"`
 	}
 
 	decoder := xml.NewDecoder(file)
-	languages := make(map[string]string)
+	codes := make(map[string]string)
 
 	for {
 		t, _ := decoder.Token()
@@ -334,28 +342,28 @@ func RetrieveLanguageCodelist() (map[string]string, error) {
 		}
 		switch se := t.(type) {
 		case xml.StartElement:
-			if se.Name.Local == "language" {
-				var l Language
-				decoder.DecodeElement(&l, &se)
-				languages[l.Code] = l.Name
+			if se.Name.Local == codeType {
+				var c CodeMap
+				decoder.DecodeElement(&c, &se)
+				codes[c.Code] = c.Name
 			}
 		}
 	}
-	return languages, err
+	return codes, err
 }
 
-// TranslateLanguageCodes takes an array of MARC language codes and returns the language names.
-func TranslateLanguageCodes(recordCodes []string, languageCodes map[string]string) []string {
-	var languages []string
-	for _, l := range recordCodes {
-		name := languageCodes[l]
+// TranslateCodes takes an array of MARC language/country codes and returns the language/country names.
+func TranslateCodes(recordCodes []string, codeMap map[string]string) []string {
+	var names []string
+	for _, c := range recordCodes {
+		name := codeMap[c]
 		if name != "" {
-			languages = append(languages, name)
+			names = append(names, name)
 		} else {
-			languages = append(languages, l)
+			names = append(names, c)
 		}
 	}
-	return languages
+	return names
 }
 
 // getLinks take a MARC record and eturns an array of Link objects from the 856 field data.
