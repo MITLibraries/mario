@@ -3,14 +3,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5ad823f0910a668f507601a1ffc4863a67a84ff7b6592bd6e9c7d51c178b93f0"
+  digest = "1:de53ea25bf07faeb942289aab1f06a25e9afadacd57c722ec145ca0cc7f73cc7"
   name = "github.com/MITLibraries/fml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "14d8240194b5e930c81260cb6aed316682994657"
+  revision = "a79082be5fac8291d39578f5ee5641ea0e660e8e"
 
 [[projects]]
-  digest = "1:05074f25c83604e6fd00d3b5904ae6cac7f3c6a58f9f2d90f3b927652d3b005d"
+  digest = "1:99d4347651f425801502c37cec85b4f0e211fbe64ed65311f0c9ae6bf585ec42"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -44,8 +44,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "62936e15518acb527a1a9cb4a39d96d94d0fd9a2"
-  version = "v1.16.15"
+  revision = "d2d8f8c33f49af99cdd889f6897ffd525c520407"
+  version = "v1.16.19"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
