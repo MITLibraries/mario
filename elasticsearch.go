@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
@@ -51,5 +53,109 @@ func createRecordIndex(client *elastic.Client, index string) error {
 		panic(err)
 	}
 	log.Println("Index created")
+	return nil
+}
+
+func previous(client *elastic.Client, prefix string) ([]string, error) {
+	// retrieve all indexes linked to production alias and filter by supplied prefix. These are the "old" indexes.
+	log.Printf("previous!")
+	aliases, err := aliases(client)
+	if err != nil {
+		return nil, err
+	}
+
+	var indexes []string
+
+	for _, a := range aliases {
+		if strings.HasPrefix(a.Index, prefix) {
+			indexes = append(indexes, a.Index)
+		}
+	}
+
+	if len(aliases) == 0 {
+		fmt.Printf("No aliases found. Nothing to demote.")
+	}
+
+	log.Println(indexes)
+
+	return indexes, nil
+}
+
+func aliases(client *elastic.Client) (elastic.CatAliasesResponse, error) {
+	ctx := context.Background()
+	aliases, err := client.CatAliases().Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return aliases, nil
+}
+
+func delete(client *elastic.Client, index string) error {
+	ctx := context.Background()
+	_, err := client.DeleteIndex(index).Do(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Index deleted")
+	return nil
+}
+
+func demote(client *elastic.Client, index string) error {
+	ctx := context.Background()
+	_, err := client.Alias().Remove(index, "production").Do(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Index %s demoted.", index)
+	return nil
+}
+
+func indexes(client *elastic.Client) error {
+	ctx := context.Background()
+	indexes, err := client.CatIndices().Do(ctx)
+	if err != nil {
+		return err
+	}
+	for _, i := range indexes {
+		fmt.Printf("Name: %s \n"+
+			"  DocsCount: %d \n"+
+			"  Health: %s \n"+
+			"  Status: %s \n"+
+			"  UUID: %s \n"+
+			"  StoreSize: %s \n\n",
+			i.Index, i.DocsCount, i.Health, i.Status, i.UUID, i.StoreSize)
+	}
+	if len(indexes) == 0 {
+		fmt.Printf("No indexes found.")
+	}
+	return nil
+}
+
+func ping(client *elastic.Client, url string) error {
+	ctx := context.Background()
+	ping, code, err := client.Ping(url).Do(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Response code: %d \n"+
+		"Name: %s \n"+
+		"Cluster Name: %s \n"+
+		"Tag line: %s \n"+
+		"Version: %s \n"+
+		"BuildHash: %s \n"+
+		"LuceneVersion: %s \n",
+		code, ping.Name, ping.ClusterName, ping.TagLine, ping.Version.Number,
+		ping.Version.BuildHash, ping.Version.LuceneVersion)
+	return nil
+}
+
+func promote(client *elastic.Client, index string) error {
+	ctx := context.Background()
+	_, err := client.Alias().Add(index, "production").Do(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Index %s promoted.", index)
 	return nil
 }

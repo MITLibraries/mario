@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,7 @@ import (
 
 func main() {
 	var debug bool
+	var auto bool
 	var url, index string
 	var v4 bool
 
@@ -60,25 +62,53 @@ func main() {
 					Value: "marc",
 					Usage: "Type of file to process",
 				},
+				cli.StringFlag{
+					Name:  "prefix, p",
+					Value: "aleph",
+					Usage: "Index prefix to use: default is aleph",
+				},
 				cli.BoolFlag{
 					Name:        "debug",
 					Usage:       "Output debugging information",
 					Destination: &debug,
+				},
+				cli.BoolFlag{
+					Name:        "auto",
+					Usage:       "Automatically promote / demote on completion",
+					Destination: &auto,
 				},
 			},
 			Action: func(c *cli.Context) error {
 				var file io.ReadCloser
 				var err error
 
-				if index == "" {
-					t := time.Now().UTC()
-					ft := strings.ToLower(t.Format(time.RFC3339))
-					index = fmt.Sprintf("%s-%s", "aleph", ft)
-				}
-
 				inputData := c.Args().Get(0)
 				if len(inputData) == 0 {
 					return cli.NewExitError("No filepath argument provided", 1)
+				}
+
+				if strings.Contains(inputData, "mit01_edsu1") {
+					// this is an aleph update. Determine the index that is currently
+					// associated with `production` with the aleph prefix and set that
+					// as the index name.
+					println("Update file detected.")
+					client, err := esClient(url, index, v4)
+					if err != nil {
+						return err
+					}
+
+					old, err := previous(client, c.String("prefix"))
+					if err != nil {
+						return err
+					}
+					if len(old) != 1 {
+						return errors.New("Multiple indexes match. Unable to determine which index to update")
+					}
+					index = old[0]
+					println("Using exisitng index:", index)
+
+					// disable auto mode as we are using an existing index
+					auto = false
 				}
 
 				if inputData[0:2] == "s3" {
@@ -93,6 +123,12 @@ func main() {
 				}
 
 				defer file.Close()
+
+				if index == "" {
+					t := time.Now().UTC()
+					ft := strings.ToLower(t.Format(time.RFC3339))
+					index = fmt.Sprintf("%s-%s", c.String("prefix"), ft)
+				}
 
 				p := Pipeline{}
 
@@ -146,6 +182,28 @@ func main() {
 					log.Printf("Total records ingested: %d", ctr.Count)
 				}
 
+				if auto {
+					client, err := esClient(url, index, v4)
+					if err != nil {
+						return err
+					}
+
+					log.Printf("Automatic mode detected")
+					// retrieve old indexes with supplied prefix
+					old, err := previous(client, c.String("prefix"))
+					if err != nil {
+						return err
+					}
+
+					// demote old indexes
+					for _, i := range old {
+						demote(client, i)
+					}
+
+					// promote new index
+					promote(client, index)
+				}
+
 				return nil
 			},
 		},
@@ -157,23 +215,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				indexes, err := client.CatIndices().Do(ctx)
-				if err != nil {
-					return err
-				}
-				for _, i := range indexes {
-					fmt.Printf("Name: %s \n"+
-						"  DocsCount: %d \n"+
-						"  Health: %s \n"+
-						"  Status: %s \n"+
-						"  UUID: %s \n"+
-						"  StoreSize: %s \n\n",
-						i.Index, i.DocsCount, i.Health, i.Status, i.UUID, i.StoreSize)
-				}
-				if len(indexes) == 0 {
-					fmt.Printf("No indexes found.")
-				}
+				indexes(client)
 				return nil
 			},
 		},
@@ -185,11 +227,12 @@ func main() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				aliases, err := client.CatAliases().Do(ctx)
+
+				aliases, err := aliases(client)
 				if err != nil {
 					return err
 				}
+
 				for _, a := range aliases {
 					fmt.Printf("Alias: %s \n"+
 						"  Index: %s \n\n", a.Alias, a.Index)
@@ -208,20 +251,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				ping, code, err := client.Ping(url).Do(ctx)
-				if err != nil {
-					return err
-				}
-				fmt.Printf("Response code: %d \n"+
-					"Name: %s \n"+
-					"Cluster Name: %s \n"+
-					"Tag line: %s \n"+
-					"Version: %s \n"+
-					"BuildHash: %s \n"+
-					"LuceneVersion: %s \n",
-					code, ping.Name, ping.ClusterName, ping.TagLine, ping.Version.Number,
-					ping.Version.BuildHash, ping.Version.LuceneVersion)
+				ping(client, url)
 				return nil
 			},
 		},
@@ -234,12 +264,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				_, err = client.DeleteIndex(index).Do(ctx)
-				if err != nil {
-					return err
-				}
-				fmt.Printf("Index deleted")
+				delete(client, index)
 				return nil
 			},
 		},
@@ -252,12 +277,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				_, err = client.Alias().Add(index, "production").Do(ctx)
-				if err != nil {
-					return err
-				}
-				fmt.Printf("Index %s promoted.", index)
+				promote(client, index)
 				return nil
 			},
 		},
@@ -270,12 +290,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				_, err = client.Alias().Remove(index, "production").Do(ctx)
-				if err != nil {
-					return err
-				}
-				fmt.Printf("Index %s demoted.", index)
+				demote(client, index)
 				return nil
 			},
 		},
