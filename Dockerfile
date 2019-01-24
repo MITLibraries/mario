@@ -1,10 +1,15 @@
-FROM golang:1.11
+FROM golang:1.11-alpine
 
+RUN apk add --no-cache curl git
 RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 WORKDIR /go/src/mario
-COPY . .
-RUN dep ensure
-RUN go install
+COPY Gopkg.* ./
+RUN dep ensure -vendor-only
+COPY *.go ./
+RUN go build
 
-ENTRYPOINT ["mario"]
+FROM alpine
+COPY --from=0 /go/src/mario/mario .
+COPY config config/
+ENTRYPOINT ["./mario"]
 CMD ["--help"]
