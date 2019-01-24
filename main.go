@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -42,7 +43,7 @@ func main() {
 		{
 			Name:      "ingest",
 			Usage:     "Parse and ingest the input file",
-			ArgsUsage: "[filepath or - to use stdin]",
+			ArgsUsage: "[filepath, use format 's3://bucketname/objectname' for s3]",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "rules",
@@ -66,7 +67,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				var file *os.File
+				var file io.ReadCloser
 				var err error
 
 				if index == "" {
@@ -75,13 +76,16 @@ func main() {
 					index = fmt.Sprintf("%s-%s", "aleph", ft)
 				}
 
-				// if a file path is passed as a flag
-				if c.Args().Get(0) != "-" {
-					// Open the file.
-					file, err = os.Open(c.Args().Get(0))
+				inputData := c.Args().Get(0)
+				if len(inputData) == 0 {
+					return cli.NewExitError("No filepath argument provided", 1)
+				}
+
+				if inputData[0:2] == "s3" {
+					s3Info := strings.Split(inputData, "/")
+					file, err = getS3Obj(s3Info[2], s3Info[3])
 				} else {
-					// otherwise try to use stdin
-					file = os.Stdin
+					file, err = os.Open(inputData)
 				}
 
 				if err != nil {

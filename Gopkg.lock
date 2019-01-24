@@ -10,7 +10,7 @@
   revision = "a79082be5fac8291d39578f5ee5641ea0e660e8e"
 
 [[projects]]
-  digest = "1:99d4347651f425801502c37cec85b4f0e211fbe64ed65311f0c9ae6bf585ec42"
+  digest = "1:d41cff10314da0d12d0e09d474eb20a9e327b0f30cd359886ccae53ae509047f"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -32,15 +32,20 @@
     "aws/session",
     "aws/signer/v4",
     "internal/ini",
+    "internal/s3err",
     "internal/sdkio",
     "internal/sdkrand",
     "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
+    "private/protocol/eventstream",
+    "private/protocol/eventstream/eventstreamapi",
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
+    "service/s3",
     "service/sts",
   ]
   pruneopts = "UT"
@@ -109,10 +114,12 @@
   analyzer-version = 1
   input-imports = [
     "github.com/MITLibraries/fml",
+    "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds",
     "github.com/aws/aws-sdk-go/aws/ec2metadata",
     "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/s3",
     "github.com/davecgh/go-spew/spew",
     "github.com/olivere/elastic",
     "github.com/olivere/elastic/aws/v4",
