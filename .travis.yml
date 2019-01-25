@@ -19,7 +19,7 @@ install:
 script: go test -v ./...
 
 before_deploy:
-  - pip install awscli
+  - pip install --user awscli
   - make dist
 
 deploy:
