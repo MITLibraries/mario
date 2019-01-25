@@ -18,7 +18,9 @@ install:
 
 script: go test -v ./...
 
-before_deploy: make dist
+before_deploy:
+  - pip install awscli
+  - make dist
 
 deploy:
   skip_cleanup: true
