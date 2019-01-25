@@ -17,3 +17,10 @@ install:
   - dep ensure
 
 script: go test -v ./...
+
+before_deploy: make dist
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: make publish
