@@ -4,7 +4,7 @@ Date: 2018-07-03
 
 ## Status
 
-Accepted
+Superceded by [12. Use Lambda and Fargate for Task Execution](0012-use-lambda-and-fargate-for-task-execution.md)
 
 ## Context
 
