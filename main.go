@@ -91,7 +91,7 @@ func main() {
 					// this is an aleph update. Determine the index that is currently
 					// associated with `production` with the aleph prefix and set that
 					// as the index name.
-					println("Update file detected.")
+					log.Printf("Update file detected.")
 					client, err := esClient(url, index, v4)
 					if err != nil {
 						return err

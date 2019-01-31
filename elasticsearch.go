@@ -52,13 +52,12 @@ func createRecordIndex(client *elastic.Client, index string) error {
 	if err != nil {
 		panic(err)
 	}
-	log.Println("Index created")
+	log.Println("Index created:", index)
 	return nil
 }
 
 func previous(client *elastic.Client, prefix string) ([]string, error) {
 	// retrieve all indexes linked to production alias and filter by supplied prefix. These are the "old" indexes.
-	log.Printf("previous!")
 	aliases, err := aliases(client)
 	if err != nil {
 		return nil, err
@@ -73,10 +72,10 @@ func previous(client *elastic.Client, prefix string) ([]string, error) {
 	}
 
 	if len(aliases) == 0 {
-		fmt.Printf("No aliases found. Nothing to demote.")
+		log.Printf("No aliases found. Nothing to demote.")
 	}
 
-	log.Println(indexes)
+	log.Println("Previous indexes:", indexes)
 
 	return indexes, nil
 }
@@ -97,7 +96,7 @@ func delete(client *elastic.Client, index string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Index deleted")
+	log.Printf("Index deleted")
 	return nil
 }
 
@@ -107,7 +106,7 @@ func demote(client *elastic.Client, index string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Index %s demoted.", index)
+	log.Println("Index demoted:", index)
 	return nil
 }
 
@@ -127,7 +126,7 @@ func indexes(client *elastic.Client) error {
 			i.Index, i.DocsCount, i.Health, i.Status, i.UUID, i.StoreSize)
 	}
 	if len(indexes) == 0 {
-		fmt.Printf("No indexes found.")
+		log.Printf("No indexes found.")
 	}
 	return nil
 }
@@ -156,6 +155,6 @@ func promote(client *elastic.Client, index string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Index %s promoted.", index)
+	log.Println("Index promoted:", index)
 	return nil
 }
