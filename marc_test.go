@@ -101,10 +101,10 @@ func TestMarcHoldings(t *testing.T) {
 	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
 
 	h := item.Holdings[0]
-	if h.Location != "HUM" {
+	if h.Location != "Hayden Library" {
 		t.Error("Expected match, got", h.Location)
 	}
-	if h.Collection != "GRNVL" {
+	if h.Collection != "Graphic Novel Collection" {
 		t.Error("Expected match, got", h.Collection)
 	}
 
