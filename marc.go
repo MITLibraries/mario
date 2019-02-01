@@ -402,8 +402,10 @@ func getHoldings(fmlRecord fml.Record, tag string, subfieldCodes []string) []Hol
 	}
 	for _, f := range df {
 		holding := Holding{
-			Location:   subfieldValue(f.SubFields, subfieldCodes[0]),
-			Collection: subfieldValue(f.SubFields, subfieldCodes[1]),
+			Location: lookupLocation(subfieldValue(f.SubFields, subfieldCodes[0])),
+			Collection: lookupCollection(
+				subfieldValue(f.SubFields, subfieldCodes[1]),
+				subfieldValue(f.SubFields, subfieldCodes[0])),
 			CallNumber: subfieldValue(f.SubFields, subfieldCodes[2]),
 			Summary:    subfieldValue(f.SubFields, subfieldCodes[3]),
 			Notes:      subfieldValue(f.SubFields, subfieldCodes[4])}
@@ -419,4 +421,147 @@ func subfieldValue(subs []fml.SubField, code string) string {
 		}
 	}
 	return ""
+}
+
+func lookupCollection(col string, loc string) string {
+	var c string
+	switch col {
+	case "STACK":
+		c = "Stacks"
+	case "ATLCS":
+		c = "Atlas Case"
+	case "AUDBK":
+		c = "Audiobooks"
+	case "JRNAL":
+		if loc == "HUM" {
+			c = "Humanities Journals"
+		} else if loc == "SCI" {
+			c = "Science Journals"
+		} else {
+			c = "Journal Collection"
+		}
+	case "BRWS":
+		c = "Browsery"
+	case "CNSUS":
+		c = "Census Collection"
+	case "CIRCD":
+		c = "Service Desk"
+	case "DETEC":
+		c = "Detective Fiction Collection"
+	case "EJ":
+		c = "Electronic Journal"
+	case "GIS":
+		c = "GIS Collection"
+	case "GOV":
+		c = "Government Documents"
+	case "GRNVL":
+		c = "Graphic Novel Collection"
+	case "HDCBX":
+		c = "Harvard Depository Boxed Items"
+	case "ICPSR":
+		c = "ICPSR Codebooks"
+	case "IMPLS":
+		c = "Impulse Borrowing Display"
+	case "LSA4":
+		c = "Journal Collection"
+	case "OVRSZ":
+		c = "Oversize Materials"
+	case "LMTED":
+		c = "Limited Access Collection"
+	case "MAPRM":
+		c = "Map Room"
+	case "MFORM":
+		c = "Microforms"
+	case "MEDIA":
+		c = "Media"
+	case "NCIP":
+		c = "BLC ILB Item"
+	case "NEWBK":
+		c = "Science New Books Display"
+	case "NOLN1":
+		c = "Noncirculating Collection 1"
+	case "NOLN2":
+		c = "Noncirculating Collection 2"
+	case "NOLN3":
+		c = "Noncirculating Collection 3"
+	case "OCC":
+		c = "Off Campus Collection"
+	case "OCCBX":
+		c = "Off Campus Collection Boxed Items"
+	case "OFFCT":
+		c = "Offsite Cataloging"
+	case "PAMPH":
+		c = "Pamphlet Collection"
+	case "PRECT":
+		if loc == "HUM" {
+			c = "Humanities Pre-cataloged Collection"
+		} else if loc == "SCI" {
+			c = "Science Pre-cataloged Collection"
+		} else {
+			c = "Pre-cataloged Collection"
+		}
+	case "REF":
+		c = "Reference Collection"
+	case "RSERV":
+		c = "Reserve Stacks"
+	case "SWING":
+		c = "Basement Grammar Books"
+	case "TRAVL":
+		c = "Travel Collection"
+	case "UNCAT":
+		c = "Uncataloged Materials - see Librarian"
+	case "UNKNW":
+		c = "Problems Materials - see Librarian"
+	case "WSTM":
+		c = "Women in Science, Technology, and Medicine"
+	default:
+		c = col
+	}
+
+	return c
+}
+
+func lookupLocation(loc string) string {
+	var t string
+	switch loc {
+	case "HUM", "RBR", "SCI":
+		t = "Hayden Library"
+	case "MIT50":
+		t = "MIT Administrative Library"
+	case "ARC":
+		t = "Institute Archives"
+	case "ACQ":
+		t = "Institute Archives"
+	case "ENG":
+		t = "Barker Library"
+	case "CAT":
+		t = "Cataloging and Metadata Services"
+	case "DEW":
+		t = "Dewey Library"
+	case "DIR":
+		t = "Director's Office"
+	case "DOC":
+		t = "Document Services"
+	case "ILB":
+		t = "Interlibrary Borrowing"
+	case "LSA":
+		t = "Library Storage Annex"
+	case "NET":
+		t = "Internet Resource"
+	case "MUS":
+		t = "Lewis Music Library"
+	case "PHY":
+		t = "Physics Department Reading Room"
+	case "RTC":
+		t = "Rotch Library"
+	case "RVC":
+		t = "Rotch Visual Collections"
+	case "SPC":
+		t = "Space Cntr: Ask library staff"
+	case "OFFIC":
+		t = "Office delivery"
+	default:
+		t = loc
+	}
+	return t
 }
