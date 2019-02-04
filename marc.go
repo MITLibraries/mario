@@ -206,10 +206,24 @@ func extractData(rule *Rule, fmlRecord fml.Record) []string {
 	for _, r := range rule.Fields {
 		f := filter(fmlRecord, r)
 		for _, y := range f {
-			field = append(field, y)
+			if !stringInSlice(y, field) {
+				field = append(field, y)
+			}
 		}
 	}
 	return field
+}
+
+// stringInSlice determines whether a supplied string is an item in a supplied slice.
+// Returns true if the string is in the slice, and returns false otherwise.
+// Taken from https://stackoverflow.com/a/15323988
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 func filter(fmlRecord fml.Record, field *Field) []string {

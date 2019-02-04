@@ -242,3 +242,11 @@ func TestMarcProcess(t *testing.T) {
 		t.Error("Expected match, got", i)
 	}
 }
+
+func TestStringInSlice(t *testing.T) {
+	l := []string{"hello", "goodbye"}
+	r := stringInSlice("hello", l)
+	if r != true {
+		t.Error("Expected true, got", r)
+	}
+}
