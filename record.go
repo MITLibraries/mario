@@ -16,7 +16,7 @@ type Record struct {
 	Doi                  []string       `json:"dois,omitempty"`
 	OclcNumber           []string       `json:"oclcs,omitempty"`
 	Lccn                 string         `json:"lccn,omitempty"`
-	Country              string         `json:"country_of_publication,omitempty"`
+	Country              string         `json:"place_of_publication,omitempty"`
 	Language             []string       `json:"languages,omitempty"`
 	PublicationDate      string         `json:"publication_date,omitempty"`
 	ContentType          string         `json:"content_type,omitempty"`

@@ -132,7 +132,7 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	r.Issn = applyRule(fmlRecord, rules, "issns")
 	r.Doi = applyRule(fmlRecord, rules, "dois")
 
-	country := applyRule(fmlRecord, rules, "country_of_publication")
+	country := applyRule(fmlRecord, rules, "place_of_publication")
 	if country != nil {
 		country[0] = strings.Trim(country[0], " |")
 		r.Country = TranslateCodes(country, countryCodes)[0]
