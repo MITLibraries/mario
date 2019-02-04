@@ -57,16 +57,6 @@
             }
           }
         },
-        "country_of_publication": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
-          }
-        },
         "creators": {
           "type": "text",
           "fields": {
@@ -165,6 +155,16 @@
         },
         "physical_description": {
           "type": "text"
+        },
+        "place_of_publication": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "normalizer": "lowercase",
+              "ignore_above": 256
+            }
+          }
         },
         "publication_date": {
           "type": "text",

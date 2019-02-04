@@ -76,7 +76,7 @@
     ]
   },
   {
-    "label": "country_of_publication",
+    "label": "place_of_publication",
     "array": false,
     "fields": [
       {
