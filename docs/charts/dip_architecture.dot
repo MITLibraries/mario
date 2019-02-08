@@ -3,22 +3,32 @@
 // http://www.graphviz.org/Download..php if that doesn't work)
 
 digraph G {
-  label="Discovery Index Architecture";
+  label="Discovery Index Flow";
   labelloc=t;
   node [style=filled];
 
-  s3[label="AWS S3 Bucket", color=darkorange]
-  s3Event[label="s3 bucket event triggers aws lamda", color=green]
-  newIndex[label="create new elasticsearch index", color=green]
-  process[label="read data from s3 and process as needed", color=green]
-  writeIndex[label="write to elasticsearch index we created", color=darkorange]
-  updateAlias[label="update alias to point to new index", color=green]
-  moveToProcessedBucket[label="move data file to completed bucket", color=green]
+  aleph[label="Aleph Export Cron to AWS S3 Bucket", color=darkorange, fillcolor=lightgray]
+  s3Event[label="S3 bucket event triggers Mario Powerup in AWS Lambda via CloudWatch", color=darkorange, fillcolor=lightgray]
+  lambda[label="Mario Powerup formats command and calls Mario in AWS Fargate", color=darkorange, fillcolor=lightgray]
+  fullLoad[label="Full Load: create new elasticsearch index", color=green, fillcolor=lightgray]
+  dailyLoad[label="Daily Updates: use current elasticsearch index", color=green, fillcolor=lightgray]
+  process[label="Process data from S3 to standard data model in ElasticSearch", color=green, fillcolor=lightgray]
+  updateAlias[label="Promote new index to production if full load", color=green, fillcolor=lightgray]
 
-  s3 -> s3Event
-  s3Event -> newIndex
-  newIndex -> process
-  process -> writeIndex
-  writeIndex -> updateAlias
-  process -> moveToProcessedBucket
+  aleph -> s3Event
+  s3Event -> lambda
+  lambda -> fullLoad
+  lambda -> dailyLoad
+  dailyLoad -> process
+  fullLoad -> process
+  process -> updateAlias
+
+  subgraph clusterLegend {
+    label="Key";
+    {
+     k2[label="Process the data", color=green, fillcolor=lightgray];
+     k1[label="Get the data into place", color=darkorange, fillcolor=lightgray];
+     k1 -> k2 [style=invis]
+     }
+  }
 }

@@ -7,21 +7,21 @@ digraph G {
   labelloc=t;
   node [style=filled];
 
-  aleph[label="Aleph", color=grey]
-  alephExporter[label="Aleph Metadata Exporter", color=green]
-  s3[label="AWS S3 Bucket", color=darkorange]
-  processor[label="Data Processor", color=green]
-  index[label="ElasticSearch", color=darkorange]
-  archives[label="Archival Metadata", color=grey]
-  archivesExporter[label="Archival Metadata Exporter", color=yellow]
-  futureData[label="Source X, Y, Z, etc", color=grey]
-  futureExporter[label="Source X, Y, Z, etc Metadata Exporter", color=yellow]
-  websites[label="Library Websites / Guides", color=grey]
-  websitesCrawler[label="Crawler", color=yellow]
-  api[label="Local Discovery API", color=green]
-  eds[label="EDS", color=grey]
-  bento[label="Bento", color=grey]
-  magic[label="?", color=grey]
+  aleph[label="Aleph", color=black, fillcolor=lightgray]
+  alephExporter[label="Aleph Metadata Exporter", color=black, fillcolor=green]
+  s3[label="AWS S3 Bucket", color=black, fillcolor=darkorange]
+  processor[label="Mario: pipeline for metadata indexing", color=black, fillcolor=green]
+  index[label="ElasticSearch", color=black, fillcolor=darkorange]
+  archives[label="Archival Metadata", color=black, fillcolor=lightgray]
+  archivesExporter[label="Archival Metadata Exporter", color=black, fillcolor=yellow]
+  futureData[label="Source X, Y, Z, etc", color=black, fillcolor=lightgray]
+  futureExporter[label="Source X, Y, Z, etc Metadata Exporter", color=black, fillcolor=yellow]
+  websites[label="Library Websites / Guides", color=black, fillcolor=lightgray]
+  websitesCrawler[label="Crawler", color=black, fillcolor=yellow]
+  api[label="TIMDEX: Local Discovery API", color=black, fillcolor=green]
+  eds[label="EDS", color=black, fillcolor=lightgray]
+  bento[label="Bento", color=red, fillcolor=lightgray]
+  magic[label="Users Doing Cool Stuff?", color=transparent]
 
   aleph -> alephExporter
   alephExporter -> s3
@@ -39,7 +39,7 @@ digraph G {
   websitesCrawler -> s3
 
   index -> api
-  api -> bento
+  api -> bento [color=red]
   api -> magic
 
   eds -> bento
@@ -47,11 +47,12 @@ digraph G {
   subgraph clusterLegend {
     label="Key";
     {
-     k4[label="Future Project", color=yellow];
+     k4[label="Future Project", color=black, fillcolor=yellow];
      k3[label="Cloud Service", color=darkorange];
-     k2[label="Current Project", color=green];
-     k1[label="Existing System", color=grey];
-     k1 -> k2 -> k3 -> k4 [style=invis]
+     k2[label="Current Project", color=black, fillcolor=green];
+     k1[label="Existing System", color=black, fillcolor=lightgray];
+     k5[label="Spun off Project", color=red, fillcolor=lightgray]
+     k1 -> k2 -> k3 -> k4 -> k5 [style=invis]
      }
   }
 
