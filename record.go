@@ -61,10 +61,10 @@ type Link struct {
 // Holding is a port of a Record
 type Holding struct {
 	Location   string `json:"location"`
-	Collection string `json:"collection"`
+	Collection string `json:"collection,omitempty"`
 	CallNumber string `json:"call_number"`
-	Summary    string `json:"summary"`
-	Notes      string `json:"notes"`
+	Summary    string `json:"summary,omitempty"`
+	Notes      string `json:"notes,omitempty"`
 }
 
 // Rule defines where the rules are in JSON
