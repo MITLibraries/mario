@@ -311,28 +311,6 @@
     ]
   },
   {
-    "label": "format",
-    "array": true,
-    "fields": [
-      {
-        "tag": "852",
-        "subfields": "b",
-        "notes": "Lookup table required to translate values from those fields"
-      }
-    ]
-  },
-  {
-    "label": "format",
-    "array": true,
-    "fields": [
-      {
-        "tag": "852",
-        "subfields": "k",
-        "notes": "Lookup table required to translate values from those fields"
-      }
-    ]
-  },
-  {
     "label": "content_type",
     "array": true,
     "fields": [
@@ -499,7 +477,7 @@
       },
       {
         "tag": "852",
-        "subfields": "bcha",
+        "subfields": "bchak",
         "notes": "We fall back on 852 if 866 does not exist. We can't use our normal rule parsing for this as we need to split the subfields into a structure in a way that doesn't fit our normal expectations."
       }
     ]

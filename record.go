@@ -29,7 +29,6 @@ type Record struct {
 	Notes                []string       `json:"notes,omitempty"`
 	Contents             []string       `json:"contents,omitempty"`
 	Summary              []string       `json:"summary,omitempty"`
-	Format               []string       `json:"format,omitempty"`
 	LiteraryForm         string         `json:"literary_form,omitempty"`
 	RelatedPlace         []string       `json:"related_place,omitempty"`
 	InBibliography       []string       `json:"in_bibliography,omitempty"`
@@ -65,6 +64,7 @@ type Holding struct {
 	CallNumber string `json:"call_number"`
 	Summary    string `json:"summary,omitempty"`
 	Notes      string `json:"notes,omitempty"`
+	Format     string `json:"format,omitempty"`
 }
 
 // Rule defines where the rules are in JSON
