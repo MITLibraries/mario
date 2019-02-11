@@ -187,6 +187,12 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 		r.Holdings = getHoldings(fmlRecord, "852", []string{"b", "c", "h", "a", "z", "k"})
 	}
 
+	for _, h := range r.Holdings {
+		if !stringInSlice(h.Format, r.Format) {
+			r.Format = append(r.Format, h.Format)
+		}
+	}
+
 	return r, err
 }
 

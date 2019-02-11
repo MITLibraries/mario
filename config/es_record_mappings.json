@@ -73,6 +73,16 @@
         "edition": {
           "type": "text"
         },
+        "format": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "normalizer": "lowercase",
+              "ignore_above": 256
+            }
+          }
+        },
         "holdings": {
           "properties": {
             "call_number": {

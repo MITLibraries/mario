@@ -29,6 +29,7 @@ type Record struct {
 	Notes                []string       `json:"notes,omitempty"`
 	Contents             []string       `json:"contents,omitempty"`
 	Summary              []string       `json:"summary,omitempty"`
+	Format               []string       `json:"format,omitempty"`
 	LiteraryForm         string         `json:"literary_form,omitempty"`
 	RelatedPlace         []string       `json:"related_place,omitempty"`
 	InBibliography       []string       `json:"in_bibliography,omitempty"`
