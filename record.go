@@ -65,6 +65,7 @@ type Holding struct {
 	CallNumber string `json:"call_number"`
 	Summary    string `json:"summary,omitempty"`
 	Notes      string `json:"notes,omitempty"`
+	Format     string `json:"format,omitempty"`
 }
 
 // Rule defines where the rules are in JSON

@@ -108,6 +108,10 @@ func TestMarcHoldings(t *testing.T) {
 		t.Error("Expected match, got", h.Collection)
 	}
 
+	if h.Format != "Print volume" {
+		t.Error("Expected match, got", h.Format)
+	}
+
 	// This record has no 866 or 852 fields
 	_ = records.Next()
 	record, _ = records.Value()
@@ -130,6 +134,9 @@ func TestMarcHoldings(t *testing.T) {
 	}
 	if h.Summary != "1995 and updates" {
 		t.Error("Expected match, got", h.Summary)
+	}
+	if h.Format != "Print volume" {
+		t.Error("Expected match, got", h.Format)
 	}
 }
 

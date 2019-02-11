@@ -175,9 +175,6 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 
 	r.Summary = applyRule(fmlRecord, rules, "summary")
 
-	// TODO: use lookup tables to translate returned codes to values
-	r.Format = applyRule(fmlRecord, rules, "format")
-
 	r.ContentType = contentType(fmlRecord.Leader.Type)
 
 	lf := applyRule(fmlRecord, rules, "literary_form")
@@ -187,7 +184,14 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	r.Holdings = getHoldings(fmlRecord, "866", []string{"b", "c", "h", "a", "z"})
 
 	if len(r.Holdings) == 0 {
-		r.Holdings = getHoldings(fmlRecord, "852", []string{"b", "c", "h", "a", "z"})
+		r.Holdings = getHoldings(fmlRecord, "852", []string{"b", "c", "h", "a", "z", "k"})
+	}
+
+	for _, h := range r.Holdings {
+		f := h.Format
+		if f != "" && !stringInSlice(f, r.Format) {
+			r.Format = append(r.Format, f)
+		}
 	}
 
 	return r, err
@@ -423,6 +427,11 @@ func getHoldings(fmlRecord fml.Record, tag string, subfieldCodes []string) []Hol
 			CallNumber: subfieldValue(f.SubFields, subfieldCodes[2]),
 			Summary:    subfieldValue(f.SubFields, subfieldCodes[3]),
 			Notes:      subfieldValue(f.SubFields, subfieldCodes[4])}
+		if tag == "866" {
+			holding.Format = "Print volume"
+		} else {
+			holding.Format = lookupFormat(holding.Location, subfieldValue(f.SubFields, subfieldCodes[5]))
+		}
 		holdings = append(holdings, holding)
 	}
 	return holdings
@@ -576,6 +585,49 @@ func lookupLocation(loc string) string {
 		t = "Office delivery"
 	default:
 		t = loc
+	}
+	return t
+}
+
+func lookupFormat(loc string, formatCode string) string {
+	var t string
+	if loc != "Internet Resource" {
+		switch formatCode {
+		case "BOOKS", "REGULAR":
+			t = "Print volume"
+		case "ATLAS":
+			t = "Atlas"
+		case "AUDIO", "AUDTAPE":
+			t = "Audio tape"
+		case "CD":
+			t = "Compact disc"
+		case "CDROM":
+			t = "CD-ROM"
+		case "DSKETTE":
+			t = "Diskette"
+		case "DVD":
+			t = "DVD-ROM"
+		case "FICHE":
+			t = "Microfiche"
+		case "FOLIO", "OVRSIZE":
+			t = "Oversized print volume"
+		case "MAP":
+			t = "Map sheet"
+		case "MFILM":
+			t = "Microfilm"
+		case "RECORD":
+			t = "Audio record"
+		case "SCORE":
+			t = "Musical score"
+		case "SMALL":
+			t = "Undersized print volume"
+		case "VDISC":
+			t = "Videodisc"
+		case "VHS":
+			t = "VHS"
+		default:
+			t = "Print volume"
+		}
 	}
 	return t
 }
