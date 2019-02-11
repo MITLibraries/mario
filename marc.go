@@ -589,10 +589,10 @@ func lookupLocation(loc string) string {
 	return t
 }
 
-func lookupFormat(loc string, format_code string) string {
+func lookupFormat(loc string, formatCode string) string {
 	var t string
 	if loc != "Internet Resource" {
-		switch format_code {
+		switch formatCode {
 		case "BOOKS", "REGULAR":
 			t = "Print volume"
 		case "ATLAS":
