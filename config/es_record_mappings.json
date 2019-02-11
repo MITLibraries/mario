@@ -102,6 +102,9 @@
             },
             "summary": {
               "type": "text"
+            },
+            "format": {
+              "type": "text"
             }
           }
         },
