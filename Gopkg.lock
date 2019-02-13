@@ -2,12 +2,13 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:de53ea25bf07faeb942289aab1f06a25e9afadacd57c722ec145ca0cc7f73cc7"
+  branch = "bad-dir-fix"
+  digest = "1:9ac58e42f094f3145dba853894f272263a1e6d17c52a4fb16e60596b7cf17b75"
   name = "github.com/MITLibraries/fml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a79082be5fac8291d39578f5ee5641ea0e660e8e"
+  revision = "039bc133960e84a958596cd42de9995725e16f37"
+  source = "github.com/MITLibraries/fml"
 
 [[projects]]
   digest = "1:d41cff10314da0d12d0e09d474eb20a9e327b0f30cd359886ccae53ae509047f"

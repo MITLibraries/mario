@@ -158,3 +158,7 @@ func promote(client *elastic.Client, index string) error {
 	log.Println("Index promoted:", index)
 	return nil
 }
+
+func after(exId int64, requests []elastic.BulkableRequest, resp *elastic.BulkResponse, err error) {
+	fmt.Printf("Request ID: %d -- Errors: %t\n", exId, resp.Errors)
+}
