@@ -73,6 +73,8 @@ func (m *MarcGenerator) Generate() <-chan Record {
 
 func (m *marcparser) parse(out chan Record) {
 	mr := fml.NewMarcIterator(m.file)
+	var dumb_counter int
+	var error_counter int
 
 	for mr.Next() {
 		record, err := mr.Value()
@@ -80,18 +82,34 @@ func (m *marcparser) parse(out chan Record) {
 		if err != nil {
 			log.Println("Error parsing MARC record:", record.ControlNum())
 			log.Println(err)
-			log.Println(record)
+			// os.Stderr.WriteString("--- Begin Problem MARC Record ---\n")
+			// os.Stderr.Write(record.Data)
+			// os.Stderr.WriteString("\n--- End Problem MARC Record ---\n")
+			error_counter++
 			continue
 		}
 
 		r, err := marcToRecord(record, m.rules, m.languageCodes, m.countryCodes)
 		if err != nil {
+			error_counter++
 			log.Println(err)
 		} else {
+			dumb_counter++
 			out <- r
 		}
 	}
+
+	log.Printf("Processed records: %s", strconv.Itoa(dumb_counter))
+	log.Printf("Error records: %s", strconv.Itoa(error_counter))
 	close(out)
+}
+
+func validRecordStatus(record fml.Record) bool {
+	switch record.Leader.Status {
+	case 'd', 'a', 'c', 'n', 'p':
+		return true
+	}
+	return false
 }
 
 func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]string, countryCodes map[string]string) (r Record, err error) {
@@ -99,6 +117,16 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	r = Record{}
 
 	r.Identifier = fmlRecord.ControlNum()
+
+	if fmlRecord.Leader.Status == 'd' {
+		err = fmt.Errorf("Record %s has been deleted or suppressed but we don't handle that yet.", r.Identifier)
+		return r, err
+	}
+
+	if !validRecordStatus(fmlRecord) {
+		err = fmt.Errorf("Record %s has illegal status: %s", r.Identifier, string(fmlRecord.Leader.Status))
+		return r, err
+	}
 
 	r.Source = "MIT Aleph"
 	r.SourceLink = "https://library.mit.edu/item/" + r.Identifier

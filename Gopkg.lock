@@ -3,14 +3,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:de53ea25bf07faeb942289aab1f06a25e9afadacd57c722ec145ca0cc7f73cc7"
+  digest = "1:49706875bd62e17a1a2eef9bee3d118f1627bcb877779442900b3061c6a3e99c"
   name = "github.com/MITLibraries/fml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a79082be5fac8291d39578f5ee5641ea0e660e8e"
+  revision = "cd8e755ed2153200e827c8c91665301d9244f302"
 
 [[projects]]
-  digest = "1:d41cff10314da0d12d0e09d474eb20a9e327b0f30cd359886ccae53ae509047f"
+  digest = "1:13e30c1638ea16b0fa641cd8d6db690778ca3778ff81bf28b02a826ed5a0b74b"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -49,8 +49,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "d2d8f8c33f49af99cdd889f6897ffd525c520407"
-  version = "v1.16.19"
+  revision = "25f89dc67cc7eddac939028c7128499dcfcab46b"
+  version = "v1.16.33"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -81,7 +81,7 @@
   revision = "60711f1a8329503b04e1c88535f419d0bb440bff"
 
 [[projects]]
-  digest = "1:a4685fac9d8029adf81c4c05331d4be3a6b8f5b4680831ae38bf26dc3ecab543"
+  digest = "1:29d64f8d7e127ac9360b0ebbdd0707772e06879ed4b24117ecd3a1c0dc3e18a1"
   name = "github.com/olivere/elastic"
   packages = [
     ".",
@@ -90,8 +90,8 @@
     "uritemplates",
   ]
   pruneopts = "UT"
-  revision = "f5738570b28a4b5fab39442e3a5b5ffc599a562c"
-  version = "v6.2.15"
+  revision = "407a1d940dcc89e279c579eb393d0bdde8fd9ac4"
+  version = "v6.2.16"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
