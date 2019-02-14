@@ -73,8 +73,7 @@ func (m *MarcGenerator) Generate() <-chan Record {
 
 func (m *marcparser) parse(out chan Record) {
 	mr := fml.NewMarcIterator(m.file)
-	var dumb_counter int
-	var error_counter int
+	var errorCount int
 
 	for mr.Next() {
 		record, err := mr.Value()
@@ -85,22 +84,20 @@ func (m *marcparser) parse(out chan Record) {
 			// os.Stderr.WriteString("--- Begin Problem MARC Record ---\n")
 			// os.Stderr.Write(record.Data)
 			// os.Stderr.WriteString("\n--- End Problem MARC Record ---\n")
-			error_counter++
+			errorCount++
 			continue
 		}
 
 		r, err := marcToRecord(record, m.rules, m.languageCodes, m.countryCodes)
 		if err != nil {
-			error_counter++
+			errorCount++
 			log.Println(err)
 		} else {
-			dumb_counter++
 			out <- r
 		}
 	}
 
-	log.Printf("Processed records: %s", strconv.Itoa(dumb_counter))
-	log.Printf("Error records: %s", strconv.Itoa(error_counter))
+	log.Printf("Error records: %s", strconv.Itoa(errorCount))
 	close(out)
 }
 
@@ -119,7 +116,7 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	r.Identifier = fmlRecord.ControlNum()
 
 	if fmlRecord.Leader.Status == 'd' {
-		err = fmt.Errorf("Record %s has been deleted or suppressed but we don't handle that yet.", r.Identifier)
+		err = fmt.Errorf("Record %s has been deleted or suppressed but we don't handle that yet", r.Identifier)
 		return r, err
 	}
 
