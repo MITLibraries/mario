@@ -152,7 +152,7 @@ func main() {
 						createRecordIndex(client, index)
 					}
 
-					es, err := client.BulkProcessor().Name("IngestWorker-1").Do(context.Background())
+					es, err := client.BulkProcessor().After(after).Name("IngestWorker-1").Workers(2).Do(context.Background())
 					if err != nil {
 						return err
 					}
