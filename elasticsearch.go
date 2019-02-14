@@ -160,5 +160,11 @@ func promote(client *elastic.Client, index string) error {
 }
 
 func after(exId int64, requests []elastic.BulkableRequest, resp *elastic.BulkResponse, err error) {
-	fmt.Printf("Request ID: %d -- Errors: %t\n", exId, resp.Errors)
+	if resp.Errors == true {
+		fmt.Printf("Request ID: %d -- Errors: %t\n", exId, resp.Errors)
+		errs := resp.Failed()
+		for _, e := range errs {
+			fmt.Println(e.Error)
+		}
+	}
 }
