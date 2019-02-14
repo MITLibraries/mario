@@ -173,7 +173,7 @@
           "type": "text",
           "fields": {
             "date": {
-              "type": "date"
+              "type": "text"
             }
           }
         },
