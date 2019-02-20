@@ -5,22 +5,25 @@
 digraph G {
   label="Discovery Index";
   labelloc=t;
-  node [style=filled];
+  fontname=helvetica;
+  fontsize=18;
+  node [style=filled, fontname=helvetica, color=black, fillcolor=white, penwidth=3, fontsize=16];
+  pad=0.3;
 
-  aleph[label="Aleph", color=black, fillcolor=lightgray]
-  alephExporter[label="Aleph Metadata Exporter", color=black, fillcolor=green]
-  s3[label="AWS S3 Bucket", color=black, fillcolor=darkorange]
-  processor[label="Mario: pipeline for metadata indexing", color=black, fillcolor=green]
-  index[label="ElasticSearch", color=black, fillcolor=darkorange]
-  archives[label="Archival Metadata", color=black, fillcolor=lightgray]
-  archivesExporter[label="Archival Metadata Exporter", color=black, fillcolor=yellow]
-  futureData[label="Source X, Y, Z, etc", color=black, fillcolor=lightgray]
-  futureExporter[label="Source X, Y, Z, etc Metadata Exporter", color=black, fillcolor=yellow]
-  websites[label="Library Websites / Guides", color=black, fillcolor=lightgray]
-  websitesCrawler[label="Crawler", color=black, fillcolor=yellow]
-  api[label="TIMDEX: Local Discovery API", color=black, fillcolor=green]
-  eds[label="EDS", color=black, fillcolor=lightgray]
-  bento[label="Bento", color=red, fillcolor=lightgray]
+  aleph[label="Aleph"]
+  alephExporter[label="Aleph Metadata Exporter", color=Yellow1, fillcolor=Yellow1]
+  s3[label="AWS S3 Bucket", color=DarkOrange3]
+  processor[label="Mario: pipeline for metadata indexing", color=Yellow1, fillcolor=Yellow1]
+  index[label="ElasticSearch", color=DarkOrange3]
+  archives[label="Archival Metadata"]
+  archivesExporter[label="Archival Metadata Exporter", color=SteelBlue1]
+  futureData[label="Source X, Y, Z, etc", color=black]
+  futureExporter[label="Source X, Y, Z, etc Metadata Exporter", color=SteelBlue1]
+  websites[label="Library Websites / Guides", color=black]
+  websitesCrawler[label="Crawler", color=SteelBlue1]
+  api[label="TIMDEX: Local Discovery API", color=Yellow1, fillcolor=Yellow1]
+  eds[label="EDS"]
+  bento[label="Bento"]
   magic[label="Users Doing Cool Stuff?", color=transparent]
 
   aleph -> alephExporter
@@ -39,7 +42,7 @@ digraph G {
   websitesCrawler -> s3
 
   index -> api
-  api -> bento [color=red]
+  api -> bento [color=SteelBlue1, penwidth=3]
   api -> magic
 
   eds -> bento
@@ -47,12 +50,11 @@ digraph G {
   subgraph clusterLegend {
     label="Key";
     {
-     k4[label="Future Project", color=black, fillcolor=yellow];
-     k3[label="Cloud Service", color=darkorange];
-     k2[label="Current Project", color=black, fillcolor=green];
-     k1[label="Existing System", color=black, fillcolor=lightgray];
-     k5[label="Spun off Project", color=red, fillcolor=lightgray]
-     k1 -> k2 -> k3 -> k4 -> k5 [style=invis]
+     k4[label="Future Project", color=SteelBlue1];
+     k3[label="Cloud Service", color=darkorange3];
+     k2[label="Current Project", color=Yellow1, fillcolor=Yellow1];
+     k1[label="Existing System"]
+     k1 -> k2 -> k3 -> k4 [style=invis]
      }
   }
 
