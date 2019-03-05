@@ -5,15 +5,18 @@
 digraph G {
   label="Discovery Index Flow";
   labelloc=t;
-  node [style=filled];
+  fontname=helvetica;
+  fontsize=18;
+  node [style=filled, fontname=helvetica, fillcolor=white, penwidth=4, fontsize=16];
+  pad=0.3;
 
-  aleph[label="Aleph Export Cron to AWS S3 Bucket", color=darkorange, fillcolor=lightgray]
-  s3Event[label="S3 bucket event triggers Mario Powerup in AWS Lambda via CloudWatch", color=darkorange, fillcolor=lightgray]
-  lambda[label="Mario Powerup formats command and calls Mario in AWS Fargate", color=darkorange, fillcolor=lightgray]
-  fullLoad[label="Full Load: create new elasticsearch index", color=green, fillcolor=lightgray]
-  dailyLoad[label="Daily Updates: use current elasticsearch index", color=green, fillcolor=lightgray]
-  process[label="Process data from S3 to standard data model in ElasticSearch", color=green, fillcolor=lightgray]
-  updateAlias[label="Promote new index to production if full load", color=green, fillcolor=lightgray]
+  aleph[label="Aleph Export Cron to AWS S3 Bucket", color=DarkOrange3]
+  s3Event[label="S3 bucket event triggers Mario Powerup in AWS Lambda via CloudWatch", color=DarkOrange3]
+  lambda[label="Mario Powerup formats command and calls Mario in AWS Fargate", color=DarkOrange3]
+  fullLoad[label="Full Load: create new elasticsearch index", color=DeepSkyBlue4]
+  dailyLoad[label="Daily Updates: use current elasticsearch index", color=DeepSkyBlue4]
+  process[label="Process data from S3 to standard data model in ElasticSearch", color=DeepSkyBlue4]
+  updateAlias[label="Promote new index to production if full load", color=DeepSkyBlue4]
 
   aleph -> s3Event
   s3Event -> lambda
@@ -26,8 +29,8 @@ digraph G {
   subgraph clusterLegend {
     label="Key";
     {
-     k2[label="Process the data", color=green, fillcolor=lightgray];
-     k1[label="Get the data into place", color=darkorange, fillcolor=lightgray];
+     k2[label="Process the data", color=DeepSkyBlue4];
+     k1[label="Get the data into place", color=darkorange3];
      k1 -> k2 [style=invis]
      }
   }
