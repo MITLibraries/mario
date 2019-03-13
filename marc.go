@@ -127,7 +127,9 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 
 	r.Source = "MIT Aleph"
 	r.SourceLink = "https://library.mit.edu/item/" + r.Identifier
-	r.OclcNumber = applyRule(fmlRecord, rules, "oclc_number")
+
+	oclcs := applyRule(fmlRecord, rules, "oclc_number")
+	r.OclcNumber = cleanOclcs(oclcs)
 
 	lccn := applyRule(fmlRecord, rules, "lccn")
 	if lccn != nil {
@@ -241,6 +243,17 @@ func extractData(rule *Rule, fmlRecord fml.Record) []string {
 		}
 	}
 	return field
+}
+
+func cleanOclcs(oclcs []string) []string {
+	var cleaned []string
+	for _, n := range oclcs {
+		if strings.Contains(n, "OCoLC") {
+			ns := strings.Replace(n, "(OCoLC)", "", 1)
+			cleaned = append(cleaned, ns)
+		}
+	}
+	return cleaned
 }
 
 // stringInSlice determines whether a supplied string is an item in a supplied slice.
