@@ -257,3 +257,55 @@ func TestStringInSlice(t *testing.T) {
 		t.Error("Expected true, got", r)
 	}
 }
+
+func TestOclcs(t *testing.T) {
+	file, err := os.Open("fixtures/mit_test_records.mrc")
+	if err != nil {
+		t.Error(err)
+	}
+	records := fml.NewMarcIterator(file)
+	_ = records.Next()
+	record, err := records.Value()
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	rules, err := RetrieveRules("config/marc_rules.json")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
+	if err != nil {
+		spew.Dump(err)
+		return
+	}
+
+	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
+
+	// Confirm oclc prefix is removed
+	if item.OclcNumber[0] != "1000583393" {
+		t.Error("Expected match, got", item.OclcNumber)
+	}
+
+	// Confirm old system numbers are not included.
+	_ = records.Next()
+	record, _ = records.Value()
+	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
+
+	if item.OclcNumber[0] != "1017661930" {
+		t.Error("Expected match, got", item.OclcNumber)
+	}
+
+	if len(item.OclcNumber) != 1 {
+		t.Error("Expected 1, got", len(item.OclcNumber))
+	}
+}
