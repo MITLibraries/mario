@@ -18,3 +18,4 @@ debug
 
 # System files
 .DS_Store
+tmp/

@@ -145,7 +145,6 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	}
 
 	r.AlternateTitles = applyRule(fmlRecord, rules, "alternate_titles")
-	r.Creator = applyRule(fmlRecord, rules, "creators")
 	r.Contributor = getContributors(fmlRecord, rules, "contributors")
 
 	r.RelatedPlace = applyRule(fmlRecord, rules, "related_place")
@@ -287,20 +286,23 @@ func filter(fmlRecord fml.Record, field *Field) []string {
 // returns slice of contributors of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
 func getContributors(fmlRecord fml.Record, rules []*Rule, field string) []*Contributor {
 	recordFieldRule := getRules(rules, field)
-	var c []*Contributor
+	var contribs []*Contributor
 
 	for _, r := range recordFieldRule.Fields {
-		y := new(Contributor)
-		y.Kind = r.Kind
 
-		y.Value = filter(fmlRecord, r)
+		for _, contrib := range filter(fmlRecord, r) {
+			y := new(Contributor)
+			y.Kind = r.Kind
+			y.Value = contrib
 
-		if y.Value != nil {
-			c = append(c, y)
+			if y.Value != "" {
+				contribs = append(contribs, y)
+			}
 		}
+
 	}
 
-	return c
+	return contribs
 }
 
 // returns slice of related items of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json

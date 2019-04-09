@@ -8,7 +8,6 @@ type Record struct {
 	SourceLink           string         `json:"source_link"`
 	Title                string         `json:"title"`
 	AlternateTitles      []string       `json:"alternate_titles,omitempty"`
-	Creator              []string       `json:"creators,omitempty"`
 	Contributor          []*Contributor `json:"contributors,omitempty"`
 	Subject              []string       `json:"subjects,omitempty"`
 	Isbn                 []string       `json:"isbns,omitempty"`
@@ -40,8 +39,8 @@ type Record struct {
 
 // Contributor is a port of a Record
 type Contributor struct {
-	Kind  string   `json:"kind"`
-	Value []string `json:"value"`
+	Kind  string `json:"kind"`
+	Value string `json:"value"`
 }
 
 // RelatedItem is a port of a Record

@@ -333,41 +333,38 @@
     ]
   },
   {
-    "label": "creators",
-    "array": true,
-    "fields": [
-      {
-        "tag": "100",
-        "subfields": "abcdeq"
-      },
-      {
-        "tag": "110",
-        "subfields": "abcde"
-      },
-      {
-        "tag": "111",
-        "subfields": "abcdefgjq"
-      }
-    ]
-  },
-  {
     "label": "contributors",
     "array": true,
     "fields": [
       {
+        "tag": "100",
+        "subfields": "abceqd",
+        "kind": "author"
+      },
+      {
+        "tag": "110",
+        "subfields": "abcde",
+        "kind": "author"
+      },
+      {
+        "tag": "111",
+        "subfields": "abcdefgjq",
+        "kind": "author"
+      },
+      {
         "tag": "700",
-        "subfields": "abcdeq",
-        "kind": "contributor added entry"
+        "subfields": "abceqd",
+        "kind": "contributor"
       },
       {
         "tag": "710",
         "subfields": "abcde",
-        "kind": "creator CB added entry"
+        "kind": "contributor"
       },
       {
         "tag": "711",
         "subfields": "acdefgjq",
-        "kind": "contributor conf added entry"
+        "kind": "contributor"
       }
     ]
   },

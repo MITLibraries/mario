@@ -41,8 +41,12 @@ func TestMarcToRecord(t *testing.T) {
 
 	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
 
-	if item.Creator[0] != "Sandburg, Carl, 1878-1967." {
-		t.Error("Expected match, got", item.Creator)
+	if item.Contributor[0].Value != "Sandburg, Carl, 1878-1967." {
+		t.Error("Expected match, got", item.Contributor[0].Value)
+	}
+
+	if item.Contributor[0].Kind != "author" {
+		t.Error("Expected match, got", item.Contributor[0].Kind)
 	}
 
 	if item.Identifier != "92005291" {
@@ -51,10 +55,6 @@ func TestMarcToRecord(t *testing.T) {
 
 	if item.Title != "Arithmetic /" {
 		t.Error("Expected match, got", item.Title)
-	}
-
-	if item.Contributor[0].Value[0] != "Rand, Ted, ill." {
-		t.Error("Expected match, got", item.Contributor[0].Value[0])
 	}
 
 	if item.Subject[0] != "Arithmetic Juvenile poetry." {
