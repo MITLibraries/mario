@@ -1,6 +1,25 @@
 {
   "settings": {
     "analysis": {
+      "analyzer": {
+        "keyword_no_trailing_punctuation": {
+          "tokenizer": "keyword",
+          "char_filter": [
+            "no_trailing_punctuation"
+          ],
+          "filter": [
+            "lowercase",
+            "trim"
+          ]
+        }
+      },
+      "char_filter": {
+        "no_trailing_punctuation": {
+          "type": "pattern_replace",
+          "pattern": "[./;=,?]$",
+          "replacement": ""
+        }
+      },
       "normalizer": {
         "lowercase": {
           "type": "custom",
@@ -239,7 +258,13 @@
           "type": "text"
         },
         "title": {
-          "type": "text"
+          "type": "text",
+          "fields": {
+            "exact_value": {
+              "type": "text",
+              "analyzer": "keyword_no_trailing_punctuation"
+            }
+          }
         }
       }
     }
