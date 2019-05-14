@@ -102,7 +102,7 @@ func main() {
 						return err
 					}
 					if len(old) != 1 {
-						return errors.New("Multiple indexes match. Unable to determine which index to update")
+						return errors.New("Multiple or zero indexes match. Unable to determine which index to update")
 					}
 					index = old[0]
 					println("Using exisitng index:", index)
