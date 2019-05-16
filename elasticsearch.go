@@ -16,6 +16,10 @@ import (
 	aws "github.com/olivere/elastic/aws/v4"
 )
 
+var (
+	prodAlias = "timdex-prod"
+)
+
 // EsClient configures the elasticsearch client
 func esClient(url string, index string, v4 bool) (*elastic.Client, error) {
 	var client *http.Client
@@ -57,7 +61,7 @@ func createRecordIndex(client *elastic.Client, index string) error {
 }
 
 func previous(client *elastic.Client, prefix string) ([]string, error) {
-	// retrieve all indexes linked to production alias and filter by supplied prefix. These are the "old" indexes.
+	// retrieve all indexes linked to timdex-prod alias and filter by supplied prefix. These are the "old" indexes.
 	aliases, err := aliases(client)
 	if err != nil {
 		return nil, err
@@ -66,7 +70,7 @@ func previous(client *elastic.Client, prefix string) ([]string, error) {
 	var indexes []string
 
 	for _, a := range aliases {
-		if strings.HasPrefix(a.Index, prefix) {
+		if a.Alias == prodAlias && strings.HasPrefix(a.Index, prefix) {
 			indexes = append(indexes, a.Index)
 		}
 	}
@@ -102,7 +106,7 @@ func delete(client *elastic.Client, index string) error {
 
 func demote(client *elastic.Client, index string) error {
 	ctx := context.Background()
-	_, err := client.Alias().Remove(index, "production").Do(ctx)
+	_, err := client.Alias().Remove(index, prodAlias).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -151,7 +155,7 @@ func ping(client *elastic.Client, url string) error {
 
 func promote(client *elastic.Client, index string) error {
 	ctx := context.Background()
-	_, err := client.Alias().Add(index, "production").Do(ctx)
+	_, err := client.Alias().Add(index, prodAlias).Do(ctx)
 	if err != nil {
 		return err
 	}
