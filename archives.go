@@ -42,15 +42,19 @@ func (m *archivesparser) parse(out chan Record) {
 				decoder.DecodeElement(&ar, &se)
 
 				r := Record{}
-				r.Identifier = ar.Header.Identifier
+				id := ar.Header.Identifier
+				r.Identifier = "MIT.archivespace." + id
 				r.Source = "MIT ArchiveSpace"
-				linkIdentifier := strings.Split(r.Identifier, "oai:mit/")[1]
+				linkIdentifier := strings.Split(id, "oai:mit/")[1]
 				r.SourceLink = "https://emmas-lib.mit.edu" + linkIdentifier
+
+				r.PublicationDate = ar.Metadata.Mods.OriginInfo.DateCreated.Text
 
 				r.Title = ar.Metadata.Mods.Titleinfo.Title
 
 				r.Summary = ar.Metadata.Mods.Abstract
 
+				// There are many note types. Some of which might want to be moved treated specially. As of now, we pull `preferredcitation` into the Citation field of Record but everything else is just an array in Notes.
 				r = gatherNotes(ar.Metadata.Mods.Note, r)
 
 				r.PhysicalDescription = gatherPD(ar.Metadata.Mods.PhysicalDescription)
@@ -60,6 +64,10 @@ func (m *archivesparser) parse(out chan Record) {
 				r.Subject = asSubjects(ar.Metadata.Mods.Subject)
 
 				r.Language = asLanguages(ar.Metadata.Mods.Language)
+
+				// Possibly useful but not sure where to put it yet
+				// -- accessCondition restrictionOnAccess
+				// -- accessCondition restrictionOnAccess
 
 				out <- r
 			}
