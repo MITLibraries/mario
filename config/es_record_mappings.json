@@ -39,6 +39,9 @@
         "call_numbers": {
           "type": "text"
         },
+        "citation": {
+          "type": "text"
+        },
         "content_type": {
           "type": "text",
           "fields": {

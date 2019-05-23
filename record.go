@@ -35,6 +35,7 @@ type Record struct {
 	RelatedItems         []*RelatedItem `json:"related_items,omitempty"`
 	Links                []Link         `json:"links,omitempty"`
 	Holdings             []Holding      `json:"holdings,omitempty"`
+	Citation             string         `json:"citation,omitempty"`
 }
 
 // Contributor is a port of a Record
@@ -61,7 +62,7 @@ type Link struct {
 type Holding struct {
 	Location   string `json:"location"`
 	Collection string `json:"collection,omitempty"`
-	CallNumber string `json:"call_number"`
+	CallNumber string `json:"call_number,omitempty"`
 	Summary    string `json:"summary,omitempty"`
 	Notes      string `json:"notes,omitempty"`
 	Format     string `json:"format,omitempty"`
