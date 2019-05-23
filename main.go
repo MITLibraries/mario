@@ -168,6 +168,8 @@ func main() {
 					}
 				} else if c.String("type") == "json" {
 					p.generator = &JSONGenerator{file: file}
+				} else if c.String("type") == "archives" {
+					p.generator = &ArchivesGenerator{archivefile: file}
 				} else {
 					log.Println("no valid type provided")
 				}
