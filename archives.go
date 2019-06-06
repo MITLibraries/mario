@@ -12,14 +12,14 @@ type archivesparser struct {
 
 //ArchivesGenerator parses binary archivespace data.
 type ArchivesGenerator struct {
-	archivefile io.Reader
-	rulesfile   string
+	file      io.Reader
+	rulesfile string
 }
 
 //Generate a channel of Records.
 func (m *ArchivesGenerator) Generate() <-chan Record {
 	out := make(chan Record)
-	p := archivesparser{file: m.archivefile}
+	p := archivesparser{file: m.file}
 	go p.parse(out)
 	return out
 }
@@ -54,7 +54,8 @@ func (m *archivesparser) parse(out chan Record) {
 
 				r.Summary = ar.Metadata.Mods.Abstract
 
-				// There are many note types. Some of which might want to be moved treated specially. As of now, we pull `preferredcitation` into the Citation field of Record but everything else is just an array in Notes.
+				// todo: There are many note types. Some of which might want to be moved treated specially. As of now, we pull `preferredcitation` into the Citation field of Record but everything else is just an array in Notes.
+				// The content in relateditems notes might be extractable into an array of Record.RelatedItems for example
 				r = gatherNotes(ar.Metadata.Mods.Note, r)
 
 				r.PhysicalDescription = gatherPD(ar.Metadata.Mods.PhysicalDescription)

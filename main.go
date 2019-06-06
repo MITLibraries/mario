@@ -169,7 +169,9 @@ func main() {
 				} else if c.String("type") == "json" {
 					p.generator = &JSONGenerator{file: file}
 				} else if c.String("type") == "archives" {
-					p.generator = &ArchivesGenerator{archivefile: file}
+					p.generator = &ArchivesGenerator{file: file}
+				} else if c.String("type") == "dspace" {
+					p.generator = &DspaceGenerator{file: file}
 				} else {
 					log.Println("no valid type provided")
 				}
