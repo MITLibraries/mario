@@ -79,3 +79,20 @@ func (t *TitleConsumer) Consume(in <-chan Record) <-chan bool {
 	}()
 	return out
 }
+
+//SilentConsumer is useful for debugging sometimes
+type SilentConsumer struct {
+	out io.Writer
+}
+
+//Consume the records and close the channel when done. No processing is done.
+func (s *SilentConsumer) Consume(in <-chan Record) <-chan bool {
+	out := make(chan bool)
+	go func() {
+		for range in {
+			continue
+		}
+		close(out)
+	}()
+	return out
+}

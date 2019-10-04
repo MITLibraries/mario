@@ -1,3 +1,7 @@
+github.com/antchfx/xmlquery v1.1.0 h1:vj0kZ1y3Q6my4AV+a9xbWrMYzubw+84zuiKgvfV8vb8=
+github.com/antchfx/xmlquery v1.1.0/go.mod h1:/+CnyD/DzHRnv2eRxrVbieRU/FIF6N0C+7oTtyUtCKk=
+github.com/antchfx/xpath v1.1.0 h1:mJTvYpiHvxNQRD4Lbfin/FodHVCHh2a5KrOFr4ZxMOI=
+github.com/antchfx/xpath v1.1.0/go.mod h1:Yee4kTMuNiPYJ7nSNorELQMr1J33uOpXDMByNYhvtNk=
 github.com/aws/aws-sdk-go v1.16.34 h1:kZj0biNt+YfvqC11/NtMGqB6YpHXd9bVEzmcTT4CmJg=
 github.com/aws/aws-sdk-go v1.16.34/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -11,8 +15,8 @@ github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af h1:pmfjZENx5i
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329 h1:2gxZ0XQIU/5z3Z3bUBu+FXuk2pFbkN6tcwi/pjyaDic=
 github.com/mailru/easyjson v0.0.0-20180823135443-60711f1a8329/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
-github.com/mitlibraries/fml v0.0.0-20190214151235-1b7d63d69dfb h1:UHPTQTjiqXugsO1CXttSE9v98hFZ6sVzKOtoX/tXUU8=
-github.com/mitlibraries/fml v0.0.0-20190214151235-1b7d63d69dfb/go.mod h1:dcA1Eu8JxdHwUveRyPUEiG8sI6wehGie51WQxqr9jUk=
+github.com/mitlibraries/fml v0.0.0-20191015202712-9dd46402482b h1:1MmpIF0/mI2BQqezoXx3q3DyBPLKECxfy4/GHroXCz4=
+github.com/mitlibraries/fml v0.0.0-20191015202712-9dd46402482b/go.mod h1:51RW/dcp8hMr4/QYGpzFtqPpLQtQ9ksC2wOXdlfaLBo=
 github.com/olivere/elastic v6.2.16+incompatible h1:+mQIHbkADkOgq9tFqnbyg7uNFVV6swGU07EoK1u0nEQ=
 github.com/olivere/elastic v6.2.16+incompatible/go.mod h1:J+q1zQJTgAz9woqsbVRqGeB5G1iqDKVBWLNSYW8yfJ8=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
