@@ -5,6 +5,14 @@
 Mario is a metadata processing pipeline that will process data from various
 sources and write to Elasticsearch.
 
+## Installing
+
+The `mario` command can be installed with:
+
+```
+$ go get github.com/mitlibraries/mario
+```
+
 ## How to Use This
 
 An Elasticsearch index can be started for development purposes by running:
@@ -25,6 +33,20 @@ The Mario container can be built and used by running:
 ```
 $ docker build -t mario .
 $ docker run --rm -i mario parse -c title - < fixtures/test.mrc
+```
+
+## Developing
+
+This project uses modules for dependencies. To upgrade all dependencies to the latest minor/patch version use:
+
+```
+$ go get -u ./...
+```
+
+Tests can be run with:
+
+```
+$ go test -v ./...
 ```
 
 ## System Overview

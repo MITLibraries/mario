@@ -8,16 +8,15 @@ help: ## Print this message
 		/^[-_[:alpha:]]+:.?*##/ { printf "  %-15s%s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 install: ## Install mario binary
-	dep ensure
 	go install
 
 test: ## Run tests
-	go test
+	go test -v ./...
 
 tests: test
 
 update: ## Update dependencies
-	dep ensure -update
+	go get -u ./...
 
 dist: ## Build docker image
 	docker build -t $(ECR_REGISTRY)/mario-stage:latest \
