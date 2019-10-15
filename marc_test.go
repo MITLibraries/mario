@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/MITLibraries/fml"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/mitlibraries/fml"
 )
 
 func TestMarcToRecord(t *testing.T) {

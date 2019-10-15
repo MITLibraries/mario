@@ -1,10 +1,8 @@
-FROM golang:1.11-alpine
+FROM golang:1.13-alpine
 
 RUN apk add --no-cache curl git ca-certificates
-RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 WORKDIR /go/src/mario
-COPY Gopkg.* ./
-RUN dep ensure -vendor-only
+COPY go.mod go.sum ./
 COPY *.go ./
 RUN go build
 

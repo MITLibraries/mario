@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/MITLibraries/fml"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/mitlibraries/fml"
 )
 
 // RetrieveRules for parsing MARC
