@@ -3,7 +3,7 @@ module github.com/mitlibraries/mario
 go 1.13
 
 require (
-	github.com/aws/aws-sdk-go v1.16.34
+	github.com/aws/aws-sdk-go v1.25.17
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
