@@ -137,6 +137,8 @@ func main() {
 					p.consumer = &JSONConsumer{out: os.Stdout}
 				} else if c.String("consumer") == "title" {
 					p.consumer = &TitleConsumer{out: os.Stdout}
+				} else if c.String("consumer") == "silent" {
+					p.consumer = &SilentConsumer{out: os.Stdout}
 				} else {
 					client, err := esClient(url, index, v4)
 					if err != nil {
@@ -168,6 +170,8 @@ func main() {
 					}
 				} else if c.String("type") == "json" {
 					p.generator = &JSONGenerator{file: file}
+				} else if c.String("type") == "archives" {
+					p.generator = &ArchivesGenerator{archivefile: file}
 				} else {
 					log.Println("no valid type provided")
 				}
