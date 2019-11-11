@@ -3,7 +3,7 @@ module github.com/mitlibraries/mario
 go 1.13
 
 require (
-	github.com/antchfx/xmlquery v1.1.0
+	github.com/antchfx/xmlquery v1.2.0
 	github.com/antchfx/xpath v1.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.16.34
 	github.com/davecgh/go-spew v1.1.1
