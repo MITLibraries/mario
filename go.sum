@@ -3,6 +3,8 @@ github.com/antchfx/xmlquery v1.1.0 h1:vj0kZ1y3Q6my4AV+a9xbWrMYzubw+84zuiKgvfV8vb
 github.com/antchfx/xmlquery v1.1.0/go.mod h1:/+CnyD/DzHRnv2eRxrVbieRU/FIF6N0C+7oTtyUtCKk=
 github.com/antchfx/xmlquery v1.2.0 h1:1nrzsSN5mFrlqFWSK9byiq/qXKE7O2vivYzhv1Ksnfw=
 github.com/antchfx/xmlquery v1.2.0/go.mod h1:/+CnyD/DzHRnv2eRxrVbieRU/FIF6N0C+7oTtyUtCKk=
+github.com/antchfx/xmlquery v1.2.3 h1:++irmxT+Pkn55FGtSTkUTHarZ6E0b1yyR+UiPZRA+eY=
+github.com/antchfx/xmlquery v1.2.3/go.mod h1:/+CnyD/DzHRnv2eRxrVbieRU/FIF6N0C+7oTtyUtCKk=
 github.com/antchfx/xpath v1.1.0 h1:mJTvYpiHvxNQRD4Lbfin/FodHVCHh2a5KrOFr4ZxMOI=
 github.com/antchfx/xpath v1.1.0/go.mod h1:Yee4kTMuNiPYJ7nSNorELQMr1J33uOpXDMByNYhvtNk=
 github.com/antchfx/xpath v1.1.1 h1:mqGYmd5pioPu06+REIf8j3y6O3S1UpVNVoCameZHotg=
