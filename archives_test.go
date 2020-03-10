@@ -42,6 +42,11 @@ func TestArchivesRecordParsing(t *testing.T) {
 		t.Error("Expected match, got", record.Citation)
 	}
 
+	// Test ContentType field
+	if record.ContentType != "Archival collection" {
+		t.Error("Expected match, got", record.ContentType)
+	}
+
 	// Test Contributor field
 	if record.Contributor[0].Value != "Lynch, Kevin, 1918-1984" {
 		t.Error("Expected match, got", record.Contributor[0].Value)
@@ -66,12 +71,12 @@ func TestArchivesRecordParsing(t *testing.T) {
 		t.Error("Expected 234, got", len(record.Links))
 	}
 
-	// Test Publication Date field
+	// Test PublicationDate field
 	if record.PublicationDate != "1934-1988" {
 		t.Error("Expected match, got", record.PublicationDate)
 	}
 
-	// Test Source Link field
+	// Test SourceLink field
 	if record.SourceLink != "https://archivesspace.mit.edu/repositories/2/resources/739" {
 		t.Error("Expected match, got", record.SourceLink)
 	}

@@ -58,6 +58,9 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	// Citation field
 	r.Citation = ar.Metadata.Ead.Archdesc.Prefercite.P.Text
 
+	// ContentType field
+	r.ContentType = "Archival " + ar.Metadata.Ead.Archdesc.Level
+
 	// Contributor field
 	if len(ar.Metadata.Ead.Archdesc.Did.Origination) > 0 {
 		r.Contributor = eadContributors(ar)
@@ -82,18 +85,18 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	// Notes field
 	r.Notes = eadNotes(ar)
 
-	//  Physical Description field
+	//  PhysicalDescription field
 	if len(ar.Metadata.Ead.Archdesc.Did.Physdesc) > 0 {
 		r.PhysicalDescription = eadPhysicalDescription(ar)
 	}
 
-	// Publication Date field
+	// PublicationDate field
 	r.PublicationDate = eadPublicationDate(ar)
 
 	// Source field
 	r.Source = "MIT ArchivesSpace"
 
-	// Source Link field
+	// SourceLink field
 	id := ar.Header.Identifier
 	linkIdentifier := strings.Split(id, "oai:mit/")[1]
 	r.SourceLink = "https://archivesspace.mit.edu" + linkIdentifier
