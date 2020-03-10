@@ -54,46 +54,62 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	decoder.DecodeElement(&ar, &se)
 
 	r := Record{}
-	r.Identifier = "MIT:archivespace:" + strings.Replace(ar.Metadata.Ead.Archdesc.Did.Unitid, " ", ".", -1)
 
-	id := ar.Header.Identifier
+	// Citation field
+	r.Citation = ar.Metadata.Ead.Archdesc.Prefercite.P.Text
+
+	// Contributor field
+	if len(ar.Metadata.Ead.Archdesc.Did.Origination) > 0 {
+		r.Contributor = eadContributors(ar)
+	}
+
+	//  Holdings field
+	var h []Holding
+	h = append(h, Holding{Location: ar.Metadata.Ead.Archdesc.Did.Physloc.Text})
+	r.Holdings = h
+
+	// Identifier field
+	r.Identifier = "MIT:archivesspace:" + strings.Replace(ar.Metadata.Ead.Archdesc.Did.Unitid, " ", ".", -1)
+
+	// Language field
+	if len(ar.Metadata.Ead.Archdesc.Did.Langmaterial) > 0 {
+		r.Language = eadLanguage(ar)
+	}
+
+	// Links field
+	r.Links = eadLinks(ar)
+
+	// Notes field
+	r.Notes = eadNotes(ar)
+
+	//  Physical Description field
+	if len(ar.Metadata.Ead.Archdesc.Did.Physdesc) > 0 {
+		r.PhysicalDescription = eadPhysicalDescription(ar)
+	}
+
+	// Publication Date field
+	r.PublicationDate = eadPublicationDate(ar)
+
+	// Source field
 	r.Source = "MIT ArchivesSpace"
+
+	// Source Link field
+	id := ar.Header.Identifier
 	linkIdentifier := strings.Split(id, "oai:mit/")[1]
 	r.SourceLink = "https://archivesspace.mit.edu" + linkIdentifier
 
-	r.PublicationDate = eadPublicationDate(ar)
+	// Subject field
+	r.Subject = eadSubjects(ar)
 
-	r.Title = ar.Metadata.Ead.Archdesc.Did.Unittitle.Text
-
+	// Summary field
 	if len(ar.Metadata.Ead.Archdesc.Did.Abstract) > 0 {
 		for _, a := range ar.Metadata.Ead.Archdesc.Did.Abstract {
 			r.Summary = append(r.Summary, a.Text)
 		}
 	}
 
-	r.Citation = ar.Metadata.Ead.Archdesc.Prefercite.P.Text
-
-	r.Links = eadLinks(ar)
-
-	if len(ar.Metadata.Ead.Archdesc.Did.Origination) > 0 {
-		r.Contributor = eadContributors(ar)
-	}
-
-	r.Subject = eadSubjects(ar)
-
-	var h []Holding
-	h = append(h, Holding{Location: ar.Metadata.Ead.Archdesc.Did.Physloc.Text})
-	r.Holdings = h
-
-	if len(ar.Metadata.Ead.Archdesc.Did.Langmaterial) > 0 {
-		r.Language = eadLanguage(ar)
-	}
-
-	if len(ar.Metadata.Ead.Archdesc.Did.Physdesc) > 0 {
-		r.PhysicalDescription = eadPhysicalDescription(ar)
-	}
-
-	r.Notes = eadNotes(ar)
+	// Title field
+	r.Title = ar.Metadata.Ead.Archdesc.Did.Unittitle.Text
 
 	out <- r
 }
