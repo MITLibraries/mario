@@ -168,17 +168,13 @@ func eadLinks(ar AspaceRecord) []Link {
 	var links []Link
 
 	dsc, _ := xmlquery.Parse(strings.NewReader(ar.Metadata.Ead.Archdesc.Dsc.Text))
-
 	dao := xmlquery.Find(dsc, "//dao")
 
 	for _, obj := range dao {
-
 		link := Link{
 			URL:  obj.SelectAttr("xlink:href"),
-			Text: obj.SelectAttr("xlink:title"),
-		}
-		if link.Kind == "" {
-			link.Kind = "unknown"
+			Text: obj.SelectElement("daodesc").SelectElement("p").InnerText(),
+			Kind: "Digital object",
 		}
 
 		// only keep links that start with http. This isn't ideal, but seems okay.

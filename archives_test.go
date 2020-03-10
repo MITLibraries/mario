@@ -68,7 +68,19 @@ func TestArchivesRecordParsing(t *testing.T) {
 
 	// Test Links field
 	if len(record.Links) != 234 {
-		t.Error("Expected 234, got", len(record.Links))
+		t.Error("Expected match, got", len(record.Links))
+	}
+
+	if record.Links[0].URL != "http://hdl.handle.net/1721.3/35646" {
+		t.Error("Expected match, got", record.Links[0].URL)
+	}
+
+	if record.Links[0].Text != "K.L. 3-8-55: 1955 March 8" {
+		t.Error("Expected match, got", record.Links[0].Text)
+	}
+
+	if record.Links[0].Kind != "Digital object" {
+		t.Error("Expected match, got", record.Links[0].Kind)
 	}
 
 	// Test PublicationDate field
