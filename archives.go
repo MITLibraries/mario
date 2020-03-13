@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/xml"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/antchfx/xmlquery"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type archivesparser struct {
@@ -117,40 +119,47 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	out <- r
 }
 
-func eadContributors(ar AspaceRecord) []*Contributor {
-	var contribs []*Contributor
-
-	contribs = eadContribKind(contribs, "Person", ar)
-	contribs = eadContribKind(contribs, "Organization", ar)
-	contribs = eadContribKind(contribs, "Family", ar)
-
-	return contribs
+// AspaceCodesMap defines codes for parsing ASpace record fields
+type AspaceCodesMap struct {
+	Enumerations struct {
+		LinkedAgentRelators map[string]string `yaml:"linked_agent_archival_record_relators"`
+	} `yaml:"enumerations"`
 }
 
-// For now we as using the supplied Kind for each different place we grab data
-// from. Eventually, we'll use the Role data but that isn't populated in our
-// Aspace consistently at this time. As the Role will require lookup tables,
-// it is not worthwhile to develop at this time.
-func eadContribKind(contribs []*Contributor, contribType string, ar AspaceRecord) []*Contributor {
-	for _, c := range ar.Metadata.Ead.Archdesc.Did.Origination {
+func eadContributors(ar AspaceRecord) []*Contributor {
+	var contribs []*Contributor
+	var codes AspaceCodesMap
 
-		auth := new(Contributor)
-		auth.Kind = contribType
-
-		if contribType == "Person" {
-			auth.Value = c.Persname.Text
-		}
-		if contribType == "Organization" {
-			auth.Value = c.Corpname.Text
-		}
-		if contribType == "Family" {
-			auth.Value = c.Famname.Text
-		}
-
-		if auth.Value != "" {
-			contribs = append(contribs, auth)
-		}
+	yamlFile, err := ioutil.ReadFile("config/aspace_code_mappings.yml")
+	if err != nil {
+		panic(err)
 	}
+
+	err = yaml.Unmarshal(yamlFile, &codes)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, c := range ar.Metadata.Ead.Archdesc.Did.Origination {
+		contrib := new(Contributor)
+		switch {
+		case c.Corpname.Text != "":
+			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Corpname.Role]
+			contrib.Value = c.Corpname.Text
+		case c.Famname.Text != "":
+			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Famname.Role]
+			contrib.Value = c.Famname.Text
+		case c.Persname.Text != "":
+			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Persname.Role]
+			contrib.Value = c.Persname.Text
+		}
+		if contrib.Kind == "" {
+			contrib.Kind = c.Label
+		}
+
+		contribs = append(contribs, contrib)
+	}
+
 	return contribs
 }
 

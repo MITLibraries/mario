@@ -48,12 +48,16 @@ func TestArchivesRecordParsing(t *testing.T) {
 	}
 
 	// Test Contributor field
-	if record.Contributor[0].Value != "Lynch, Kevin, 1918-1984" {
-		t.Error("Expected match, got", record.Contributor[0].Value)
+	if len(record.Contributor) != 1 {
+		t.Error("Expected 1, got", len(record.Contributor))
 	}
 
-	if record.Contributor[0].Kind != "Person" {
-		t.Error("Expected match, got", record.Contributor[0].Kind)
+	if record.Contributor[0].Kind != "Creator" {
+		t.Error("Expected 'Creator', got", record.Contributor[0].Kind)
+	}
+
+	if record.Contributor[0].Value != "Lynch, Kevin, 1918-1984" {
+		t.Error("Expected 'Lynch, Kevin, 1918-1984', got", record.Contributor[0].Value)
 	}
 
 	// Test Holdings field
