@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/xml"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/antchfx/xmlquery"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type archivesparser struct {
@@ -54,84 +56,110 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	decoder.DecodeElement(&ar, &se)
 
 	r := Record{}
-	r.Identifier = "MIT:archivespace:" + strings.Replace(ar.Metadata.Ead.Archdesc.Did.Unitid, " ", ".", -1)
 
-	id := ar.Header.Identifier
+	// Citation field
+	r.Citation = ar.Metadata.Ead.Archdesc.Prefercite.P.Text
+
+	// ContentType field
+	r.ContentType = "Archival " + ar.Metadata.Ead.Archdesc.Level
+
+	// Contributor field
+	if len(ar.Metadata.Ead.Archdesc.Did.Origination) > 0 {
+		r.Contributor = eadContributors(ar)
+	}
+
+	//  Holdings field
+	var h []Holding
+	h = append(h, Holding{Location: ar.Metadata.Ead.Archdesc.Did.Physloc.Text})
+	r.Holdings = h
+
+	// Identifier field
+	r.Identifier = "MIT:archivesspace:" + strings.Replace(ar.Metadata.Ead.Archdesc.Did.Unitid, " ", ".", -1)
+
+	// Language field
+	if len(ar.Metadata.Ead.Archdesc.Did.Langmaterial) > 0 {
+		r.Language = eadLanguage(ar)
+	}
+
+	// Links field
+	r.Links = eadLinks(ar)
+
+	// Notes field
+	r.Notes = eadNotes(ar)
+
+	//  PhysicalDescription field
+	if len(ar.Metadata.Ead.Archdesc.Did.Physdesc) > 0 {
+		r.PhysicalDescription = eadPhysicalDescription(ar)
+	}
+
+	// PublicationDate field
+	r.PublicationDate = eadPublicationDate(ar)
+
+	// Source field
 	r.Source = "MIT ArchivesSpace"
+
+	// SourceLink field
+	id := ar.Header.Identifier
 	linkIdentifier := strings.Split(id, "oai:mit/")[1]
 	r.SourceLink = "https://archivesspace.mit.edu" + linkIdentifier
 
-	r.PublicationDate = eadPublicationDate(ar)
+	// Subject field
+	r.Subject = eadSubjects(ar)
 
-	r.Title = ar.Metadata.Ead.Archdesc.Did.Unittitle.Text
-
+	// Summary field
 	if len(ar.Metadata.Ead.Archdesc.Did.Abstract) > 0 {
 		for _, a := range ar.Metadata.Ead.Archdesc.Did.Abstract {
 			r.Summary = append(r.Summary, a.Text)
 		}
 	}
 
-	r.Citation = ar.Metadata.Ead.Archdesc.Prefercite.P.Text
-
-	r.Links = eadLinks(ar)
-
-	if len(ar.Metadata.Ead.Archdesc.Did.Origination) > 0 {
-		r.Contributor = eadContributors(ar)
-	}
-
-	r.Subject = eadSubjects(ar)
-
-	var h []Holding
-	h = append(h, Holding{Location: ar.Metadata.Ead.Archdesc.Did.Physloc.Text})
-	r.Holdings = h
-
-	if len(ar.Metadata.Ead.Archdesc.Did.Langmaterial) > 0 {
-		r.Language = eadLanguage(ar)
-	}
-
-	if len(ar.Metadata.Ead.Archdesc.Did.Physdesc) > 0 {
-		r.PhysicalDescription = eadPhysicalDescription(ar)
-	}
-
-	r.Notes = eadNotes(ar)
+	// Title field
+	r.Title = ar.Metadata.Ead.Archdesc.Did.Unittitle.Text
 
 	out <- r
 }
 
-func eadContributors(ar AspaceRecord) []*Contributor {
-	var contribs []*Contributor
-
-	contribs = eadContribKind(contribs, "Person", ar)
-	contribs = eadContribKind(contribs, "Organization", ar)
-	contribs = eadContribKind(contribs, "Family", ar)
-
-	return contribs
+// AspaceCodesMap defines codes for parsing ASpace record fields
+type AspaceCodesMap struct {
+	Enumerations struct {
+		LinkedAgentRelators map[string]string `yaml:"linked_agent_archival_record_relators"`
+	} `yaml:"enumerations"`
 }
 
-// For now we as using the supplied Kind for each different place we grab data
-// from. Eventually, we'll use the Role data but that isn't populated in our
-// Aspace consistently at this time. As the Role will require lookup tables,
-// it is not worthwhile to develop at this time.
-func eadContribKind(contribs []*Contributor, contribType string, ar AspaceRecord) []*Contributor {
-	for _, c := range ar.Metadata.Ead.Archdesc.Did.Origination {
+func eadContributors(ar AspaceRecord) []*Contributor {
+	var contribs []*Contributor
+	var codes AspaceCodesMap
 
-		auth := new(Contributor)
-		auth.Kind = contribType
-
-		if contribType == "Person" {
-			auth.Value = c.Persname.Text
-		}
-		if contribType == "Organization" {
-			auth.Value = c.Corpname.Text
-		}
-		if contribType == "Family" {
-			auth.Value = c.Famname.Text
-		}
-
-		if auth.Value != "" {
-			contribs = append(contribs, auth)
-		}
+	yamlFile, err := ioutil.ReadFile("config/aspace_code_mappings.yml")
+	if err != nil {
+		panic(err)
 	}
+
+	err = yaml.Unmarshal(yamlFile, &codes)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, c := range ar.Metadata.Ead.Archdesc.Did.Origination {
+		contrib := new(Contributor)
+		switch {
+		case c.Corpname.Text != "":
+			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Corpname.Role]
+			contrib.Value = c.Corpname.Text
+		case c.Famname.Text != "":
+			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Famname.Role]
+			contrib.Value = c.Famname.Text
+		case c.Persname.Text != "":
+			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Persname.Role]
+			contrib.Value = c.Persname.Text
+		}
+		if contrib.Kind == "" {
+			contrib.Kind = c.Label
+		}
+
+		contribs = append(contribs, contrib)
+	}
+
 	return contribs
 }
 
@@ -149,17 +177,13 @@ func eadLinks(ar AspaceRecord) []Link {
 	var links []Link
 
 	dsc, _ := xmlquery.Parse(strings.NewReader(ar.Metadata.Ead.Archdesc.Dsc.Text))
-
 	dao := xmlquery.Find(dsc, "//dao")
 
 	for _, obj := range dao {
-
 		link := Link{
 			URL:  obj.SelectAttr("xlink:href"),
-			Text: obj.SelectAttr("xlink:title"),
-		}
-		if link.Kind == "" {
-			link.Kind = "unknown"
+			Text: obj.SelectElement("daodesc").SelectElement("p").InnerText(),
+			Kind: "Digital object",
 		}
 
 		// only keep links that start with http. This isn't ideal, but seems okay.
