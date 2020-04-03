@@ -4,9 +4,9 @@ Date: 2019-01-31
 
 ## Status
 
-Accepted
-
 Supercedes [5. Use AWS Lambda](0005-use-aws-lambda.md)
+
+Superceded by [13. Use SQS and Airflow for Task Execution](0013-use-sqs-and-airflow-for-task-execution.md)
 
 ## Context
 
