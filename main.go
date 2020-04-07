@@ -126,7 +126,7 @@ func main() {
 
 				if index == "" {
 					t := time.Now().UTC()
-					ft := strings.ToLower(t.Format(time.RFC3339))
+					ft := t.Format("2006-01-02t15-04-05z")
 					index = fmt.Sprintf("%s-%s", c.String("prefix"), ft)
 				}
 
