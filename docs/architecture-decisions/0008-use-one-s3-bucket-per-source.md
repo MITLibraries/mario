@@ -4,7 +4,7 @@ Date: 2018-07-05
 
 ## Status
 
-Accepted
+Superceded by [15. Use a Single Bucket](0015-use-a-single-bucket.md)
 
 ## Context
 

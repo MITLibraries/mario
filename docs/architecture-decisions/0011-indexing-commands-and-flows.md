@@ -4,7 +4,7 @@ Date: 2018-11-26
 
 ## Status
 
-Accepted
+Superceded by [14. Structure of CLI](0014-structure-of-cli.md)
 
 ## Context
 
