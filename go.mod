@@ -13,7 +13,7 @@ require (
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mitlibraries/fml v0.0.0-20191112153439-258f51343ffe
-	github.com/olivere/elastic v6.2.26+incompatible
+	github.com/olivere/elastic v6.2.30+incompatible
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/urfave/cli v1.22.1
