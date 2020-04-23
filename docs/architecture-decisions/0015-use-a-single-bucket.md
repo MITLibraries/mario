@@ -26,4 +26,4 @@ mario should ignore source identifiers that it does not know about.
 
 ## Consequences
 
-Changes will be needed both in mario and in the scripts that upload data to the current bucket.
+Changes will be needed both in mario and in the scripts that upload data to the current bucket. It's worth noting that bucket policies around lifecycle and permissions can be applied to objects based on prefix, so any existing needs specific to a source can be supported with this change.
