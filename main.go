@@ -298,6 +298,26 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:      "reindex",
+			Usage:     "Reindex one index to another index.",
+			UsageText: "Use the Elasticsearch reindex API to copy one index to another. The doc source must be present in the original index.",
+			Category:  "Index actions",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "destination",
+					Usage: "Name of new index",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				client, err := esClient(url, index, v4)
+				if err != nil {
+					return err
+				}
+				reindex(client, index, c.String("destination"))
+				return nil
+			},
+		},
 	}
 
 	err := app.Run(os.Args)

@@ -172,3 +172,13 @@ func after(exID int64, requests []elastic.BulkableRequest, resp *elastic.BulkRes
 		}
 	}
 }
+
+func reindex(client *elastic.Client, source string, destination string) error {
+	ctx := context.Background()
+	resp, err := client.Reindex().SourceIndex(source).DestinationIndex(destination).Do(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Reindexed %d docs from %s into %s\n", resp.Total, source, destination)
+	return nil
+}
