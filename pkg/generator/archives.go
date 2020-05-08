@@ -1,4 +1,4 @@
-package main
+package generator
 
 import (
 	"encoding/xml"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/antchfx/xmlquery"
 	"github.com/markbates/pkger"
+	"github.com/mitlibraries/mario/pkg/record"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -17,20 +18,20 @@ type archivesparser struct {
 
 // ArchivesGenerator parses archivespace ead xml data.
 type ArchivesGenerator struct {
-	archivefile io.Reader
+	Archivefile io.Reader
 	rulesfile   string
 }
 
 // Generate a channel of Records.
-func (m *ArchivesGenerator) Generate() <-chan Record {
-	out := make(chan Record)
-	p := archivesparser{file: m.archivefile}
+func (m *ArchivesGenerator) Generate() <-chan record.Record {
+	out := make(chan record.Record)
+	p := archivesparser{file: m.Archivefile}
 	go p.parse(out)
 	return out
 }
 
 // Streams the xml file and kicks off processing for each record found
-func (m *archivesparser) parse(out chan Record) {
+func (m *archivesparser) parse(out chan record.Record) {
 	decoder := xml.NewDecoder(m.file)
 
 	for {
@@ -52,11 +53,11 @@ func (m *archivesparser) parse(out chan Record) {
 }
 
 // processXMLRecord handles the mapping from EAD to Record. More complex mappings split out into funcs
-func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record) {
+func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan record.Record) {
 	var ar AspaceRecord
 	decoder.DecodeElement(&ar, &se)
 
-	r := Record{}
+	r := record.Record{}
 
 	// Citation field
 	r.Citation = ar.Metadata.Ead.Archdesc.Prefercite.P.Text
@@ -70,8 +71,8 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	}
 
 	//  Holdings field
-	var h []Holding
-	h = append(h, Holding{Location: ar.Metadata.Ead.Archdesc.Did.Physloc.Text})
+	var h []record.Holding
+	h = append(h, record.Holding{Location: ar.Metadata.Ead.Archdesc.Did.Physloc.Text})
 	r.Holdings = h
 
 	// Identifier field
@@ -127,8 +128,8 @@ type AspaceCodesMap struct {
 	} `yaml:"enumerations"`
 }
 
-func eadContributors(ar AspaceRecord) []*Contributor {
-	var contribs []*Contributor
+func eadContributors(ar AspaceRecord) []*record.Contributor {
+	var contribs []*record.Contributor
 	var codes AspaceCodesMap
 
 	file, err := pkger.Open("/config/aspace_code_mappings.yml")
@@ -146,7 +147,7 @@ func eadContributors(ar AspaceRecord) []*Contributor {
 	}
 
 	for _, c := range ar.Metadata.Ead.Archdesc.Did.Origination {
-		contrib := new(Contributor)
+		contrib := new(record.Contributor)
 		switch {
 		case c.Corpname.Text != "":
 			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Corpname.Role]
@@ -178,14 +179,14 @@ func eadLanguage(ar AspaceRecord) []string {
 	return skipEmpty(lang)
 }
 
-func eadLinks(ar AspaceRecord) []Link {
-	var links []Link
+func eadLinks(ar AspaceRecord) []record.Link {
+	var links []record.Link
 
 	dsc, _ := xmlquery.Parse(strings.NewReader(ar.Metadata.Ead.Archdesc.Dsc.Text))
 	dao := xmlquery.Find(dsc, "//dao")
 
 	for _, obj := range dao {
-		link := Link{
+		link := record.Link{
 			URL:  obj.SelectAttr("xlink:href"),
 			Text: obj.SelectElement("daodesc").SelectElement("p").InnerText(),
 			Kind: "Digital object",

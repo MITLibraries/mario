@@ -1,7 +1,8 @@
-package main
+package generator
 
 import (
 	"encoding/json"
+	"github.com/mitlibraries/mario/pkg/record"
 	"io"
 	"log"
 )
@@ -12,11 +13,10 @@ type jsonparser struct {
 
 //JSONGenerator parses JSON records.
 type JSONGenerator struct {
-	file io.Reader
+	File io.Reader
 }
 
-func (j *jsonparser) parse(out chan Record) {
-	ingested = 0
+func (j *jsonparser) parse(out chan record.Record) {
 	decoder := json.NewDecoder(j.file)
 
 	// read open bracket
@@ -26,12 +26,11 @@ func (j *jsonparser) parse(out chan Record) {
 	}
 
 	for decoder.More() {
-		var r Record
+		var r record.Record
 		err = decoder.Decode(&r)
 		if err != nil {
 			log.Fatal(err)
 		}
-		ingested++
 		out <- r
 	}
 
@@ -45,9 +44,9 @@ func (j *jsonparser) parse(out chan Record) {
 }
 
 //Generate creates a channel of Records.
-func (j *JSONGenerator) Generate() <-chan Record {
-	out := make(chan Record)
-	p := jsonparser{file: j.file}
+func (j *JSONGenerator) Generate() <-chan record.Record {
+	out := make(chan record.Record)
+	p := jsonparser{file: j.File}
 	go p.parse(out)
 	return out
 }

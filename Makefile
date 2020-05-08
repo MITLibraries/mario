@@ -8,7 +8,7 @@ help: ## Print this message
 		/^[-_[:alpha:]]+:.?*##/ { printf "  %-15s%s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 install: ## Install mario binary
-	go install
+	go install ./...
 
 test: ## Run tests
 	go test -v ./...

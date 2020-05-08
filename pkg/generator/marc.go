@@ -1,9 +1,10 @@
-package main
+package generator
 
 import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/mitlibraries/mario/pkg/record"
 	"io"
 	"log"
 	"strconv"
@@ -15,7 +16,7 @@ import (
 )
 
 // RetrieveRules for parsing MARC
-func RetrieveRules(rulefile string) ([]*Rule, error) {
+func RetrieveRules(rulefile string) ([]*record.Rule, error) {
 	// Open the file.
 	file, err := pkger.Open(rulefile)
 	if err != nil {
@@ -28,7 +29,7 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 
 	// Decode the file into a slice of pointers
 	// to Feed values.
-	var rules []*Rule
+	var rules []*record.Rule
 	err = json.NewDecoder(file).Decode(&rules)
 	// We don't need to check for errors, the caller can do this.
 	return rules, err
@@ -36,20 +37,20 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 
 type marcparser struct {
 	file          io.Reader
-	rules         []*Rule
+	rules         []*record.Rule
 	languageCodes map[string]string
 	countryCodes  map[string]string
 }
 
 //MarcGenerator parses binary MARC records.
 type MarcGenerator struct {
-	marcfile  io.Reader
-	rulesfile string
+	Marcfile  io.Reader
+	Rulesfile string
 }
 
 //Generate a channel of Records.
-func (m *MarcGenerator) Generate() <-chan Record {
-	rules, err := RetrieveRules(m.rulesfile)
+func (m *MarcGenerator) Generate() <-chan record.Record {
+	rules, err := RetrieveRules(m.Rulesfile)
 	if err != nil {
 		spew.Dump(err)
 	}
@@ -64,14 +65,14 @@ func (m *MarcGenerator) Generate() <-chan Record {
 		spew.Dump(err)
 	}
 
-	out := make(chan Record)
-	p := marcparser{file: m.marcfile, rules: rules, languageCodes: languageCodes,
+	out := make(chan record.Record)
+	p := marcparser{file: m.Marcfile, rules: rules, languageCodes: languageCodes,
 		countryCodes: countryCodes}
 	go p.parse(out)
 	return out
 }
 
-func (m *marcparser) parse(out chan Record) {
+func (m *marcparser) parse(out chan record.Record) {
 	mr := fml.NewMarcIterator(m.file)
 	var errorCount int
 
@@ -109,9 +110,9 @@ func validRecordStatus(record fml.Record) bool {
 	return false
 }
 
-func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]string, countryCodes map[string]string) (r Record, err error) {
+func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[string]string, countryCodes map[string]string) (r record.Record, err error) {
 	err = nil
-	r = Record{}
+	r = record.Record{}
 
 	r.Identifier = fmlRecord.ControlNum()
 
@@ -223,7 +224,7 @@ func marcToRecord(fmlRecord fml.Record, rules []*Rule, languageCodes map[string]
 	return r, err
 }
 
-func applyRule(fmlRecord fml.Record, rules []*Rule, field string) []string {
+func applyRule(fmlRecord fml.Record, rules []*record.Rule, field string) []string {
 	recordFieldRule := getRules(rules, field)
 
 	res := extractData(recordFieldRule, fmlRecord)
@@ -231,7 +232,7 @@ func applyRule(fmlRecord fml.Record, rules []*Rule, field string) []string {
 }
 
 // takes a supplied marc rule and fmlRecord returns an array of stringified subfields
-func extractData(rule *Rule, fmlRecord fml.Record) []string {
+func extractData(rule *record.Rule, fmlRecord fml.Record) []string {
 	var field []string
 	for _, r := range rule.Fields {
 		f := filter(fmlRecord, r)
@@ -267,7 +268,7 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func filter(fmlRecord fml.Record, field *Field) []string {
+func filter(fmlRecord fml.Record, field *record.Field) []string {
 	var stuff []string
 	values := fmlRecord.Filter(field.Tag + field.Subfields)
 	for _, f := range values {
@@ -284,14 +285,14 @@ func filter(fmlRecord fml.Record, field *Field) []string {
 }
 
 // returns slice of contributors of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
-func getContributors(fmlRecord fml.Record, rules []*Rule, field string) []*Contributor {
+func getContributors(fmlRecord fml.Record, rules []*record.Rule, field string) []*record.Contributor {
 	recordFieldRule := getRules(rules, field)
-	var contribs []*Contributor
+	var contribs []*record.Contributor
 
 	for _, r := range recordFieldRule.Fields {
 
 		for _, contrib := range filter(fmlRecord, r) {
-			y := new(Contributor)
+			y := new(record.Contributor)
 			y.Kind = r.Kind
 			y.Value = contrib
 
@@ -306,11 +307,11 @@ func getContributors(fmlRecord fml.Record, rules []*Rule, field string) []*Contr
 }
 
 // returns slice of related items of marc fields taking into account the rules for which fields and subfields we care about as defined in marc_rules.json
-func getRelatedItems(fmlRecord fml.Record, rules []*Rule, field string) []*RelatedItem {
+func getRelatedItems(fmlRecord fml.Record, rules []*record.Rule, field string) []*record.RelatedItem {
 	recordFieldRule := getRules(rules, field)
-	var c []*RelatedItem
+	var c []*record.RelatedItem
 	for _, r := range recordFieldRule.Fields {
-		y := new(RelatedItem)
+		y := new(record.RelatedItem)
 		y.Kind = r.Kind
 		y.Value = filter(fmlRecord, r)
 		if y.Value != nil {
@@ -321,7 +322,7 @@ func getRelatedItems(fmlRecord fml.Record, rules []*Rule, field string) []*Relat
 }
 
 // returns all rules that match a supplied fieldname
-func getRules(rules []*Rule, label string) *Rule {
+func getRules(rules []*record.Rule, label string) *record.Rule {
 	for _, v := range rules {
 		if v.Label == label {
 			return v
@@ -425,8 +426,8 @@ func TranslateCodes(recordCodes []string, codeMap map[string]string) []string {
 }
 
 // getLinks take a MARC record and eturns an array of Link objects from the 856 field data.
-func getLinks(fmlRecord fml.Record) []Link {
-	var links []Link
+func getLinks(fmlRecord fml.Record) []record.Link {
+	var links []record.Link
 	marc856 := fmlRecord.DataField("856")
 	if len(marc856) == 0 {
 		return nil
@@ -436,7 +437,7 @@ func getLinks(fmlRecord fml.Record) []Link {
 		ind2 := string(f.Indicator2)
 
 		if ind1 == "4" && (ind2 == "0" || ind2 == "1") {
-			link := Link{
+			link := record.Link{
 				Kind:         subfieldValue(f.SubFields, "3"),
 				URL:          subfieldValue(f.SubFields, "u"),
 				Text:         subfieldValue(f.SubFields, "y"),
@@ -452,14 +453,14 @@ func getLinks(fmlRecord fml.Record) []Link {
 
 // getLocations takes a MARC record and returns an array of Holdings objects.
 // The expecation is to use either an 852 or an 866 field.
-func getHoldings(fmlRecord fml.Record, tag string, subfieldCodes []string) []Holding {
-	var holdings []Holding
+func getHoldings(fmlRecord fml.Record, tag string, subfieldCodes []string) []record.Holding {
+	var holdings []record.Holding
 	df := fmlRecord.DataField(tag)
 	if len(df) == 0 {
 		return nil
 	}
 	for _, f := range df {
-		holding := Holding{
+		holding := record.Holding{
 			Location: lookupLocation(subfieldValue(f.SubFields, subfieldCodes[0])),
 			Collection: lookupCollection(
 				subfieldValue(f.SubFields, subfieldCodes[1]),

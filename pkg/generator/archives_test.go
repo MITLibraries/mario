@@ -1,17 +1,18 @@
-package main
+package generator
 
 import (
+	"github.com/mitlibraries/mario/pkg/record"
 	"os"
 	"testing"
 )
 
 func TestArchivesProcessesAllRecords(t *testing.T) {
-	ead, err := os.Open("fixtures/aspace_samples.xml")
+	ead, err := os.Open("../../fixtures/aspace_samples.xml")
 	if err != nil {
 		t.Error(err)
 	}
 
-	out := make(chan Record)
+	out := make(chan record.Record)
 	p := archivesparser{file: ead}
 	go p.parse(out)
 
@@ -26,12 +27,12 @@ func TestArchivesProcessesAllRecords(t *testing.T) {
 }
 
 func TestArchivesRecordParsing(t *testing.T) {
-	ead, err := os.Open("fixtures/aspace_samples.xml")
+	ead, err := os.Open("../../fixtures/aspace_samples.xml")
 	if err != nil {
 		t.Error(err)
 	}
 
-	out := make(chan Record)
+	out := make(chan record.Record)
 	p := archivesparser{file: ead}
 	go p.parse(out)
 

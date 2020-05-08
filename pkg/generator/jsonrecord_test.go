@@ -1,17 +1,18 @@
-package main
+package generator
 
 import (
+	"github.com/mitlibraries/mario/pkg/record"
 	"os"
 	"testing"
 )
 
 func TestJsonParser(t *testing.T) {
-	jsonfile, err := os.Open("fixtures/mit_test_records.json")
+	jsonfile, err := os.Open("../../fixtures/mit_test_records.json")
 	if err != nil {
 		t.Error(err)
 	}
 
-	out := make(chan Record)
+	out := make(chan record.Record)
 
 	p := jsonparser{file: jsonfile}
 	go p.parse(out)
@@ -27,13 +28,13 @@ func TestJsonParser(t *testing.T) {
 }
 
 func TestJsonProcess(t *testing.T) {
-	jsonfile, err := os.Open("fixtures/mit_test_records.json")
+	jsonfile, err := os.Open("../../fixtures/mit_test_records.json")
 	if err != nil {
 		t.Error(err)
 	}
 
 	var i int
-	p := JSONGenerator{file: jsonfile}
+	p := JSONGenerator{File: jsonfile}
 	for range p.Generate() {
 		i++
 	}

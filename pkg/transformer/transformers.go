@@ -1,4 +1,6 @@
-package main
+package transformer
+
+import "github.com/mitlibraries/mario/pkg/record"
 
 //Counter transformer records the number of records handled.
 type Counter struct {
@@ -6,8 +8,8 @@ type Counter struct {
 }
 
 //Transform counts the records.
-func (c *Counter) Transform(in <-chan Record) <-chan Record {
-	out := make(chan Record)
+func (c *Counter) Transform(in <-chan record.Record) <-chan record.Record {
+	out := make(chan record.Record)
 	go func() {
 		for r := range in {
 			c.Count++
