@@ -7,10 +7,13 @@ help: ## Print this message
 	@awk 'BEGIN { FS = ":.*##"; print "Usage:  make <target>\n\nTargets:" } \
 		/^[-_[:alpha:]]+:.?*##/ { printf "  %-15s%s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-install: ## Install mario binary
+generate: ## Generate code lists
+	go generate
+
+install: generate ## Install mario binary
 	go install
 
-test: ## Run tests
+test: generate ## Run tests
 	go test -v ./...
 
 tests: test

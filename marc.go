@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/mitlibraries/fml"
+	"github.com/mitlibraries/mario/pkg/config"
 )
 
 // RetrieveRules for parsing MARC
@@ -35,10 +35,8 @@ func RetrieveRules(rulefile string) ([]*Rule, error) {
 }
 
 type marcparser struct {
-	file          io.Reader
-	rules         []*Rule
-	languageCodes map[string]string
-	countryCodes  map[string]string
+	file  io.Reader
+	rules []*Rule
 }
 
 //MarcGenerator parses binary MARC records.
@@ -54,19 +52,8 @@ func (m *MarcGenerator) Generate() <-chan Record {
 		spew.Dump(err)
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
-	if err != nil {
-		spew.Dump(err)
-	}
-
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
-	if err != nil {
-		spew.Dump(err)
-	}
-
 	out := make(chan Record)
-	p := marcparser{file: m.marcfile, rules: rules, languageCodes: languageCodes,
-		countryCodes: countryCodes}
+	p := marcparser{file: m.marcfile, rules: rules}
 	go p.parse(out)
 	return out
 }
@@ -88,7 +75,7 @@ func (m *marcparser) parse(out chan Record) {
 			continue
 		}
 
-		r, err := marcToRecord(record, m.rules, m.languageCodes, m.countryCodes)
+		r, err := marcToRecord(record, m.rules, config.Language, config.Country) //m.languageCodes, m.countryCodes)
 		if err != nil {
 			errorCount++
 			log.Println(err)
@@ -376,38 +363,6 @@ func contentType(x byte) string {
 		t = "Text"
 	}
 	return t
-}
-
-// RetrieveCodelist retrieves language codes for parsing MARC languages
-func RetrieveCodelist(codeType string, filePath string) (map[string]string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Language struct
-	type CodeMap struct {
-		Name string `xml:"name"`
-		Code string `xml:"code"`
-	}
-
-	decoder := xml.NewDecoder(file)
-	codes := make(map[string]string)
-
-	for {
-		t, _ := decoder.Token()
-		if t == nil {
-			break
-		}
-		switch se := t.(type) {
-		case xml.StartElement:
-			if se.Name.Local == codeType {
-				var c CodeMap
-				decoder.DecodeElement(&c, &se)
-				codes[c.Code] = c.Name
-			}
-		}
-	}
-	return codes, err
 }
 
 // TranslateCodes takes an array of MARC language/country codes and returns the language/country names.

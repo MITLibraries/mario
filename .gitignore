@@ -21,3 +21,4 @@ debug
 tmp/
 
 mario
+pkg/config/

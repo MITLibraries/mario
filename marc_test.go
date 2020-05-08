@@ -6,6 +6,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/mitlibraries/fml"
+	"github.com/mitlibraries/mario/pkg/config"
 )
 
 func TestMarcToRecord(t *testing.T) {
@@ -27,19 +28,7 @@ func TestMarcToRecord(t *testing.T) {
 		return
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
-	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
+	item, _ := marcToRecord(record, rules, config.Language, config.Country)
 
 	if item.Contributor[0].Value != "Sandburg, Carl, 1878-1967." {
 		t.Error("Expected match, got", item.Contributor[0].Value)
@@ -85,20 +74,8 @@ func TestMarcHoldings(t *testing.T) {
 		return
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
 	// This record has an 852, but no 866
-	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
+	item, _ := marcToRecord(record, rules, config.Language, config.Country)
 
 	h := item.Holdings[0]
 	if h.Location != "Hayden Library" {
@@ -115,7 +92,7 @@ func TestMarcHoldings(t *testing.T) {
 	// This record has no 866 or 852 fields
 	_ = records.Next()
 	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
+	item, _ = marcToRecord(record, rules, config.Language, config.Country)
 
 	if len(item.Holdings) != 0 {
 		t.Error("Expected no holdings, got", len(item.Holdings))
@@ -124,7 +101,7 @@ func TestMarcHoldings(t *testing.T) {
 	// This record has an 866 field and 852. We use 866.
 	_ = records.Next()
 	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
+	item, _ = marcToRecord(record, rules, config.Language, config.Country)
 	h = item.Holdings[0]
 	if h.Location != "Barker Library" {
 		t.Error("Expected match, got", h.Location)
@@ -184,15 +161,9 @@ func TestContentType(t *testing.T) {
 }
 
 func TestTranslateLanguageCodes(t *testing.T) {
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
 	in := []string{"abk", "ach", "afa", "aaa", ""}
 	out := []string{"Abkhaz", "Acoli", "Afroasiatic (Other)", "aaa", ""}
-	langs := TranslateCodes(in, languageCodes)
+	langs := TranslateCodes(in, config.Language)
 
 	if len(langs) != len(out) {
 		t.Errorf("got %q items, want %q", len(langs), len(out))
@@ -277,19 +248,7 @@ func TestOclcs(t *testing.T) {
 		return
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
-	if err != nil {
-		spew.Dump(err)
-		return
-	}
-
-	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
+	item, _ := marcToRecord(record, rules, config.Language, config.Country)
 
 	// Confirm oclc prefix is removed
 	if item.OclcNumber[0] != "1000583393" {
@@ -299,7 +258,7 @@ func TestOclcs(t *testing.T) {
 	// Confirm old system numbers are not included.
 	_ = records.Next()
 	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
+	item, _ = marcToRecord(record, rules, config.Language, config.Country)
 
 	if item.OclcNumber[0] != "1017661930" {
 		t.Error("Expected match, got", item.OclcNumber)
