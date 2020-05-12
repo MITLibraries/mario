@@ -3,11 +3,10 @@ package main
 import (
 	"encoding/xml"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"github.com/antchfx/xmlquery"
-	yaml "gopkg.in/yaml.v2"
+	"github.com/mitlibraries/mario/pkg/config"
 )
 
 type archivesparser struct {
@@ -119,38 +118,20 @@ func processXMLRecord(se xml.StartElement, decoder *xml.Decoder, out chan Record
 	out <- r
 }
 
-// AspaceCodesMap defines codes for parsing ASpace record fields
-type AspaceCodesMap struct {
-	Enumerations struct {
-		LinkedAgentRelators map[string]string `yaml:"linked_agent_archival_record_relators"`
-	} `yaml:"enumerations"`
-}
-
 func eadContributors(ar AspaceRecord) []*Contributor {
 	var contribs []*Contributor
-	var codes AspaceCodesMap
-
-	yamlFile, err := ioutil.ReadFile("config/aspace_code_mappings.yml")
-	if err != nil {
-		panic(err)
-	}
-
-	err = yaml.Unmarshal(yamlFile, &codes)
-	if err != nil {
-		panic(err)
-	}
 
 	for _, c := range ar.Metadata.Ead.Archdesc.Did.Origination {
 		contrib := new(Contributor)
 		switch {
 		case c.Corpname.Text != "":
-			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Corpname.Role]
+			contrib.Kind = config.Contributor[c.Corpname.Role]
 			contrib.Value = c.Corpname.Text
 		case c.Famname.Text != "":
-			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Famname.Role]
+			contrib.Kind = config.Contributor[c.Famname.Role]
 			contrib.Value = c.Famname.Text
 		case c.Persname.Text != "":
-			contrib.Kind = codes.Enumerations.LinkedAgentRelators[c.Persname.Role]
+			contrib.Kind = config.Contributor[c.Persname.Role]
 			contrib.Value = c.Persname.Text
 		}
 		if contrib.Kind == "" {
