@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/markbates/pkger"
 	"github.com/olivere/elastic"
 	aws "github.com/olivere/elastic/aws/v4"
 )
@@ -46,7 +47,11 @@ func esClient(url string, index string, v4 bool) (*elastic.Client, error) {
 
 // CreateRecordIndex creates our Record index
 func createRecordIndex(client *elastic.Client, index string) error {
-	mappings, err := ioutil.ReadFile("config/es_record_mappings.json")
+	file, err := pkger.Open("/config/es_record_mappings.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	mappings, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}

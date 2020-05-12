@@ -6,18 +6,18 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/markbates/pkger"
 	"github.com/mitlibraries/fml"
 )
 
 // RetrieveRules for parsing MARC
 func RetrieveRules(rulefile string) ([]*Rule, error) {
 	// Open the file.
-	file, err := os.Open(rulefile)
+	file, err := pkger.Open(rulefile)
 	if err != nil {
 		return nil, err
 	}
@@ -54,12 +54,12 @@ func (m *MarcGenerator) Generate() <-chan Record {
 		spew.Dump(err)
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	languageCodes, err := RetrieveCodelist("language", "/config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 	}
 
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
+	countryCodes, err := RetrieveCodelist("country", "/config/countries.xml")
 	if err != nil {
 		spew.Dump(err)
 	}
@@ -380,7 +380,7 @@ func contentType(x byte) string {
 
 // RetrieveCodelist retrieves language codes for parsing MARC languages
 func RetrieveCodelist(codeType string, filePath string) (map[string]string, error) {
-	file, err := os.Open(filePath)
+	file, err := pkger.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}

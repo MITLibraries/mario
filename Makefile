@@ -7,7 +7,11 @@ help: ## Print this message
 	@awk 'BEGIN { FS = ":.*##"; print "Usage:  make <target>\n\nTargets:" } \
 		/^[-_[:alpha:]]+:.?*##/ { printf "  %-15s%s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-install: ## Install mario binary
+package: ## Package static assets
+	go get github.com/markbates/pkger/cmd/pkger
+	pkger -include /config
+
+install: package ## Install mario binary
 	go install
 
 test: ## Run tests
@@ -18,7 +22,7 @@ tests: test
 update: ## Update dependencies
 	go get -u ./...
 
-dist: ## Build docker image
+dist: package ## Build docker image
 	docker build -t $(ECR_REGISTRY)/mario-stage:latest \
 		-t $(ECR_REGISTRY)/mario-stage:`git describe --always` \
 		-t mario:latest .

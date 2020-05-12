@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/antchfx/xmlquery"
+	"github.com/markbates/pkger"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -130,7 +131,11 @@ func eadContributors(ar AspaceRecord) []*Contributor {
 	var contribs []*Contributor
 	var codes AspaceCodesMap
 
-	yamlFile, err := ioutil.ReadFile("config/aspace_code_mappings.yml")
+	file, err := pkger.Open("/config/aspace_code_mappings.yml")
+	if err != nil {
+		panic(err)
+	}
+	yamlFile, err := ioutil.ReadAll(file)
 	if err != nil {
 		panic(err)
 	}
