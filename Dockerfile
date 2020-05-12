@@ -3,7 +3,10 @@ FROM golang:1.13-alpine
 RUN apk add --no-cache curl git ca-certificates
 WORKDIR /go/src/mario
 COPY . ./
-RUN go build
+RUN \
+  go get github.com/markbates/pkger/cmd/pkger && \
+  pkger -include /config && \
+  go build
 
 FROM alpine
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
