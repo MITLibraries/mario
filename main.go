@@ -49,7 +49,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "rules",
-					Value: "config/marc_rules.json",
+					Value: "/config/marc_rules.json",
 					Usage: "Path to marc rules file",
 				},
 				cli.StringFlag{

@@ -12,10 +12,10 @@ require (
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
+	github.com/markbates/pkger v0.15.1
 	github.com/mitlibraries/fml v0.0.0-20191112153439-258f51343ffe
 	github.com/olivere/elastic v6.2.26+incompatible
 	github.com/pkg/errors v0.8.1 // indirect
-	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/urfave/cli v1.22.1
 	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
 	golang.org/x/text v0.3.2 // indirect

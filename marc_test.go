@@ -21,19 +21,19 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error(err)
 	}
 
-	rules, err := RetrieveRules("config/marc_rules.json")
+	rules, err := RetrieveRules("/config/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	languageCodes, err := RetrieveCodelist("language", "/config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
+	countryCodes, err := RetrieveCodelist("country", "/config/countries.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
@@ -79,19 +79,19 @@ func TestMarcHoldings(t *testing.T) {
 		t.Error(err)
 	}
 
-	rules, err := RetrieveRules("config/marc_rules.json")
+	rules, err := RetrieveRules("/config/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	languageCodes, err := RetrieveCodelist("language", "/config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
+	countryCodes, err := RetrieveCodelist("country", "/config/countries.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
@@ -184,7 +184,7 @@ func TestContentType(t *testing.T) {
 }
 
 func TestTranslateLanguageCodes(t *testing.T) {
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	languageCodes, err := RetrieveCodelist("language", "/config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
@@ -207,7 +207,7 @@ func TestTranslateLanguageCodes(t *testing.T) {
 }
 
 func TestMarcParser(t *testing.T) {
-	rules, err := RetrieveRules("config/marc_rules.json")
+	rules, err := RetrieveRules("/config/marc_rules.json")
 
 	if err != nil {
 		spew.Dump(err)
@@ -239,7 +239,7 @@ func TestMarcProcess(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	p := MarcGenerator{marcfile: marcfile, rulesfile: "config/marc_rules.json"}
+	p := MarcGenerator{marcfile: marcfile, rulesfile: "/config/marc_rules.json"}
 	out := p.Generate()
 	var i int
 	for range out {
@@ -271,19 +271,19 @@ func TestOclcs(t *testing.T) {
 		t.Error(err)
 	}
 
-	rules, err := RetrieveRules("config/marc_rules.json")
+	rules, err := RetrieveRules("/config/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	languageCodes, err := RetrieveCodelist("language", "config/languages.xml")
+	languageCodes, err := RetrieveCodelist("language", "/config/languages.xml")
 	if err != nil {
 		spew.Dump(err)
 		return
 	}
 
-	countryCodes, err := RetrieveCodelist("country", "config/countries.xml")
+	countryCodes, err := RetrieveCodelist("country", "/config/countries.xml")
 	if err != nil {
 		spew.Dump(err)
 		return

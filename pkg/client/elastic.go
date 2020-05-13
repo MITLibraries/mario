@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/markbates/pkger"
 	"github.com/mitlibraries/mario/pkg/record"
 	"github.com/olivere/elastic"
 	aws "github.com/olivere/elastic/aws/v4"
@@ -45,7 +46,11 @@ func (c ESClient) Current(prefix string) (string, error) {
 
 // Create the new index.
 func (c ESClient) Create(index string) error {
-	mappings, err := ioutil.ReadFile("config/es_record_mappings.json")
+	file, err := pkger.Open("/config/es_record_mappings.json")
+	if err != nil {
+		return err
+	}
+	mappings, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
 	}
