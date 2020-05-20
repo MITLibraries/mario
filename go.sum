@@ -30,6 +30,8 @@ github.com/mailru/easyjson v0.7.1 h1:mdxE1MF9o53iCb2Ghj1VfWvh7ZOwHpnVG/xwXrV90U8
 github.com/mailru/easyjson v0.7.1/go.mod h1:KAzv3t3aY1NaHWoQz1+4F1ccyAH66Jk7yos7ldAVICs=
 github.com/markbates/pkger v0.15.1 h1:3MPelV53RnGSW07izx5xGxl4e/sdRD6zqseIk0rMASY=
 github.com/markbates/pkger v0.15.1/go.mod h1:0JoVlrol20BSywW79rN3kdFFsE5xYM+rSCQDXbLhiuI=
+github.com/markbates/pkger v0.16.0 h1:bZGAXW80/vi6ORfJCDVQhT8/9raoPdGAhvFd9Yq0LMA=
+github.com/markbates/pkger v0.16.0/go.mod h1:0JoVlrol20BSywW79rN3kdFFsE5xYM+rSCQDXbLhiuI=
 github.com/mitlibraries/fml v0.0.0-20191112153439-258f51343ffe h1:dlFav5w4Q6+tNwuQ2VbuIudJuUbjPspUQeOhEm9BvP4=
 github.com/mitlibraries/fml v0.0.0-20191112153439-258f51343ffe/go.mod h1:51RW/dcp8hMr4/QYGpzFtqPpLQtQ9ksC2wOXdlfaLBo=
 github.com/olivere/elastic v6.2.31+incompatible h1:zwJIIsgfiDBuDS3sb6MCbm/e03BPEJoGZvqevZXM254=
