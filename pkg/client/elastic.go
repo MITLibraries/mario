@@ -18,6 +18,18 @@ import (
 // Primary alias
 const primary = "timdex-prod"
 
+// Indexer provides an interface for interacting with an index.
+type Indexer interface {
+	Current(string) (string, error)
+	Create(string) error
+	Start() error
+	Stop() error
+	Add(record.Record, string, string)
+	Promote(string, string) error
+	Delete(string) error
+	Reindex(string, string) (int64, error)
+}
+
 // ESClient wraps an olivere/elastic client. Create a new client with the
 // NewESClient function.
 type ESClient struct {
@@ -37,15 +49,22 @@ func (c ESClient) Current(prefix string) (string, error) {
 	aliases := res.IndicesByAlias(primary)
 	if len(aliases) == 0 {
 		return "", nil
-	} else if len(aliases) > 0 {
+	} else if len(aliases) > 1 {
 		return "", errors.New("Could not determine current index")
 	} else {
 		return aliases[0], nil
 	}
 }
 
-// Create the new index.
+// Create the new index if it does not exist.
 func (c ESClient) Create(index string) error {
+	exists, err := c.client.IndexExists(index).Do(context.Background())
+	if err != nil {
+		return err
+	}
+	if exists {
+		return nil
+	}
 	file, err := pkger.Open("/config/es_record_mappings.json")
 	if err != nil {
 		return err
@@ -78,10 +97,11 @@ func (c *ESClient) Stop() error {
 }
 
 // Add a record using a bulk processor.
-func (c *ESClient) Add(record record.Record, index string) {
+func (c *ESClient) Add(record record.Record, index string, rtype string) {
 	d := elastic.NewBulkIndexRequest().
 		Index(index).
 		Id(record.Identifier).
+		Type(rtype).
 		Doc(record)
 	c.bulker.Add(d)
 }
@@ -108,6 +128,7 @@ func (c ESClient) Delete(index string) error {
 	return err
 }
 
+// Indexes returns a list of indexes in a cluster.
 func (c ESClient) Indexes() (elastic.CatIndicesResponse, error) {
 	return c.client.
 		CatIndices().
@@ -115,10 +136,12 @@ func (c ESClient) Indexes() (elastic.CatIndicesResponse, error) {
 		Do(context.Background())
 }
 
+// Aliases returns a list of aliases in a cluster.
 func (c ESClient) Aliases() (elastic.CatAliasesResponse, error) {
 	return c.client.CatAliases().Do(context.Background())
 }
 
+// Ping the URL for basic information about the cluster.
 func (c ESClient) Ping(url string) (*elastic.PingResult, error) {
 	res, _, err := c.client.Ping(url).Do(context.Background())
 	return res, err
@@ -139,7 +162,7 @@ func (c ESClient) Reindex(source string, dest string) (int64, error) {
 }
 
 // NewESClient creates a new Elasticsearch client.
-func NewESClient(url string, v4 bool) (ESClient, error) {
+func NewESClient(url string, v4 bool) (*ESClient, error) {
 	var client *http.Client
 	if v4 {
 		sess := session.Must(session.NewSession())
@@ -160,5 +183,5 @@ func NewESClient(url string, v4 bool) (ESClient, error) {
 		elastic.SetHealthcheck(false),
 		elastic.SetHttpClient(client),
 	)
-	return ESClient{client: es}, err
+	return &ESClient{client: es}, err
 }

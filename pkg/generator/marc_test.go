@@ -1,4 +1,4 @@
-package main
+package generator
 
 import (
 	"os"
@@ -6,10 +6,11 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/mitlibraries/fml"
+	"github.com/mitlibraries/mario/pkg/record"
 )
 
 func TestMarcToRecord(t *testing.T) {
-	file, err := os.Open("fixtures/record1.mrc")
+	file, err := os.Open("../../fixtures/record1.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -67,7 +68,7 @@ func TestMarcToRecord(t *testing.T) {
 }
 
 func TestMarcHoldings(t *testing.T) {
-	file, err := os.Open("fixtures/holdings_test_records.mrc")
+	file, err := os.Open("../../fixtures/holdings_test_records.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -214,12 +215,12 @@ func TestMarcParser(t *testing.T) {
 		return
 	}
 
-	marcfile, err := os.Open("fixtures/test.mrc")
+	marcfile, err := os.Open("../../fixtures/test.mrc")
 	if err != nil {
 		t.Error(err)
 	}
 
-	out := make(chan Record)
+	out := make(chan record.Record)
 
 	p := marcparser{file: marcfile, rules: rules}
 	go p.parse(out)
@@ -235,11 +236,11 @@ func TestMarcParser(t *testing.T) {
 }
 
 func TestMarcProcess(t *testing.T) {
-	marcfile, err := os.Open("fixtures/test.mrc")
+	marcfile, err := os.Open("../../fixtures/test.mrc")
 	if err != nil {
 		t.Error(err)
 	}
-	p := MarcGenerator{marcfile: marcfile, rulesfile: "/config/marc_rules.json"}
+	p := MarcGenerator{Marcfile: marcfile, Rulesfile: "/config/marc_rules.json"}
 	out := p.Generate()
 	var i int
 	for range out {
@@ -259,7 +260,7 @@ func TestStringInSlice(t *testing.T) {
 }
 
 func TestOclcs(t *testing.T) {
-	file, err := os.Open("fixtures/mit_test_records.mrc")
+	file, err := os.Open("../../fixtures/mit_test_records.mrc")
 	if err != nil {
 		t.Error(err)
 	}

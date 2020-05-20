@@ -1,13 +1,14 @@
-package main
+package pipeline
 
 import (
+	"github.com/mitlibraries/mario/pkg/record"
 	"testing"
 )
 
 type Fooer struct{}
 
-func (f *Fooer) Transform(in <-chan Record) <-chan Record {
-	out := make(chan Record)
+func (f *Fooer) Transform(in <-chan record.Record) <-chan record.Record {
+	out := make(chan record.Record)
 	go func() {
 		for r := range in {
 			r.Title = r.Title + "FOO"
@@ -20,21 +21,21 @@ func (f *Fooer) Transform(in <-chan Record) <-chan Record {
 
 type RecordGenerator struct{}
 
-func (g *RecordGenerator) Generate() <-chan Record {
-	out := make(chan Record)
+func (g *RecordGenerator) Generate() <-chan record.Record {
+	out := make(chan record.Record)
 	go func() {
-		out <- Record{Title: "Bar"}
-		out <- Record{Title: "Gaz"}
+		out <- record.Record{Title: "Bar"}
+		out <- record.Record{Title: "Gaz"}
 		close(out)
 	}()
 	return out
 }
 
 type RecordConsumer struct {
-	records []Record
+	records []record.Record
 }
 
-func (c *RecordConsumer) Consume(in <-chan Record) <-chan bool {
+func (c *RecordConsumer) Consume(in <-chan record.Record) <-chan bool {
 	out := make(chan bool)
 	go func() {
 		for r := range in {
@@ -48,8 +49,8 @@ func (c *RecordConsumer) Consume(in <-chan Record) <-chan bool {
 func TestRun(t *testing.T) {
 	c := &RecordConsumer{}
 	p := Pipeline{
-		generator: &RecordGenerator{},
-		consumer:  c,
+		Generator: &RecordGenerator{},
+		Consumer:  c,
 	}
 	p.Next(&Fooer{})
 	out := p.Run()

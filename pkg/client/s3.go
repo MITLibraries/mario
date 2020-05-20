@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"io"
@@ -8,7 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-func getS3Obj(bucket string, key string) (io.ReadCloser, error) {
+// GetS3Obj returns an io.ReadCloser for an S3 object.
+func GetS3Obj(bucket string, key string) (io.ReadCloser, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("us-east-1")},
 	)

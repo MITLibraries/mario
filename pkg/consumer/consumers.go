@@ -1,4 +1,4 @@
-package main
+package consumer
 
 import (
 	"encoding/json"
@@ -6,27 +6,23 @@ import (
 	"io"
 	"log"
 
-	"github.com/olivere/elastic"
+	"github.com/mitlibraries/mario/pkg/client"
+	"github.com/mitlibraries/mario/pkg/record"
 )
 
 //ESConsumer adds Records to ElasticSearch.
 type ESConsumer struct {
-	Index string
-	RType string
-	p     *elastic.BulkProcessor
+	Index  string
+	RType  string
+	Client client.Indexer
 }
 
 //Consume the records.
-func (es *ESConsumer) Consume(in <-chan Record) <-chan bool {
+func (es *ESConsumer) Consume(in <-chan record.Record) <-chan bool {
 	out := make(chan bool)
 	go func() {
 		for r := range in {
-			d := elastic.NewBulkIndexRequest().
-				Index(es.Index).
-				Id(r.Identifier).
-				Type(es.RType).
-				Doc(r)
-			es.p.Add(d)
+			es.Client.Add(r, es.Index, es.RType)
 		}
 		close(out)
 	}()
@@ -36,14 +32,14 @@ func (es *ESConsumer) Consume(in <-chan Record) <-chan bool {
 //JSONConsumer outputs Records as JSON. The Records will be written
 //to JSONConsumer.out.
 type JSONConsumer struct {
-	out io.Writer
+	Out io.Writer
 }
 
 //Consume the records.
-func (js *JSONConsumer) Consume(in <-chan Record) <-chan bool {
+func (js *JSONConsumer) Consume(in <-chan record.Record) <-chan bool {
 	out := make(chan bool)
 	go func() {
-		fmt.Fprintln(js.out, "[")
+		fmt.Fprintln(js.Out, "[")
 		var i int
 		for r := range in {
 			b, err := json.MarshalIndent(r, "", "    ")
@@ -51,12 +47,12 @@ func (js *JSONConsumer) Consume(in <-chan Record) <-chan bool {
 				log.Println(err)
 			}
 			if i != 0 {
-				fmt.Fprintln(js.out, ",")
+				fmt.Fprintln(js.Out, ",")
 			}
-			fmt.Fprintln(js.out, string(b))
+			fmt.Fprintln(js.Out, string(b))
 			i++
 		}
-		fmt.Fprintln(js.out, "]")
+		fmt.Fprintln(js.Out, "]")
 		close(out)
 	}()
 	return out
@@ -65,15 +61,15 @@ func (js *JSONConsumer) Consume(in <-chan Record) <-chan bool {
 //TitleConsumer just outputs the title of Records. The titles will be
 //written to TitleConsumer.out.
 type TitleConsumer struct {
-	out io.Writer
+	Out io.Writer
 }
 
 //Consume the records.
-func (t *TitleConsumer) Consume(in <-chan Record) <-chan bool {
+func (t *TitleConsumer) Consume(in <-chan record.Record) <-chan bool {
 	out := make(chan bool)
 	go func() {
 		for r := range in {
-			fmt.Fprintln(t.out, r.Title)
+			fmt.Fprintln(t.Out, r.Title)
 		}
 		close(out)
 	}()
@@ -82,11 +78,11 @@ func (t *TitleConsumer) Consume(in <-chan Record) <-chan bool {
 
 //SilentConsumer is useful for debugging sometimes
 type SilentConsumer struct {
-	out io.Writer
+	Out io.Writer
 }
 
 //Consume the records and close the channel when done. No processing is done.
-func (s *SilentConsumer) Consume(in <-chan Record) <-chan bool {
+func (s *SilentConsumer) Consume(in <-chan record.Record) <-chan bool {
 	out := make(chan bool)
 	go func() {
 		for range in {
