@@ -14,9 +14,13 @@ RUN \
   pkger && \
   go build -o mario cmd/mario/main.go
 
+# Note: the two `RUN true` commands appear to be necessary because of
+# https://github.com/moby/moby/issues/37965
 FROM golang:1.13-alpine
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+RUN true
 COPY --from=0 /go/src/mario/mario .
+RUN true
 COPY --from=0 /go/src/mario/config ./config
 ENTRYPOINT ["./mario"]
 CMD ["--help"]
