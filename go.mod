@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/antchfx/xmlquery v1.2.4
-	github.com/aws/aws-sdk-go v1.30.26
+	github.com/aws/aws-sdk-go v1.33.6
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/google/go-cmp v0.4.0 // indirect
