@@ -12,6 +12,6 @@ require (
 	github.com/markbates/pkger v0.15.1
 	github.com/mitlibraries/fml v0.0.0-20191112153439-258f51343ffe
 	github.com/olivere/elastic v6.2.31+incompatible
-	github.com/urfave/cli v1.22.4
+	github.com/urfave/cli v1.22.5
 	gopkg.in/yaml.v2 v2.3.0
 )
