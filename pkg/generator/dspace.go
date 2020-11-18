@@ -16,7 +16,6 @@ type dspaceparser struct {
 // DspaceGenerator parses dspace oai_dc xml data.
 type DspaceGenerator struct {
 	Dspacefile io.Reader
-	rulesfile  string
 }
 
 // Generate a channel of Records.
@@ -42,15 +41,15 @@ func (m *dspaceparser) parse(out chan record.Record) {
 		case xml.StartElement:
 			// If we just read a StartElement token named "record"
 			if se.Name.Local == "record" {
-				processDCRecord(se, decoder, out)
+				processMETSRecord(se, decoder, out)
 			}
 		}
 	}
 	close(out)
 }
 
-// processDCRecord handles the mapping from OAI_DC to Record.
-func processDCRecord(se xml.StartElement, decoder *xml.Decoder, out chan record.Record) {
+// processMETSRecord handles the mapping from OAI-PMH harvested METS to Record.
+func processMETSRecord(se xml.StartElement, decoder *xml.Decoder, out chan record.Record) {
 	var dr DspaceRecord
 	decoder.DecodeElement(&dr, &se)
 
