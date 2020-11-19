@@ -3,16 +3,17 @@ package ingester
 import (
 	"errors"
 	"fmt"
-	"github.com/mitlibraries/mario/pkg/client"
-	"github.com/mitlibraries/mario/pkg/consumer"
-	"github.com/mitlibraries/mario/pkg/generator"
-	"github.com/mitlibraries/mario/pkg/pipeline"
-	"github.com/mitlibraries/mario/pkg/transformer"
 	"io"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/mitlibraries/mario/pkg/client"
+	"github.com/mitlibraries/mario/pkg/consumer"
+	"github.com/mitlibraries/mario/pkg/generator"
+	"github.com/mitlibraries/mario/pkg/pipeline"
+	"github.com/mitlibraries/mario/pkg/transformer"
 )
 
 // Config is a structure for passing a set of configuration parameters to
@@ -62,6 +63,8 @@ func (i *Ingester) Configure(config Config) error {
 		}
 	} else if config.Source == "archives" {
 		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}
+	} else if config.Source == "dspace" {
+		i.generator = &generator.DspaceGenerator{Dspacefile: i.Stream}
 	} else {
 		return errors.New("Unknown source data")
 	}
