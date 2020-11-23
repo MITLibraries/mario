@@ -1,11 +1,14 @@
 package generator
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"io"
+	"io/ioutil"
 	"regexp"
 	"strings"
 
+	"github.com/markbates/pkger"
 	"github.com/mitlibraries/mario/pkg/record"
 )
 
@@ -17,6 +20,8 @@ type dspaceparser struct {
 type DspaceGenerator struct {
 	Dspacefile io.Reader
 }
+
+var setMap = getSetMap()
 
 // Generate a channel of Records.
 func (m *DspaceGenerator) Generate() <-chan record.Record {
@@ -56,6 +61,18 @@ func processMETSRecord(se xml.StartElement, decoder *xml.Decoder, out chan recor
 	mods := dr.Metadata.Mets.DmdSec.MdWrap.XMLData.Mods
 
 	r := record.Record{}
+
+	// Collection field
+	if len(dr.Header.SetSpecs) > 0 {
+		for _, s := range dr.Header.SetSpecs {
+			if s.SetSpec[0:3] != "hdl" {
+				setName := setMap[s.SetSpec]
+				if setName != "" {
+					r.Collection = append(r.Collection, setName)
+				}
+			}
+		}
+	}
 
 	// ContentType field
 	r.ContentType = mods.Genre
@@ -140,4 +157,25 @@ func processMETSRecord(se xml.StartElement, decoder *xml.Decoder, out chan recor
 	r.Title = mods.TitleInfo.Title
 
 	out <- r
+}
+
+func getSetMap() map[string]string {
+	file, err := pkger.Open("/config/dspace_set_list.json")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	jsonFile, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	var result map[string]string
+	err = json.Unmarshal(jsonFile, &result)
+	if err != nil {
+		panic(err)
+	}
+
+	return result
 }

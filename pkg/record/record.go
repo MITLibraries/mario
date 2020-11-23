@@ -36,6 +36,7 @@ type Record struct {
 	Links                []Link         `json:"links,omitempty"`
 	Holdings             []Holding      `json:"holdings,omitempty"`
 	Citation             string         `json:"citation,omitempty"`
+	Collection           []string       `json:"collections,omitempty"`
 }
 
 // Contributor is a port of a Record

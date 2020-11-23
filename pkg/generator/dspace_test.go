@@ -44,6 +44,14 @@ func TestDspaceRecordParsing(t *testing.T) {
 		t.Error("Expected 'Price, Max et al. \"Fodder, pasture, and the development of complex society in the Chalcolithic: isotopic perspectives on animal husbandry.\" Archaeological and Anthropological Sciences 12, 4 (March 2020): 95 © 2020 Springer-Verlag', got", record.Citation)
 	}
 
+	// Test Collection field
+	if len(record.Collection) != 1 {
+		t.Error("Expected 1, got", record.Collection)
+	}
+	if record.Collection[0] != "MIT Open Access Articles" {
+		t.Error("Expected 'MIT Open Access Articles', got", record.Collection[0])
+	}
+
 	// Test ContentType field
 	if record.ContentType != "Article" {
 		t.Error("Expected 'Article', got", record.ContentType)

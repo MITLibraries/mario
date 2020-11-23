@@ -49,6 +49,17 @@ Tests can be run with:
 $ go test -v ./...
 ```
 
+## Config Files
+We have several config files that are essential for mapping various metadata
+field codes to their human-readable translations, and some of them may need to
+be updated from time to time. Most of these config files are pulled from
+authoritative sources, with the exception of `marc_rules.json` which we created
+and manage ourselves. Sources of the other config files are as follows:
+
+- `dspace_set_list.json` this is harvested from our DSpace repository using our
+  OAI-PMH harvester app. The app includes a flag to convert the standard XML
+  response to JSON, which just makes it easier to parse.
+
 ## System Overview
 ![alt text](docs/charts/dip_overview.png "Mario system overview chart")
 

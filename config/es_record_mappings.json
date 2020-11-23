@@ -52,6 +52,16 @@
             }
           }
         },
+        "collections": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "normalizer": "lowercase",
+              "ignore_above": 256
+            }
+          }
+        },
         "contents": {
           "type": "text"
         },
