@@ -22,3 +22,6 @@ tmp/
 
 mario
 pkged.go
+
+# Local env settings
+.env

@@ -10,7 +10,7 @@ sources and write to Elasticsearch.
 The `mario` command can be installed with:
 
 ```
-$ go get github.com/mitlibraries/mario
+$ make install
 ```
 
 ## How to Use This
@@ -19,35 +19,69 @@ An Elasticsearch index can be started for development purposes by running:
 
 ```
 $ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" \
-    docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    docker.elastic.co/elasticsearch/elasticsearch:6.8.4
 ```
 
-Create and configure the index with:
+Alternatively, if you intend to test this with a local instance of TIMDEX
+as well, use docker-compose to run both docker and TIMDEX locally using the
+instructions in the [TIMDEX README](https://github.com/MITLibraries/timdex/blob/master/README.md#docker-compose-orchestrated-local-environment).
 
-```
-$ mario create
-```
-
-The Mario container can be built and used by running:
-
-```
-$ docker build -t mario .
-$ docker run --rm -i mario parse -c title - < fixtures/test.mrc
-```
+Here are a few sample Mario commands that may be useful for local development:
+- `mario ingest -c json -t archives -p aspace fixtures/aspace_samples.xml`
+  runs the ingest process with ASpace sample files and prints out each record
+  as JSON
+- `mario ingest -t dspace -p dspace fixtures/dspace_samples.xml` ingests the
+  DSpace sample files into a local Elasticsearch instance.
+- `mario ingest --auto fixtures/mit_test_records.mrc` ingests the Aleph sample
+  files into a local Elasticsearch instance and promotes the index to the
+  timdex-prod alias on completion.
+- `mario indexes` list all indexes
+- `mario -i [index name] promote` promotes the named index to the timdex-prod
+  alias.
 
 ## Developing
 
 This project uses modules for dependencies. To upgrade all dependencies to the latest minor/patch version use:
 
 ```
-$ go get -u ./...
+$ make update
 ```
 
 Tests can be run with:
 
 ```
-$ go test -v ./...
+$ make test
 ```
+
+### Adding a new source parser
+To add a new source parser:
+- (Probably) create a source record struct in `pkg/generator`.
+- Add a source parser module in `pkg/generator`.
+- Add a tests file that tests ALL fields mapped from the source.
+- Update `pkg/ingester/ingester.go` to add a Config.source that uses the new
+  generator.
+- Update documentation to include the new generator param option (as "type") to
+  command options.
+- (Probably) don’t need to update the CLI.
+- After all of that is completed, tested, and merged, create tasks to harvest
+  the source metadata files and ingest them using our [airflow implementation](https://github.com/MITLibraries/workflow).
+
+### Updating the data model
+Updating the data model is somewhat complicated because many files need to be
+edited across multiple repositories and deployment steps should happen in a
+particular order so as not to break production services. Start by updating the data model here in Mario as follows:
+- Update `config/es_record_mappings.json` to reflect added/updated/deleted
+  fields.
+- Update `pkg/record/record.go` to reflect added/updated/deleted fields.
+- Update ALL relevant source record definitions and source parser files in
+  `pkg/generator`. If a field is edited or deleted, be sure to check every
+  source file for usage. If a field is new, add to all relevant sources
+  (confirm mapping with metadata folks first).
+- Update relevant tests in `pkg/generator`.
+- Once the above steps are done, update the data model in TIMDEX following the
+  instructions in the [TIMDEX README](https://github.com/MITLibraries/timdex/blob/master/README.md) and test locally with the docker-compose
+  orchestrated environment to ensure all changes are properly indexed and
+  consumable via the API.
 
 ## Config Files
 We have several config files that are essential for mapping various metadata
