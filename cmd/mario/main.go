@@ -104,7 +104,7 @@ func main() {
 				}
 				count, err := ingest.Ingest()
 				if debug {
-					fmt.Printf("Total records ingested: %d\n", count)
+					log.Printf("Total records ingested: %d\n", count)
 				}
 				return err
 			},

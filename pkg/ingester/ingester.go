@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -75,12 +77,15 @@ func (i *Ingester) Configure(config Config) error {
 		// updates to aleph have the string mit01_edsu1 in the filename. If that
 		// string is present we will add the records to the current aleph index
 		// instead of creating a new index.
+
 		if config.Index == "" {
 			if strings.Contains(config.Filename, "mit01_edsu1") {
+				log.Printf("Update file detected: %s", config.Filename)
 				current, err := i.Client.Current(config.Prefix)
 				if err != nil || current == "" {
-					return errors.New("Could not determine current index")
+					return errors.New("Could not determine current index to update")
 				}
+				log.Printf("Using existing index: %s", current)
 				config.Index = current
 				config.Promote = false
 			} else {
@@ -98,6 +103,9 @@ func (i *Ingester) Configure(config Config) error {
 			RType:  "Record",
 			Client: i.Client,
 		}
+
+		log.Printf("Configured Elasticsearch consumer with index: %s, prefix: %s, and promote: %s", config.Index, config.Prefix, strconv.FormatBool(config.Promote))
+
 	} else if config.Consumer == "json" {
 		i.consumer = &consumer.JSONConsumer{Out: os.Stdout}
 	} else if config.Consumer == "title" {
@@ -133,6 +141,7 @@ func (i *Ingester) Ingest() (int, error) {
 	out := p.Run()
 	<-out
 	if i.config.Promote {
+		log.Printf("Automatic promotion is happening")
 		err = i.Client.Promote(i.config.Index, i.config.Prefix)
 	}
 	return ctr.Count, err
