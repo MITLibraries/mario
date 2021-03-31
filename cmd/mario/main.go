@@ -85,6 +85,9 @@ func main() {
 					Promote:   auto,
 					Rulesfile: c.String("rules"),
 				}
+				if debug {
+					log.Printf("Ingesting records from file: %s\n", config.Filename)
+				}
 				stream, err := ingester.NewStream(config.Filename)
 				if err != nil {
 					return err
@@ -98,7 +101,7 @@ func main() {
 				}
 
 				ingest := ingester.Ingester{Stream: stream, Client: es}
-				err = ingest.Configure(config)
+				err = ingest.Configure(config, debug)
 				if err != nil {
 					return err
 				}
