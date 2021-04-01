@@ -59,8 +59,8 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:  "prefix, p",
-					Value: "aleph",
-					Usage: "Index prefix to use: default is aleph",
+					Usage: "Index prefix to use: current options are aleph, aspace, dspace",
+					Required: true,
 				},
 				cli.BoolFlag{
 					Name:        "auto",
@@ -189,8 +189,8 @@ Lucene version: %s
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "prefix, p",
-					Value: "aleph",
-					Usage: "Index prefix to use: default is aleph",
+					Usage: "Index prefix to use: current options are aleph, aspace, dspace",
+					Required: true,
 				},
 			},
 			Action: func(c *cli.Context) error {
