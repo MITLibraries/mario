@@ -53,7 +53,7 @@ type Ingester struct {
 }
 
 // Configure an Ingester. This should be called before Ingest.
-func (i *Ingester) Configure(config Config, debug bool) error {
+func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
 	if config.Source == "json" {
@@ -80,16 +80,12 @@ func (i *Ingester) Configure(config Config, debug bool) error {
 
 		if config.Index == "" {
 			if strings.Contains(config.Filename, "mit01_edsu1") {
-				if debug {
-					log.Printf("Update file detected: %s", config.Filename)
-				}
+				log.Printf("Update file detected: %s", config.Filename)
 				current, err := i.Client.Current(config.Prefix)
 				if err != nil || current == "" {
 					return errors.New("Could not determine current index to update")
 				}
-				if debug {
-					log.Printf("Using existing index: %s", current)
-				}
+				log.Printf("Using existing index: %s", current)
 				config.Index = current
 				config.Promote = false
 			} else {
@@ -108,9 +104,7 @@ func (i *Ingester) Configure(config Config, debug bool) error {
 			Client: i.Client,
 		}
 
-		if debug {
-			log.Printf("Configured Elasticsearch consumer with index: %s, prefix: %s, and promote: %s", config.Index, config.Prefix, strconv.FormatBool(config.Promote))
-		}
+		log.Printf("Configured Elasticsearch consumer with index: %s, prefix: %s, and promote: %s", config.Index, config.Prefix, strconv.FormatBool(config.Promote))
 
 
 	} else if config.Consumer == "json" {
