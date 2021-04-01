@@ -74,14 +74,15 @@ func (m *MarcGenerator) Generate() <-chan record.Record {
 
 func (m *marcparser) parse(out chan record.Record) {
 	mr := fml.NewMarcIterator(m.file)
+	var totalRecordCount int
 	var errorCount int
 
 	for mr.Next() {
 		record, err := mr.Value()
+		totalRecordCount++
 
 		if err != nil {
-			log.Println("Error parsing MARC record:", record.ControlNum())
-			log.Println(err)
+			log.Printf("Error parsing MARC record: %s, %s", record.ControlNum(), err)
 			// os.Stderr.WriteString("--- Begin Problem MARC Record ---\n")
 			// os.Stderr.Write(record.Data)
 			// os.Stderr.WriteString("\n--- End Problem MARC Record ---\n")
@@ -98,6 +99,7 @@ func (m *marcparser) parse(out chan record.Record) {
 		}
 	}
 
+	log.Printf("Total records processed: %d", totalRecordCount)
 	log.Printf("Error records: %s", strconv.Itoa(errorCount))
 	close(out)
 }

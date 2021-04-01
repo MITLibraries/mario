@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	var debug bool
 	var auto bool
 	var url, index string
 	var v4 bool
@@ -64,11 +63,6 @@ func main() {
 					Usage: "Index prefix to use: default is aleph",
 				},
 				cli.BoolFlag{
-					Name:        "debug",
-					Usage:       "Output debugging information",
-					Destination: &debug,
-				},
-				cli.BoolFlag{
 					Name:        "auto",
 					Usage:       "Automatically promote / demote on completion",
 					Destination: &auto,
@@ -85,6 +79,7 @@ func main() {
 					Promote:   auto,
 					Rulesfile: c.String("rules"),
 				}
+				log.Printf("Ingesting records from file: %s\n", config.Filename)
 				stream, err := ingester.NewStream(config.Filename)
 				if err != nil {
 					return err
@@ -103,9 +98,7 @@ func main() {
 					return err
 				}
 				count, err := ingest.Ingest()
-				if debug {
-					fmt.Printf("Total records ingested: %d\n", count)
-				}
+				log.Printf("Total records ingested: %d\n", count)
 				return err
 			},
 		},
