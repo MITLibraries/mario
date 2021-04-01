@@ -25,7 +25,6 @@ type Config struct {
 	Source    string
 	Consumer  string
 	Index     string
-	Prefix    string
 	Promote   bool
 	Rulesfile string
 }
@@ -56,17 +55,17 @@ type Ingester struct {
 func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
-	if config.Source == "json" {
-		i.generator = &generator.JSONGenerator{File: i.Stream}
-	} else if config.Source == "marc" {
+	if config.Source == "aleph" {
 		i.generator = &generator.MarcGenerator{
 			Marcfile:  i.Stream,
 			Rulesfile: config.Rulesfile,
 		}
-	} else if config.Source == "archives" {
+	} else if config.Source == "aspace" {
 		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}
 	} else if config.Source == "dspace" {
 		i.generator = &generator.DspaceGenerator{Dspacefile: i.Stream}
+	} else if config.Source == "mario" {
+			i.generator = &generator.JSONGenerator{File: i.Stream}
 	} else {
 		return errors.New("Unknown source data")
 	}
@@ -81,7 +80,7 @@ func (i *Ingester) Configure(config Config) error {
 		if config.Index == "" {
 			if strings.Contains(config.Filename, "mit01_edsu1") {
 				log.Printf("Update file detected: %s", config.Filename)
-				current, err := i.Client.Current(config.Prefix)
+				current, err := i.Client.Current(config.Source)
 				if err != nil || current == "" {
 					return errors.New("Could not determine current index to update")
 				}
@@ -90,7 +89,7 @@ func (i *Ingester) Configure(config Config) error {
 				config.Promote = false
 			} else {
 				now := time.Now().UTC()
-				config.Index = fmt.Sprintf("%s-%s", config.Prefix, now.Format("2006-01-02t15-04-05z"))
+				config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
 			}
 		}
 
@@ -104,7 +103,7 @@ func (i *Ingester) Configure(config Config) error {
 			Client: i.Client,
 		}
 
-		log.Printf("Configured Elasticsearch consumer with index: %s, prefix: %s, and promote: %s", config.Index, config.Prefix, strconv.FormatBool(config.Promote))
+		log.Printf("Configured Elasticsearch consumer using source: %s, index: %s, and promote: %s", config.Source, config.Index, strconv.FormatBool(config.Promote))
 
 
 	} else if config.Consumer == "json" {
@@ -143,7 +142,7 @@ func (i *Ingester) Ingest() (int, error) {
 	<-out
 	if i.config.Promote {
 		log.Printf("Automatic promotion is happening")
-		err = i.Client.Promote(i.config.Index, i.config.Prefix)
+		err = i.Client.Promote(i.config.Index, i.config.Source)
 	}
 	return ctr.Count, err
 }

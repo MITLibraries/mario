@@ -50,16 +50,11 @@ func main() {
 				cli.StringFlag{
 					Name:  "consumer, c",
 					Value: "es",
-					Usage: "Consumer to use (es, json or title)",
+					Usage: "Consumer to use. Must be one of [es, json, title, silent]",
 				},
 				cli.StringFlag{
-					Name:  "type, t",
-					Value: "marc",
-					Usage: "Type of file to process",
-				},
-				cli.StringFlag{
-					Name:  "prefix, p",
-					Usage: "Index prefix to use: current options are aleph, aspace, dspace",
+					Name:  "source, s",
+					Usage: "Source system of metadata file to process. Must be one of [aleph, aspace, dspace, mario]",
 					Required: true,
 				},
 				cli.BoolFlag{
@@ -73,9 +68,8 @@ func main() {
 				config := ingester.Config{
 					Filename:  c.Args().Get(0),
 					Consumer:  c.String("consumer"),
-					Source:    c.String("type"),
+					Source:    c.String("source"),
 					Index:     index,
-					Prefix:    c.String("prefix"),
 					Promote:   auto,
 					Rulesfile: c.String("rules"),
 				}
