@@ -37,12 +37,12 @@ type ESClient struct {
 	bulker *elastic.BulkProcessor
 }
 
-// Current returns the name of the current index for the given prefix. A
+// Current returns the name of the current index for the given source. A
 // current index is defined as one which is linked to the primary alias. An
 // error is returned if there is more than one matching index. An empty
 // string indicates there were no matching indexes.
-func (c ESClient) Current(prefix string) (string, error) {
-	res, err := c.client.Aliases().Index(prefix + "*").Do(context.Background())
+func (c ESClient) Current(source string) (string, error) {
+	res, err := c.client.Aliases().Index(source + "*").Do(context.Background())
 	if err != nil {
 		return "", err
 	}
