@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/mitlibraries/mario/pkg/client"
 	"github.com/mitlibraries/mario/pkg/ingester"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 )
@@ -18,46 +18,50 @@ func main() {
 
 	//Global options
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:        "url, u",
+		&cli.StringFlag{
+			Name:        "url",
+			Aliases: 		 []string{"u"},
 			Value:       "http://127.0.0.1:9200",
 			Usage:       "URL for the Elasticsearch cluster",
 			Destination: &url,
 		},
-		cli.StringFlag{
-			Name:        "index, i",
+		&cli.StringFlag{
+			Name:        "index",
+			Aliases: 		 []string{"i"},
 			Usage:       "Name of the Elasticsearch index",
 			Destination: &index,
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:        "v4",
 			Usage:       "Use AWS v4 signing",
 			Destination: &v4,
 		},
 	}
 
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:      "ingest",
 			Usage:     "Parse and ingest the input file",
 			ArgsUsage: "[filepath, use format 's3://bucketname/objectname' for s3]",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "rules",
 					Value: "/config/marc_rules.json",
 					Usage: "Path to marc rules file",
 				},
-				cli.StringFlag{
-					Name:  "consumer, c",
-					Value: "es",
-					Usage: "Consumer to use. Must be one of [es, json, title, silent]",
+				&cli.StringFlag{
+					Name:  	 "consumer",
+					Aliases: []string{"c"},
+					Value: 	 "es",
+					Usage: 	 "Consumer to use. Must be one of [es, json, title, silent]",
 				},
-				cli.StringFlag{
-					Name:  "source, s",
-					Usage: "Source system of metadata file to process. Must be one of [aleph, aspace, dspace, mario]",
+				&cli.StringFlag{
+					Name:  	 "source, s",
+					Aliases: []string{"s"},
+					Usage: 	 "Source system of metadata file to process. Must be one of [aleph, aspace, dspace, mario]",
 					Required: true,
 				},
-				cli.BoolFlag{
+				&cli.BoolFlag{
 					Name:        "auto",
 					Usage:       "Automatically promote / demote on completion",
 					Destination: &auto,
@@ -181,9 +185,10 @@ Lucene version: %s
 			Usage:    "Promote Elasticsearch alias to prod",
 			Category: "Index actions",
 			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "prefix, p",
-					Usage: "Index prefix to use: current options are aleph, aspace, dspace",
+				&cli.StringFlag{
+					Name:    "prefix",
+					Aliases: []string{"p"},
+					Usage: 	 "Index prefix to use: current options are aleph, aspace, dspace",
 					Required: true,
 				},
 			},
@@ -202,7 +207,7 @@ Lucene version: %s
 			UsageText: "Use the Elasticsearch reindex API to copy one index to another. The doc source must be present in the original index.",
 			Category:  "Index actions",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:  "destination",
 					Usage: "Name of new index",
 				},
