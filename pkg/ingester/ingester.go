@@ -26,7 +26,6 @@ type Config struct {
 	Consumer  string
 	Index     string
 	Promote   bool
-	Rulesfile string
 }
 
 // NewStream returns an io.ReadCloser from a path string. The path can be
@@ -56,10 +55,7 @@ func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
 	if config.Source == "aleph" {
-		i.generator = &generator.MarcGenerator{
-			Marcfile:  i.Stream,
-			Rulesfile: config.Rulesfile,
-		}
+		i.generator = &generator.MarcGenerator{Marcfile:  i.Stream}
 	} else if config.Source == "aspace" {
 		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}
 	} else if config.Source == "dspace" {
@@ -142,7 +138,7 @@ func (i *Ingester) Ingest() (int, error) {
 	<-out
 	if i.config.Promote {
 		log.Printf("Automatic promotion is happening")
-		err = i.Client.Promote(i.config.Index, i.config.Source)
+		err = i.Client.Promote(i.config.Index)
 	}
 	return ctr.Count, err
 }

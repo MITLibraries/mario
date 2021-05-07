@@ -45,12 +45,11 @@ type marcparser struct {
 //MarcGenerator parses binary MARC records.
 type MarcGenerator struct {
 	Marcfile  io.Reader
-	Rulesfile string
 }
 
 //Generate a channel of Records.
 func (m *MarcGenerator) Generate() <-chan record.Record {
-	rules, err := RetrieveRules(m.Rulesfile)
+	rules, err := RetrieveRules("/config/marc_rules.json")
 	if err != nil {
 		spew.Dump(err)
 	}
