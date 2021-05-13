@@ -44,7 +44,7 @@ type marcparser struct {
 
 //MarcGenerator parses binary MARC records.
 type MarcGenerator struct {
-	Marcfile  io.Reader
+	Marcfile io.Reader
 }
 
 //Generate a channel of Records.

@@ -20,12 +20,12 @@ import (
 // Config is a structure for passing a set of configuration parameters to
 // an Ingester.
 type Config struct {
-	Filename  string
-	Source    string
-	Consumer  string
-  Index     string
-	NewIndex  bool
-	Promote   bool
+	Filename string
+	Source   string
+	Consumer string
+	Index    string
+	NewIndex bool
+	Promote  bool
 }
 
 // NewStream returns an io.ReadCloser from a path string. The path can be
@@ -55,13 +55,13 @@ func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
 	if config.Source == "aleph" {
-		i.generator = &generator.MarcGenerator{Marcfile:  i.Stream}
+		i.generator = &generator.MarcGenerator{Marcfile: i.Stream}
 	} else if config.Source == "aspace" {
 		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}
 	} else if config.Source == "dspace" {
 		i.generator = &generator.DspaceGenerator{Dspacefile: i.Stream}
 	} else if config.Source == "mario" {
-			i.generator = &generator.JSONGenerator{File: i.Stream}
+		i.generator = &generator.JSONGenerator{File: i.Stream}
 	} else {
 		return errors.New("Unknown source data")
 	}
@@ -69,18 +69,18 @@ func (i *Ingester) Configure(config Config) error {
 	// Configure consumer
 	if config.Consumer == "es" {
 		if config.NewIndex == true {
-      now := time.Now().UTC()
-      config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
-    } else {
-      current, err := i.Client.Current(config.Source)
+			now := time.Now().UTC()
+			config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
+		} else {
+			current, err := i.Client.Current(config.Source)
 			if err != nil || current == "" {
-        e := fmt.Errorf("No existing production index for source '%s'. Either promote an existing %s index or add the 'new' flag to the ingest command to create a new index.", config.Source, config.Source)
+				e := fmt.Errorf("No existing production index for source '%s'. Either promote an existing %s index or add the 'new' flag to the ingest command to create a new index.", config.Source, config.Source)
 				return e
 			}
 			log.Printf("Ingesting into current production index: %s", current)
 			config.Index = current
 			config.Promote = false
-    }
+		}
 
 		err = i.Client.Create(config.Index)
 		if err != nil {
@@ -93,7 +93,6 @@ func (i *Ingester) Configure(config Config) error {
 		}
 
 		log.Printf("Configured Elasticsearch consumer using source: %s, index: %s, and promote: %s", config.Source, config.Index, strconv.FormatBool(config.Promote))
-
 
 	} else if config.Consumer == "json" {
 		i.consumer = &consumer.JSONConsumer{Out: os.Stdout}

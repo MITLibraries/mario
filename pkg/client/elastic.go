@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"errors"
-  "strings"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
@@ -14,6 +13,7 @@ import (
 	aws "github.com/olivere/elastic/aws/v4"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // Primary alias
@@ -29,7 +29,7 @@ type Indexer interface {
 	Promote(string) error
 	Delete(string) error
 	Reindex(string, string) (int64, error)
-  Indexes() (elastic.CatIndicesResponse, error)
+	Indexes() (elastic.CatIndicesResponse, error)
 }
 
 // ESClient wraps an olivere/elastic client. Create a new client with the
@@ -112,9 +112,9 @@ func (c *ESClient) Add(record record.Record, index string, rtype string) {
 // existing index with the same prefix as the promoted index and linked to the
 // primary alias, it will be removed from the alias. This action is atomic.
 func (c ESClient) Promote(index string) error {
-  svc := c.client.Alias().Add(index, primary)
-  prefix := strings.Split(index, "-")[0]
-  current, err := c.Current(prefix)
+	svc := c.client.Alias().Add(index, primary)
+	prefix := strings.Split(index, "-")[0]
+	current, err := c.Current(prefix)
 	if err != nil {
 		return err
 	}

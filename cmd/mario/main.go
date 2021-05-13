@@ -19,7 +19,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:        "url",
-			Aliases: 		 []string{"u"},
+			Aliases:     []string{"u"},
 			Value:       "http://127.0.0.1:9200",
 			Usage:       "URL for the Elasticsearch cluster",
 			Destination: &url,
@@ -32,12 +32,12 @@ func main() {
 	}
 
 	app.Commands = []*cli.Command{
-    // Elasticsearch commands
+		// Elasticsearch commands
 		{
 			Name:     "aliases",
 			Usage:    "List Elasticsearch aliases and their associated indexes",
-      Category: "Elasticsearch actions",
-			Action:   func(c *cli.Context) error {
+			Category: "Elasticsearch actions",
+			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
 					return err
@@ -52,11 +52,11 @@ func main() {
 				return nil
 			},
 		},
-    {
+		{
 			Name:     "indexes",
 			Usage:    "List all Elasticsearch indexes",
-      Category: "Elasticsearch actions",
-			Action:   func(c *cli.Context) error {
+			Category: "Elasticsearch actions",
+			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
 					return err
@@ -70,11 +70,11 @@ func main() {
 				}
 				return nil
 			},
-    },
+		},
 		{
 			Name:     "ping",
 			Usage:    "Ping Elasticsearch",
-      Category: "Elasticsearch actions",
+			Category: "Elasticsearch actions",
 			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
@@ -88,29 +88,29 @@ func main() {
 				return nil
 			},
 		},
-    // Index-specific commands
+		// Index-specific commands
 		{
 			Name:      "ingest",
 			Usage:     "Parse and ingest the input file. By default, ingests into the current production index for the provided source.",
 			ArgsUsage: "[filepath, use format 's3://bucketname/objectname' for s3]",
-      Category:  "Index actions",
-			Flags:     []cli.Flag{
+			Category:  "Index actions",
+			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:  	  "source",
+					Name:     "source",
 					Aliases:  []string{"s"},
-					Usage: 	  "Source system of metadata file to process. Must be one of [aleph, aspace, dspace, mario]",
+					Usage:    "Source system of metadata file to process. Must be one of [aleph, aspace, dspace, mario]",
 					Required: true,
 				},
 				&cli.StringFlag{
-					Name:  	 "consumer",
+					Name:    "consumer",
 					Aliases: []string{"c"},
-					Value: 	 "es",
-					Usage: 	 "Consumer to use. Must be one of [es, json, title, silent]",
+					Value:   "es",
+					Usage:   "Consumer to use. Must be one of [es, json, title, silent]",
 				},
-        &cli.BoolFlag{
-          Name: "new",
-          Usage: "Create a new index instead of ingesting into the current production index for the source",
-        },
+				&cli.BoolFlag{
+					Name:  "new",
+					Usage: "Create a new index instead of ingesting into the current production index for the source",
+				},
 				&cli.BoolFlag{
 					Name:  "auto",
 					Usage: "Automatically promote / demote on completion",
@@ -119,11 +119,11 @@ func main() {
 			Action: func(c *cli.Context) error {
 				var es *client.ESClient
 				config := ingester.Config{
-					Filename:  c.Args().Get(0),
-					Consumer:  c.String("consumer"),
-					Source:    c.String("source"),
-          NewIndex:  c.Bool("new"),
-					Promote:   c.Bool("auto"),
+					Filename: c.Args().Get(0),
+					Consumer: c.String("consumer"),
+					Source:   c.String("source"),
+					NewIndex: c.Bool("new"),
+					Promote:  c.Bool("auto"),
 				}
 				log.Printf("Ingesting records from file: %s\n", config.Filename)
 				stream, err := ingester.NewStream(config.Filename)
@@ -148,17 +148,17 @@ func main() {
 			},
 		},
 		{
-			Name:     "promote",
-			Usage:    "Promote an index to production",
-      UsageText: "Demotes the existing production index for the provided prefix, if there is one",
-			Category: "Index actions",
-			Flags:    []cli.Flag{
-    		&cli.StringFlag{
-    			Name:     "index",
-    			Aliases:  []string{"i"},
-    			Usage:    "Name of the Elasticsearch index to promote",
-          Required: true,
-    		},
+			Name:      "promote",
+			Usage:     "Promote an index to production",
+			UsageText: "Demotes the existing production index for the provided prefix, if there is one",
+			Category:  "Index actions",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "index",
+					Aliases:  []string{"i"},
+					Usage:    "Name of the Elasticsearch index to promote",
+					Required: true,
+				},
 			},
 			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
@@ -174,18 +174,18 @@ func main() {
 			Usage:     "Reindex one index to another index",
 			UsageText: "Use the Elasticsearch reindex API to copy one index to another. The doc source must be present in the original index.",
 			Category:  "Index actions",
-			Flags:     []cli.Flag{
-    		&cli.StringFlag{
-    			Name:     "index",
-    			Aliases: 	[]string{"i"},
-    			Usage:    "Name of the Elasticsearch index to copy",
-          Required: true,
-    		},
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "index",
+					Aliases:  []string{"i"},
+					Usage:    "Name of the Elasticsearch index to copy",
+					Required: true,
+				},
 				&cli.StringFlag{
 					Name:     "destination",
-          Aliases:  []string{"d"},
+					Aliases:  []string{"d"},
 					Usage:    "Name of new index",
-          Required: true,
+					Required: true,
 				},
 			},
 			Action: func(c *cli.Context) error {
@@ -199,17 +199,17 @@ func main() {
 			},
 		},
 		{
-			Name:      "delete",
-			Usage:     "Delete an index",
-			Category:  "Index actions",
-			Flags:     []cli.Flag{
-    		&cli.StringFlag{
-    			Name:     "index",
-    			Aliases: 	[]string{"i"},
-    			Usage:    "Name of the Elasticsearch index to delete",
-          Required: true,
-    		},
-      },
+			Name:     "delete",
+			Usage:    "Delete an index",
+			Category: "Index actions",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "index",
+					Aliases:  []string{"i"},
+					Usage:    "Name of the Elasticsearch index to delete",
+					Required: true,
+				},
+			},
 			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
