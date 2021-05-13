@@ -29,6 +29,7 @@ type Indexer interface {
 	Promote(string) error
 	Delete(string) error
 	Reindex(string, string) (int64, error)
+  Indexes() (elastic.CatIndicesResponse, error)
 }
 
 // ESClient wraps an olivere/elastic client. Create a new client with the

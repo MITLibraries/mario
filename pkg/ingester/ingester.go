@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+  "github.com/olivere/elastic"
+
 	"github.com/mitlibraries/mario/pkg/client"
 	"github.com/mitlibraries/mario/pkg/consumer"
 	"github.com/mitlibraries/mario/pkg/generator"
@@ -87,7 +89,16 @@ func (i *Ingester) Configure(config Config) error {
 				now := time.Now().UTC()
 				config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
 			}
-		}
+		} else {
+      indexes, err := i.Client.Indexes()
+  		if err != nil {
+  			return err
+  		}
+      if contains(indexes, config.Index) == false {
+        err := fmt.Errorf("No index exists with the provided name, '%s'. Either provide a current index name to ingest to, or do not provide an index name and a new one will be created using the provided source name.", config.Index)
+        return err
+      }
+    }
 
 		err = i.Client.Create(config.Index)
 		if err != nil {
@@ -141,4 +152,14 @@ func (i *Ingester) Ingest() (int, error) {
 		err = i.Client.Promote(i.config.Index)
 	}
 	return ctr.Count, err
+}
+
+func contains(s elastic.CatIndicesResponse, str string) bool {
+	for _, v := range s {
+		if v.Index == str {
+			return true
+		}
+	}
+
+	return false
 }
