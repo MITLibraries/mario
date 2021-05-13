@@ -91,15 +91,10 @@ func main() {
     // Index-specific commands
 		{
 			Name:      "ingest",
-			Usage:     "Parse and ingest the input file to a new or existing index",
+			Usage:     "Parse and ingest the input file. By default, ingests into the current production index for the provided source.",
 			ArgsUsage: "[filepath, use format 's3://bucketname/objectname' for s3]",
       Category:  "Index actions",
 			Flags:     []cli.Flag{
-    		&cli.StringFlag{
-      		Name:    "index",
-    			Aliases: []string{"i"},
-    			Usage:   "Name of the Elasticsearch index to ingest to. If not included, will default to a new index named with the source prefix plus timestamp (except for Aleph update files, which are always ingested into the current production Aleph index)",
-    		},
 				&cli.StringFlag{
 					Name:  	  "source",
 					Aliases:  []string{"s"},
@@ -112,6 +107,10 @@ func main() {
 					Value: 	 "es",
 					Usage: 	 "Consumer to use. Must be one of [es, json, title, silent]",
 				},
+        &cli.BoolFlag{
+          Name: "new",
+          Usage: "Create a new index instead of ingesting into the current production index for the source",
+        },
 				&cli.BoolFlag{
 					Name:  "auto",
 					Usage: "Automatically promote / demote on completion",
@@ -123,7 +122,7 @@ func main() {
 					Filename:  c.Args().Get(0),
 					Consumer:  c.String("consumer"),
 					Source:    c.String("source"),
-					Index:     c.String("index"),
+          NewIndex:  c.Bool("new"),
 					Promote:   c.Bool("auto"),
 				}
 				log.Printf("Ingesting records from file: %s\n", config.Filename)

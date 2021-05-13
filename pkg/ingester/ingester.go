@@ -8,10 +8,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"strings"
 	"time"
-
-  "github.com/olivere/elastic"
 
 	"github.com/mitlibraries/mario/pkg/client"
 	"github.com/mitlibraries/mario/pkg/consumer"
@@ -26,7 +23,8 @@ type Config struct {
 	Filename  string
 	Source    string
 	Consumer  string
-	Index     string
+  Index     string
+	NewIndex  bool
 	Promote   bool
 }
 
@@ -70,34 +68,18 @@ func (i *Ingester) Configure(config Config) error {
 
 	// Configure consumer
 	if config.Consumer == "es" {
-		// This block relies on certain file naming conventions to work. Daily
-		// updates to aleph have the string mit01_edsu1 in the filename. If that
-		// string is present we will add the records to the current aleph index
-		// instead of creating a new index.
-
-		if config.Index == "" {
-			if strings.Contains(config.Filename, "mit01_edsu1") {
-				log.Printf("Update file detected: %s", config.Filename)
-				current, err := i.Client.Current(config.Source)
-				if err != nil || current == "" {
-					return errors.New("Could not determine current index to update")
-				}
-				log.Printf("Using existing index: %s", current)
-				config.Index = current
-				config.Promote = false
-			} else {
-				now := time.Now().UTC()
-				config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
+		if config.NewIndex == true {
+      now := time.Now().UTC()
+      config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
+    } else {
+      current, err := i.Client.Current(config.Source)
+			if err != nil || current == "" {
+        e := fmt.Errorf("No existing production index for source '%s'. Either promote an existing %s index or add the 'new' flag to the ingest command to create a new index.", config.Source, config.Source)
+				return e
 			}
-		} else {
-      indexes, err := i.Client.Indexes()
-  		if err != nil {
-  			return err
-  		}
-      if contains(indexes, config.Index) == false {
-        err := fmt.Errorf("No index exists with the provided name, '%s'. Either provide a current index name to ingest to, or do not provide an index name and a new one will be created using the provided source name.", config.Index)
-        return err
-      }
+			log.Printf("Ingesting into current production index: %s", current)
+			config.Index = current
+			config.Promote = false
     }
 
 		err = i.Client.Create(config.Index)
@@ -152,14 +134,4 @@ func (i *Ingester) Ingest() (int, error) {
 		err = i.Client.Promote(i.config.Index)
 	}
 	return ctr.Count, err
-}
-
-func contains(s elastic.CatIndicesResponse, str string) bool {
-	for _, v := range s {
-		if v.Index == str {
-			return true
-		}
-	}
-
-	return false
 }
