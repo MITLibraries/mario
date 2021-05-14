@@ -240,7 +240,7 @@ func TestMarcProcess(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	p := MarcGenerator{Marcfile: marcfile, Rulesfile: "/config/marc_rules.json"}
+	p := MarcGenerator{Marcfile: marcfile}
 	out := p.Generate()
 	var i int
 	for range out {

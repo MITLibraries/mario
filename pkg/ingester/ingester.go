@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/mitlibraries/mario/pkg/client"
@@ -21,12 +20,12 @@ import (
 // Config is a structure for passing a set of configuration parameters to
 // an Ingester.
 type Config struct {
-	Filename  string
-	Source    string
-	Consumer  string
-	Index     string
-	Promote   bool
-	Rulesfile string
+	Filename string
+	Source   string
+	Consumer string
+	Index    string
+	NewIndex bool
+	Promote  bool
 }
 
 // NewStream returns an io.ReadCloser from a path string. The path can be
@@ -56,41 +55,31 @@ func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
 	if config.Source == "aleph" {
-		i.generator = &generator.MarcGenerator{
-			Marcfile:  i.Stream,
-			Rulesfile: config.Rulesfile,
-		}
+		i.generator = &generator.MarcGenerator{Marcfile: i.Stream}
 	} else if config.Source == "aspace" {
 		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}
 	} else if config.Source == "dspace" {
 		i.generator = &generator.DspaceGenerator{Dspacefile: i.Stream}
 	} else if config.Source == "mario" {
-			i.generator = &generator.JSONGenerator{File: i.Stream}
+		i.generator = &generator.JSONGenerator{File: i.Stream}
 	} else {
 		return errors.New("Unknown source data")
 	}
 
 	// Configure consumer
 	if config.Consumer == "es" {
-		// This block relies on certain file naming conventions to work. Daily
-		// updates to aleph have the string mit01_edsu1 in the filename. If that
-		// string is present we will add the records to the current aleph index
-		// instead of creating a new index.
-
-		if config.Index == "" {
-			if strings.Contains(config.Filename, "mit01_edsu1") {
-				log.Printf("Update file detected: %s", config.Filename)
-				current, err := i.Client.Current(config.Source)
-				if err != nil || current == "" {
-					return errors.New("Could not determine current index to update")
-				}
-				log.Printf("Using existing index: %s", current)
-				config.Index = current
-				config.Promote = false
-			} else {
-				now := time.Now().UTC()
-				config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
+		if config.NewIndex == true {
+			now := time.Now().UTC()
+			config.Index = fmt.Sprintf("%s-%s", config.Source, now.Format("2006-01-02t15-04-05z"))
+		} else {
+			current, err := i.Client.Current(config.Source)
+			if err != nil || current == "" {
+				e := fmt.Errorf("No existing production index for source '%s'. Either promote an existing %s index or add the 'new' flag to the ingest command to create a new index.", config.Source, config.Source)
+				return e
 			}
+			log.Printf("Ingesting into current production index: %s", current)
+			config.Index = current
+			config.Promote = false
 		}
 
 		err = i.Client.Create(config.Index)
@@ -104,7 +93,6 @@ func (i *Ingester) Configure(config Config) error {
 		}
 
 		log.Printf("Configured Elasticsearch consumer using source: %s, index: %s, and promote: %s", config.Source, config.Index, strconv.FormatBool(config.Promote))
-
 
 	} else if config.Consumer == "json" {
 		i.consumer = &consumer.JSONConsumer{Out: os.Stdout}
@@ -142,7 +130,7 @@ func (i *Ingester) Ingest() (int, error) {
 	<-out
 	if i.config.Promote {
 		log.Printf("Automatic promotion is happening")
-		err = i.Client.Promote(i.config.Index, i.config.Source)
+		err = i.Client.Promote(i.config.Index)
 	}
 	return ctr.Count, err
 }

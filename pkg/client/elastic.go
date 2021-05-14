@@ -13,6 +13,7 @@ import (
 	aws "github.com/olivere/elastic/aws/v4"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // Primary alias
@@ -25,9 +26,10 @@ type Indexer interface {
 	Start() error
 	Stop() error
 	Add(record.Record, string, string)
-	Promote(string, string) error
+	Promote(string) error
 	Delete(string) error
 	Reindex(string, string) (int64, error)
+	Indexes() (elastic.CatIndicesResponse, error)
 }
 
 // ESClient wraps an olivere/elastic client. Create a new client with the
@@ -107,15 +109,16 @@ func (c *ESClient) Add(record record.Record, index string, rtype string) {
 }
 
 // Promote will add the given index to the primary alias. If there is an
-// existing index matching the prefix linked to the primary alias it will
-// be removed from the alias. This action is atomic.
-func (c ESClient) Promote(index string, prefix string) error {
+// existing index with the same prefix as the promoted index and linked to the
+// primary alias, it will be removed from the alias. This action is atomic.
+func (c ESClient) Promote(index string) error {
 	svc := c.client.Alias().Add(index, primary)
+	prefix := strings.Split(index, "-")[0]
 	current, err := c.Current(prefix)
 	if err != nil {
 		return err
 	}
-	if current != "" {
+	if current != "" && current != index {
 		svc.Remove(current, primary)
 	}
 	_, err = svc.Do(context.Background())

@@ -27,17 +27,17 @@ as well, use docker-compose to run both docker and TIMDEX locally using the
 instructions in the [TIMDEX README](https://github.com/MITLibraries/timdex/blob/master/README.md#docker-compose-orchestrated-local-environment).
 
 Here are a few sample Mario commands that may be useful for local development:
-- `mario ingest -c json -t archives -p aspace fixtures/aspace_samples.xml`
+- `mario ingest -c json -s aspace fixtures/aspace_samples.xml`
   runs the ingest process with ASpace sample files and prints out each record
   as JSON
-- `mario ingest -t dspace -p dspace fixtures/dspace_samples.xml` ingests the
+- `mario ingest -s dspace fixtures/dspace_samples.xml` ingests the
   DSpace sample files into a local Elasticsearch instance.
-- `mario ingest --auto fixtures/mit_test_records.mrc` ingests the Aleph sample
-  files into a local Elasticsearch instance and promotes the index to the
-  timdex-prod alias on completion.
+- `mario ingest -s aleph --auto fixtures/mit_test_records.mrc` ingests the
+  Aleph sample files into a local Elasticsearch instance and promotes the
+  index to the timdex-prod alias on completion.
 - `mario indexes` list all indexes
-- `mario -i [index name] promote` promotes the named index to the timdex-prod
-  alias.
+- `mario promote -i [index name]` promotes the named index to the
+  timdex-prod alias.
 
 ## Developing
 
