@@ -24,12 +24,12 @@ dist: ## Build docker image
 		-t mario:latest .
 
 publish: dist ## Build, tag and push
-	$$(aws ecr get-login --no-include-email --region us-east-1)
+	docker login -u AWS -p $$(aws ecr get-login-password --region us-east-1) $(ECR_REGISTRY)
 	docker push $(ECR_REGISTRY)/mario-stage:latest
 	docker push $(ECR_REGISTRY)/mario-stage:`git describe --always`
 
 promote: ## Promote the current staging build to production
-	$$(aws ecr get-login --no-include-email --region us-east-1)
+	docker login -u AWS -p $$(aws ecr get-login-password --region us-east-1) $(ECR_REGISTRY)
 	docker pull $(ECR_REGISTRY)/mario-stage:latest
 	docker tag $(ECR_REGISTRY)/mario-stage:latest $(ECR_REGISTRY)/mario-prod:latest
 	docker tag $(ECR_REGISTRY)/mario-stage:latest $(ECR_REGISTRY)/mario-prod:$(DATETIME)
