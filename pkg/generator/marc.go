@@ -127,6 +127,12 @@ func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[
 		return r, err
 	}
 
+	zeroZeroEight := fmlRecord.Filter("008")[0][0]
+	if zeroZeroEight != "" && len(zeroZeroEight) != 40 {
+		err = fmt.Errorf("Record %s has illegal 008 field length of %d characters: '%s'", r.Identifier, len(zeroZeroEight), zeroZeroEight)
+		return r, err
+	}
+
 	r.Source = "MIT Aleph"
 	r.SourceLink = "https://library.mit.edu/item/" + r.Identifier
 
@@ -270,6 +276,18 @@ func stringInSlice(a string, list []string) bool {
 }
 
 func filter(fmlRecord fml.Record, field *record.Field) []string {
+
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(field.Tag)
+			if field.Tag != "008" {
+				fmt.Println("Recovered from panic", r)
+				fmt.Printf("Field that caused the panic: %#v\n", field)
+				fmt.Printf("Full record that caused the panic: %#v\n\n", fmlRecord)
+			}
+		}
+	}()
+
 	var stuff []string
 	values := fmlRecord.Filter(field.Tag + field.Subfields)
 	for _, f := range values {
