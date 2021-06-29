@@ -133,8 +133,8 @@ func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[
 		return r, err
 	}
 
-	r.Source = "MIT Aleph"
-	r.SourceLink = "https://library.mit.edu/item/" + r.Identifier
+	r.Source = "MIT Alma"
+	r.SourceLink = ("https://mit.primo.exlibrisgroup.com/discovery/fulldisplay?vid=01MIT_INST:MIT&docid=alma" + r.Identifier)
 
 	oclcs := applyRule(fmlRecord, rules, "oclc_number")
 	r.OclcNumber = cleanOclcs(oclcs)
