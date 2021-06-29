@@ -32,8 +32,8 @@ Here are a few sample Mario commands that may be useful for local development:
   as JSON
 - `mario ingest -s dspace fixtures/dspace_samples.xml` ingests the
   DSpace sample files into a local Elasticsearch instance.
-- `mario ingest -s aleph --auto fixtures/mit_test_records.mrc` ingests the
-  Aleph sample files into a local Elasticsearch instance and promotes the
+- `mario ingest -s alma --auto fixtures/alma_samples.mrc` ingests the
+  Alma sample files into a local Elasticsearch instance and promotes the
   index to the timdex-prod alias on completion.
 - `mario indexes` list all indexes
 - `mario promote -i [index name]` promotes the named index to the

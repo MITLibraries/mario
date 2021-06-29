@@ -98,7 +98,7 @@ func main() {
 				&cli.StringFlag{
 					Name:     "source",
 					Aliases:  []string{"s"},
-					Usage:    "Source system of metadata file to process. Must be one of [aleph, aspace, dspace, mario]",
+					Usage:    "Source system of metadata file to process. Must be one of [alma, aspace, dspace, mario]",
 					Required: true,
 				},
 				&cli.StringFlag{

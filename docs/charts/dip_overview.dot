@@ -10,8 +10,8 @@ digraph G {
   node [style=filled, fontname=helvetica, color=black, fillcolor=white, penwidth=3, fontsize=16];
   pad=0.3;
 
-  aleph[label="Aleph"]
-  alephExporter[label="Aleph Metadata Exporter", color=Yellow1, fillcolor=Yellow1]
+  alma[label="Alma"]
+  almaExporter[label="Alma Metadata Exporter", color=Yellow1, fillcolor=Yellow1]
   s3[label="AWS S3 Bucket", color=DarkOrange3]
   processor[label="Mario: pipeline for metadata indexing", color=Yellow1, fillcolor=Yellow1]
   index[label="ElasticSearch", color=DarkOrange3]
@@ -26,8 +26,8 @@ digraph G {
   bento[label="Bento"]
   magic[label="Users Doing Cool Stuff?", color=transparent]
 
-  aleph -> alephExporter
-  alephExporter -> s3
+  alma -> almaExporter
+  almaExporter -> s3
 
   s3 -> processor
   processor -> index
