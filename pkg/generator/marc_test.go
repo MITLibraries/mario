@@ -10,7 +10,7 @@ import (
 )
 
 func TestMarcToRecord(t *testing.T) {
-	file, err := os.Open("../../fixtures/record1.mrc")
+	file, err := os.Open("../../fixtures/alma_samples.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,7 +42,7 @@ func TestMarcToRecord(t *testing.T) {
 
 	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
 
-	if item.Contributor[0].Value != "Sandburg, Carl, 1878-1967." {
+	if item.Contributor[0].Value != "D'Rivera, Paquito, 1948-" {
 		t.Error("Expected match, got", item.Contributor[0].Value)
 	}
 
@@ -50,25 +50,25 @@ func TestMarcToRecord(t *testing.T) {
 		t.Error("Expected match, got", item.Contributor[0].Kind)
 	}
 
-	if item.Identifier != "92005291" {
+	if item.Identifier != "990026671500206761" {
 		t.Error("Expected match, got", item.Identifier)
 	}
 
-	if item.Title != "Arithmetic /" {
+	if item.Title != "Spice it up! the best of Paquito D'Rivera." {
 		t.Error("Expected match, got", item.Title)
 	}
 
-	if item.Subject[0] != "Arithmetic Juvenile poetry." {
+	if item.Subject[0] != "Jazz." {
 		t.Error("Expected match, got", item.Subject[0])
 	}
 
-	if item.PublicationDate != "1993" {
+	if item.PublicationDate != "2008" {
 		t.Error("Expected match, got", item.PublicationDate)
 	}
 }
 
 func TestMarcHoldings(t *testing.T) {
-	file, err := os.Open("../../fixtures/holdings_test_records.mrc")
+	file, err := os.Open("../../fixtures/alma_holdings_test_records.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -113,16 +113,7 @@ func TestMarcHoldings(t *testing.T) {
 		t.Error("Expected match, got", h.Format)
 	}
 
-	// This record has no 866 or 852 fields
-	_ = records.Next()
-	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
-
-	if len(item.Holdings) != 0 {
-		t.Error("Expected no holdings, got", len(item.Holdings))
-	}
-
-	// This record has an 866 field and 852. We use 866.
+	// This record has an 866 field and 852. We use 852 and append the 866 summary.
 	_ = records.Next()
 	record, _ = records.Value()
 	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
@@ -133,7 +124,7 @@ func TestMarcHoldings(t *testing.T) {
 	if h.Collection != "Stacks" {
 		t.Error("Expected match, got", h.Collection)
 	}
-	if h.Summary != "1995 and updates" {
+	if h.Summary != "MCM 1995 and updates" {
 		t.Error("Expected match, got", h.Summary)
 	}
 	if h.Format != "Print volume" {
@@ -215,7 +206,7 @@ func TestMarcParser(t *testing.T) {
 		return
 	}
 
-	marcfile, err := os.Open("../../fixtures/test.mrc")
+	marcfile, err := os.Open("../../fixtures/alma_samples.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -230,13 +221,13 @@ func TestMarcParser(t *testing.T) {
 		chanLength++
 	}
 
-	if chanLength != 85 {
+	if chanLength != 358 {
 		t.Error("Expected match, got", chanLength)
 	}
 }
 
 func TestMarcProcess(t *testing.T) {
-	marcfile, err := os.Open("../../fixtures/test.mrc")
+	marcfile, err := os.Open("../../fixtures/alma_samples.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -246,7 +237,7 @@ func TestMarcProcess(t *testing.T) {
 	for range out {
 		i++
 	}
-	if i != 85 {
+	if i != 358 {
 		t.Error("Expected match, got", i)
 	}
 }
@@ -260,7 +251,7 @@ func TestStringInSlice(t *testing.T) {
 }
 
 func TestOclcs(t *testing.T) {
-	file, err := os.Open("../../fixtures/mit_test_records.mrc")
+	file, err := os.Open("../../fixtures/alma_samples.mrc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -293,19 +284,11 @@ func TestOclcs(t *testing.T) {
 	item, _ := marcToRecord(record, rules, languageCodes, countryCodes)
 
 	// Confirm oclc prefix is removed
-	if item.OclcNumber[0] != "1000583393" {
+	if item.OclcNumber[0] != "811549562" {
 		t.Error("Expected match, got", item.OclcNumber)
 	}
 
 	// Confirm old system numbers are not included.
-	_ = records.Next()
-	record, _ = records.Value()
-	item, _ = marcToRecord(record, rules, languageCodes, countryCodes)
-
-	if item.OclcNumber[0] != "1017661930" {
-		t.Error("Expected match, got", item.OclcNumber)
-	}
-
 	if len(item.OclcNumber) != 1 {
 		t.Error("Expected 1, got", len(item.OclcNumber))
 	}

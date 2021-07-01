@@ -118,7 +118,7 @@ func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[
 	r.Identifier = fmlRecord.ControlNum()
 
 	if fmlRecord.Leader.Status == 'd' {
-		err = fmt.Errorf("Record %s has been deleted or suppressed but we don't handle that yet", r.Identifier)
+		err = fmt.Errorf("Record %s has been deleted but we don't handle that yet", r.Identifier)
 		return r, err
 	}
 
@@ -215,16 +215,16 @@ func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[
 	r.LiteraryForm = literaryForm(lf)
 
 	r.Links = getLinks(fmlRecord)
-	r.Holdings = getHoldings(fmlRecord, "866", []string{"b", "c", "h", "a", "z"})
 
-	if len(r.Holdings) == 0 {
-		r.Holdings = getHoldings(fmlRecord, "852", []string{"b", "c", "h", "a", "z", "k"})
-	}
-
-	for _, h := range r.Holdings {
+	r.Holdings = getHoldings(fmlRecord, "852", []string{"b", "c", "h", "a", "z", "k"})
+	for i, h := range r.Holdings {
 		f := h.Format
 		if f != "" && !stringInSlice(f, r.Format) {
 			r.Format = append(r.Format, f)
+		}
+		eightSixSix := getHoldings(fmlRecord, "866", []string{"b", "c", "h", "a", "z"})
+		if len(eightSixSix) > 0 {
+			r.Holdings[i].Summary += " " + eightSixSix[i].Summary
 		}
 	}
 
@@ -470,7 +470,7 @@ func getLinks(fmlRecord fml.Record) []record.Link {
 	return links
 }
 
-// getLocations takes a MARC record and returns an array of Holdings objects.
+// getHoldings takes a MARC record and returns an array of Holdings objects.
 // The expecation is to use either an 852 or an 866 field.
 func getHoldings(fmlRecord fml.Record, tag string, subfieldCodes []string) []record.Holding {
 	var holdings []record.Holding
