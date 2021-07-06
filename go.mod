@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/antchfx/xmlquery v1.3.6
 	github.com/antchfx/xpath v1.2.0 // indirect
-	github.com/aws/aws-sdk-go v1.38.71
+	github.com/aws/aws-sdk-go v1.39.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fortytw2/leaktest v1.3.0 // indirect
