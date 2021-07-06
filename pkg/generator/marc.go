@@ -224,7 +224,7 @@ func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[
 		}
 		eightSixSix := getHoldings(fmlRecord, "866", []string{"b", "c", "h", "a", "z"})
 		if len(eightSixSix) > 0 {
-			r.Holdings[i].Summary += " " + eightSixSix[i].Summary
+			r.Holdings[i].Summary += " " + eightSixSix[0].Summary
 		}
 	}
 
