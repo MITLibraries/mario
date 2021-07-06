@@ -1,4 +1,4 @@
-FROM golang:1.13-alpine
+FROM golang:1.16-alpine
 
 RUN apk add --no-cache curl git ca-certificates
 RUN go get github.com/markbates/pkger/cmd/pkger
@@ -16,7 +16,7 @@ RUN \
 
 # Note: the two `RUN true` commands appear to be necessary because of
 # https://github.com/moby/moby/issues/37965
-FROM golang:1.13-alpine
+FROM golang:1.16-alpine
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 RUN true
 COPY --from=0 /go/src/mario/mario .

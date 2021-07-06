@@ -10,7 +10,7 @@ digraph G {
   node [style=filled, fontname=helvetica, fillcolor=white, penwidth=4, fontsize=16];
   pad=0.3;
 
-  aleph[label="Aleph Export Cron to AWS S3 Bucket", color=DarkOrange3]
+  alma[label="Alma Export Cron to AWS S3 Bucket", color=DarkOrange3]
   s3Event[label="S3 bucket event triggers Mario Powerup in AWS Lambda via CloudWatch", color=DarkOrange3]
   lambda[label="Mario Powerup formats command and calls Mario in AWS Fargate", color=DarkOrange3]
   fullLoad[label="Full Load: create new elasticsearch index", color=DeepSkyBlue4]
@@ -18,7 +18,7 @@ digraph G {
   process[label="Process data from S3 to standard data model in ElasticSearch", color=DeepSkyBlue4]
   updateAlias[label="Promote new index to production if full load", color=DeepSkyBlue4]
 
-  aleph -> s3Event
+  alma -> s3Event
   s3Event -> lambda
   lambda -> fullLoad
   lambda -> dailyLoad

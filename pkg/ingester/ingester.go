@@ -54,7 +54,7 @@ type Ingester struct {
 func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
-	if config.Source == "aleph" {
+	if config.Source == "alma" {
 		i.generator = &generator.MarcGenerator{Marcfile: i.Stream}
 	} else if config.Source == "aspace" {
 		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}

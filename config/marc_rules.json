@@ -475,7 +475,7 @@
       {
         "tag": "852",
         "subfields": "bchak",
-        "notes": "We fall back on 852 if 866 does not exist. We can't use our normal rule parsing for this as we need to split the subfields into a structure in a way that doesn't fit our normal expectations."
+        "notes": "We can't use our normal rule parsing for this as we need to split the subfields into a structure in a way that doesn't fit our normal expectations."
       }
     ]
   }
