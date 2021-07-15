@@ -127,9 +127,13 @@ func marcToRecord(fmlRecord fml.Record, rules []*record.Rule, languageCodes map[
 		return r, err
 	}
 
-	zeroZeroEight := fmlRecord.Filter("008")[0][0]
-	if zeroZeroEight != "" && len(zeroZeroEight) != 40 {
-		err = fmt.Errorf("Record %s has illegal 008 field length of %d characters: '%s'", r.Identifier, len(zeroZeroEight), zeroZeroEight)
+	zeroZeroEight := fmlRecord.Filter("008")
+	if len(zeroZeroEight) == 0 {
+		err = fmt.Errorf("Record %s has no 008 field", r.Identifier)
+		return r, err
+	}
+	if zeroZeroEight[0][0] != "" && len(zeroZeroEight[0][0]) != 40 {
+		err = fmt.Errorf("Record %s has illegal 008 field length of %d characters: '%s'", r.Identifier, len(zeroZeroEight[0][0]), zeroZeroEight[0][0])
 		return r, err
 	}
 
