@@ -11,7 +11,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/markbates/pkger v0.17.1
 	github.com/mitlibraries/fml v0.0.0-20210401134007-2909b0d5b37e
-	github.com/olivere/elastic v6.2.35+incompatible
+	github.com/olivere/elastic v6.2.37+incompatible
 	github.com/urfave/cli/v2 v2.3.0
 	gopkg.in/yaml.v2 v2.4.0
 )
