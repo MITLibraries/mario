@@ -31,252 +31,250 @@
     }
   },
   "mappings": {
-    "Record": {
-      "properties": {
-        "alternate_titles": {
-          "type": "text"
-        },
-        "call_numbers": {
-          "type": "text"
-        },
-        "citation": {
-          "type": "text"
-        },
-        "content_type": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+    "properties": {
+      "alternate_titles": {
+        "type": "text"
+      },
+      "call_numbers": {
+        "type": "text"
+      },
+      "citation": {
+        "type": "text"
+      },
+      "content_type": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "collections": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "collections": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "contents": {
-          "type": "text"
-        },
-        "contributors": {
-          "type": "nested",
-          "properties": {
-            "kind": {
-              "type": "text",
-              "fields": {
-                "keyword": {
-                  "type": "keyword",
-                  "normalizer": "lowercase",
-                  "ignore_above": 256
-                }
+        }
+      },
+      "contents": {
+        "type": "text"
+      },
+      "contributors": {
+        "type": "nested",
+        "properties": {
+          "kind": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase",
+                "ignore_above": 256
               }
-            },
-            "value": {
-              "type": "text",
-              "fields": {
-                "keyword": {
-                  "type": "keyword",
-                  "normalizer": "lowercase",
-                  "ignore_above": 256
-                }
+            }
+          },
+          "value": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase",
+                "ignore_above": 256
               }
             }
           }
-        },
-        "dois": {
-          "type": "text"
-        },
-        "edition": {
-          "type": "text"
-        },
-        "format": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "dois": {
+        "type": "text"
+      },
+      "edition": {
+        "type": "text"
+      },
+      "format": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "holdings": {
-          "properties": {
-            "call_number": {
-              "type": "keyword",
-              "normalizer": "lowercase"
-            },
-            "collection": {
-              "type": "keyword",
-              "normalizer": "lowercase"
-            },
-            "location": {
-              "type": "keyword",
-              "normalizer": "lowercase"
-            },
-            "notes": {
-              "type": "text"
-            },
-            "summary": {
-              "type": "text"
-            },
-            "format": {
-              "type": "text"
-            }
+        }
+      },
+      "holdings": {
+        "properties": {
+          "call_number": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "collection": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "location": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "notes": {
+            "type": "text"
+          },
+          "summary": {
+            "type": "text"
+          },
+          "format": {
+            "type": "text"
           }
-        },
-        "identifier": {
-          "type": "text"
-        },
-        "imprint": {
-          "type": "text"
-        },
-        "isbns": {
-          "type": "text"
-        },
-        "languages": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "identifier": {
+        "type": "text"
+      },
+      "imprint": {
+        "type": "text"
+      },
+      "isbns": {
+        "type": "text"
+      },
+      "languages": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "lccn": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "lccn": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "literary_form": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "literary_form": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "notes": {
-          "type": "text"
-        },
-        "numbering": {
-          "type": "text"
-        },
-        "oclcs": {
-          "type": "text"
-        },
-        "physical_description": {
-          "type": "text"
-        },
-        "place_of_publication": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "notes": {
+        "type": "text"
+      },
+      "numbering": {
+        "type": "text"
+      },
+      "oclcs": {
+        "type": "text"
+      },
+      "physical_description": {
+        "type": "text"
+      },
+      "place_of_publication": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "publication_date": {
-          "type": "text",
-          "fields": {
-            "date": {
-              "type": "text"
-            }
+        }
+      },
+      "publication_date": {
+        "type": "text",
+        "fields": {
+          "date": {
+            "type": "text"
           }
-        },
-        "publication_frequency": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "publication_frequency": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "related_items": {
-          "properties": {
-            "kind": {
-              "type": "text",
-              "fields": {
-                "keyword": {
-                  "type": "keyword",
-                  "normalizer": "lowercase",
-                  "ignore_above": 256
-                }
-              }
-            },
-            "value": {
-              "type": "text",
-              "fields": {
-                "keyword": {
-                  "type": "keyword",
-                  "normalizer": "lowercase",
-                  "ignore_above": 256
-                }
+        }
+      },
+      "related_items": {
+        "properties": {
+          "kind": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase",
+                "ignore_above": 256
               }
             }
-          }
-        },
-        "related_place": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
+          },
+          "value": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase",
+                "ignore_above": 256
+              }
             }
           }
-        },
-        "source": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "related_place": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "source_link": {
-          "type": "text"
-        },
-        "subjects": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "normalizer": "lowercase",
-              "ignore_above": 256
-            }
+        }
+      },
+      "source": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
           }
-        },
-        "summary": {
-          "type": "text"
-        },
-        "title": {
-          "type": "text",
-          "fields": {
-            "exact_value": {
-              "type": "text",
-              "analyzer": "keyword_no_trailing_punctuation"
-            }
+        }
+      },
+      "source_link": {
+        "type": "text"
+      },
+      "subjects": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase",
+            "ignore_above": 256
+          }
+        }
+      },
+      "summary": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "exact_value": {
+            "type": "text",
+            "analyzer": "keyword_no_trailing_punctuation"
           }
         }
       }

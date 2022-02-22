@@ -19,7 +19,7 @@ An Elasticsearch index can be started for development purposes by running:
 
 ```
 $ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" \
-    docker.elastic.co/elasticsearch/elasticsearch:6.8.4
+    docker.elastic.co/elasticsearch/elasticsearch:7.10.2
 ```
 
 Alternatively, if you intend to test this with a local instance of TIMDEX
