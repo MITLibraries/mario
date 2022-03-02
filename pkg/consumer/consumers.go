@@ -10,7 +10,7 @@ import (
 	"github.com/mitlibraries/mario/pkg/record"
 )
 
-//ESConsumer adds Records to ElasticSearch.
+//ESConsumer adds Records to OpenSearch.
 type ESConsumer struct {
 	Index  string
 	RType  string

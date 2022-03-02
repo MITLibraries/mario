@@ -21,7 +21,7 @@ func main() {
 			Name:        "url",
 			Aliases:     []string{"u"},
 			Value:       "http://127.0.0.1:9200",
-			Usage:       "URL for the Elasticsearch cluster",
+			Usage:       "URL for the OpenSearch cluster",
 			Destination: &url,
 		},
 		&cli.BoolFlag{
@@ -32,11 +32,11 @@ func main() {
 	}
 
 	app.Commands = []*cli.Command{
-		// Elasticsearch commands
+		// OpenSearch commands
 		{
 			Name:     "aliases",
-			Usage:    "List Elasticsearch aliases and their associated indexes",
-			Category: "Elasticsearch actions",
+			Usage:    "List OpenSearch aliases and their associated indexes",
+			Category: "OpenSearch actions",
 			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
@@ -54,8 +54,8 @@ func main() {
 		},
 		{
 			Name:     "indexes",
-			Usage:    "List all Elasticsearch indexes",
-			Category: "Elasticsearch actions",
+			Usage:    "List all OpenSearch indexes",
+			Category: "OpenSearch actions",
 			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
@@ -73,8 +73,8 @@ func main() {
 		},
 		{
 			Name:     "ping",
-			Usage:    "Ping Elasticsearch",
-			Category: "Elasticsearch actions",
+			Usage:    "Ping OpenSearch",
+			Category: "OpenSearch actions",
 			Action: func(c *cli.Context) error {
 				es, err := client.NewESClient(url, v4)
 				if err != nil {
@@ -156,7 +156,7 @@ func main() {
 				&cli.StringFlag{
 					Name:     "index",
 					Aliases:  []string{"i"},
-					Usage:    "Name of the Elasticsearch index to promote",
+					Usage:    "Name of the OpenSearch index to promote",
 					Required: true,
 				},
 			},
@@ -172,13 +172,13 @@ func main() {
 		{
 			Name:      "reindex",
 			Usage:     "Reindex one index to another index",
-			UsageText: "Use the Elasticsearch reindex API to copy one index to another. The doc source must be present in the original index.",
+			UsageText: "Use the OpenSearch reindex API to copy one index to another. The doc source must be present in the original index.",
 			Category:  "Index actions",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "index",
 					Aliases:  []string{"i"},
-					Usage:    "Name of the Elasticsearch index to copy",
+					Usage:    "Name of the OpenSearch index to copy",
 					Required: true,
 				},
 				&cli.StringFlag{
@@ -206,7 +206,7 @@ func main() {
 				&cli.StringFlag{
 					Name:     "index",
 					Aliases:  []string{"i"},
-					Usage:    "Name of the Elasticsearch index to delete",
+					Usage:    "Name of the OpenSearch index to delete",
 					Required: true,
 				},
 			},

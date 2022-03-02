@@ -3,7 +3,7 @@
 ## What is this?
 
 Mario is a metadata processing pipeline that will process data from various
-sources and write to Elasticsearch.
+sources and write to Opensearch.
 
 ## Installing
 
@@ -15,11 +15,12 @@ $ make install
 
 ## How to Use This
 
-An Elasticsearch index can be started for development purposes by running:
+An OpenSearch index can be started for development purposes by running:
 
 ```
-$ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" \
-    docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+$ docker run -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" \
+  -e "plugins.security.disabled=true" \
+  opensearchproject/opensearch:1.2.4
 ```
 
 Alternatively, if you intend to test this with a local instance of TIMDEX
@@ -31,9 +32,9 @@ Here are a few sample Mario commands that may be useful for local development:
   runs the ingest process with ASpace sample files and prints out each record
   as JSON
 - `mario ingest -s dspace fixtures/dspace_samples.xml` ingests the
-  DSpace sample files into a local Elasticsearch instance.
+  DSpace sample files into a local OpenSearch instance.
 - `mario ingest -s alma --auto fixtures/alma_samples.mrc` ingests the
-  Alma sample files into a local Elasticsearch instance and promotes the
+  Alma sample files into a local OpenSearch instance and promotes the
   index to the timdex-prod alias on completion.
 - `mario indexes` list all indexes
 - `mario promote -i [index name]` promotes the named index to the

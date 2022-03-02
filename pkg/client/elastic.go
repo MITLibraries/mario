@@ -163,7 +163,7 @@ func (c ESClient) Reindex(source string, dest string) (int64, error) {
 	return resp.Total, nil
 }
 
-// NewESClient creates a new Elasticsearch client.
+// NewESClient creates a new OpenSearch client.
 func NewESClient(url string, v4 bool) (*ESClient, error) {
 	var client *http.Client
 	if v4 {

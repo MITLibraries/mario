@@ -92,7 +92,7 @@ func (i *Ingester) Configure(config Config) error {
 			Client: i.Client,
 		}
 
-		log.Printf("Configured Elasticsearch consumer using source: %s, index: %s, and promote: %s", config.Source, config.Index, strconv.FormatBool(config.Promote))
+		log.Printf("Configured OpenSearch consumer using source: %s, index: %s, and promote: %s", config.Source, config.Index, strconv.FormatBool(config.Promote))
 
 	} else if config.Consumer == "json" {
 		i.consumer = &consumer.JSONConsumer{Out: os.Stdout}

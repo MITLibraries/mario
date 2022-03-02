@@ -14,7 +14,7 @@ digraph G {
   almaExporter[label="Alma Metadata Exporter", color=Yellow1, fillcolor=Yellow1]
   s3[label="AWS S3 Bucket", color=DarkOrange3]
   processor[label="Mario: pipeline for metadata indexing", color=Yellow1, fillcolor=Yellow1]
-  index[label="ElasticSearch", color=DarkOrange3]
+  index[label="OpenSearch", color=DarkOrange3]
   archives[label="Archival Metadata"]
   archivesExporter[label="Archival Metadata Exporter", color=SteelBlue1]
   futureData[label="Source X, Y, Z, etc", color=black]
