@@ -1,7 +1,7 @@
 package record
 
 // Record struct stores our internal mappings of data and is used to when
-// mapping various external data sources before sending to elasticsearch
+// mapping various external data sources before sending to OpenSearch
 type Record struct {
 	Identifier           string         `json:"identifier"`
 	Source               string         `json:"source"`

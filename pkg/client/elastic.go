@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/markbates/pkger"
 	"github.com/mitlibraries/mario/pkg/record"
-	"github.com/olivere/elastic"
-	aws "github.com/olivere/elastic/aws/v4"
+	"github.com/olivere/elastic/v7"
+	aws "github.com/olivere/elastic/v7/aws/v4"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -77,7 +77,7 @@ func (c ESClient) Create(index string) error {
 	}
 	_, err = c.client.
 		CreateIndex(index).
-		BodyString(string(mappings)).
+		Body(string(mappings)).
 		Do(context.Background())
 	return err
 }
@@ -103,7 +103,6 @@ func (c *ESClient) Add(record record.Record, index string, rtype string) {
 	d := elastic.NewBulkIndexRequest().
 		Index(index).
 		Id(record.Identifier).
-		Type(rtype).
 		Doc(record)
 	c.bulker.Add(d)
 }
@@ -164,7 +163,7 @@ func (c ESClient) Reindex(source string, dest string) (int64, error) {
 	return resp.Total, nil
 }
 
-// NewESClient creates a new Elasticsearch client.
+// NewESClient creates a new OpenSearch client.
 func NewESClient(url string, v4 bool) (*ESClient, error) {
 	var client *http.Client
 	if v4 {

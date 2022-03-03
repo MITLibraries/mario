@@ -4,7 +4,7 @@ Date: 2018-07-03
 
 ## Status
 
-Accepted
+Superceded by [16. Replace Elasticsearch with OpenSearch](0016-replace-elasticsearch-with-opensearch.md)
 
 ## Context
 
