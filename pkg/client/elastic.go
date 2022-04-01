@@ -102,7 +102,7 @@ func (c *ESClient) Stop() error {
 func (c *ESClient) Add(record record.Record, index string, rtype string) {
 	d := elastic.NewBulkIndexRequest().
 		Index(index).
-		Id(record.Identifier).
+		Id(record.TimdexRecordId).
 		Doc(record)
 	c.bulker.Add(d)
 }

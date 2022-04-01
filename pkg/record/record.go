@@ -1,72 +1,136 @@
 package record
 
-// Record struct stores our internal mappings of data and is used to when
+// Record struct stores our internal mappings of data and is used when
 // mapping various external data sources before sending to OpenSearch
 type Record struct {
-	Identifier           string         `json:"identifier"`
-	Source               string         `json:"source"`
-	SourceLink           string         `json:"source_link"`
-	Title                string         `json:"title"`
-	AlternateTitles      []string       `json:"alternate_titles,omitempty"`
-	Contributor          []*Contributor `json:"contributors,omitempty"`
-	Subject              []string       `json:"subjects,omitempty"`
-	Isbn                 []string       `json:"isbns,omitempty"`
-	Issn                 []string       `json:"issns,omitempty"`
-	Doi                  []string       `json:"dois,omitempty"`
-	OclcNumber           []string       `json:"oclcs,omitempty"`
-	Lccn                 string         `json:"lccn,omitempty"`
-	Country              string         `json:"place_of_publication,omitempty"`
-	Language             []string       `json:"languages,omitempty"`
-	PublicationDate      string         `json:"publication_date,omitempty"`
-	ContentType          string         `json:"content_type,omitempty"`
-	CallNumber           []string       `json:"call_numbers,omitempty"`
-	Edition              string         `json:"edition,omitempty"`
-	Imprint              []string       `json:"imprint,omitempty"`
-	PhysicalDescription  string         `json:"physical_description,omitempty"`
-	PublicationFrequency []string       `json:"publication_frequency,omitempty"`
-	Numbering            string         `json:"numbering,omitempty"`
-	Notes                []string       `json:"notes,omitempty"`
-	Contents             []string       `json:"contents,omitempty"`
-	Summary              []string       `json:"summary,omitempty"`
-	Format               []string       `json:"format,omitempty"`
-	LiteraryForm         string         `json:"literary_form,omitempty"`
-	RelatedPlace         []string       `json:"related_place,omitempty"`
-	InBibliography       []string       `json:"in_bibliography,omitempty"`
-	RelatedItems         []*RelatedItem `json:"related_items,omitempty"`
-	Links                []Link         `json:"links,omitempty"`
-	Holdings             []Holding      `json:"holdings,omitempty"`
-	Citation             string         `json:"citation,omitempty"`
-	Collection           []string       `json:"collections,omitempty"`
+	AlternateTitles        []*AlternateTitle `json:"alternate_titles,omitempty"`
+	CallNumbers            []string          `json:"call_numbers,omitempty"`
+	Citation               string            `json:"citation,omitempty"`
+	ContentType            []string          `json:"content_type,omitempty"`
+	Contents               []string          `json:"contents,omitempty"`
+	Contributors           []*Contributor    `json:"contributors,omitempty"`
+	Dates                  []*Date           `json:"dates,omitempty"`
+	Edition                string            `json:"edition,omitempty"`
+	FileFormats            []string          `json:"file_formats,omitempty"`
+	Format                 string            `json:"format,omitempty"`
+	FundingInformation     []*Funding        `json:"funding_information,omitempty"`
+	Holdings               []*Holding        `json:"holdings,omitempty"`
+	Identifiers            []*Identifier     `json:"identifiers,omitempty"`
+	Languages              []string          `json:"languages,omitempty"`
+	Links                  []Link            `json:"links,omitempty"`
+	LiteraryForm           string            `json:"literary_form,omitempty"`
+	Locations              []*Location       `json:"locations,omitempty"`
+	Notes                  []*Note           `json:"notes,omitempty"`
+	Numbering              string            `json:"numbering,omitempty"`
+	PhysicalDescription    string            `json:"physical_description,omitempty"`
+	PublicationFrequency   []string          `json:"publication_frequency,omitempty"`
+	PublicationInformation []string          `json:"publication_information,omitempty"`
+	RelatedItems           []*RelatedItem    `json:"related_items,omitempty"`
+	Rights                 []*Right          `json:"rights,omitempty"`
+	Source                 string            `json:"source"`
+	SourceLink             string            `json:"source_link"`
+	Subjects               []*Subject        `json:"subjects,omitempty"`
+	Summary                []string          `json:"summary,omitempty"`
+	TimdexRecordId         string            `json:"timdex_record_id"`
+	Title                  string            `json:"title"`
 }
 
-// Contributor is a port of a Record
-type Contributor struct {
-	Kind  string `json:"kind"`
+// AlternateTitle object
+type AlternateTitle struct {
+	Kind  string `json:"kind,omitempty"`
 	Value string `json:"value"`
 }
 
-// RelatedItem is a port of a Record
-type RelatedItem struct {
-	Kind  string   `json:"kind"`
+// Contributor object
+type Contributor struct {
+	Affiliation   string `json:"affiliation,omitempty"`
+	Kind          string `json:"kind,omitempty"`
+	Identifier    string `json:"identifier,omitempty"`
+	MitAffiliated bool   `json:"mit_affiliated,omitempty"`
+	Value         string `json:"value"`
+}
+
+// Date object
+type Date struct {
+	Kind  string `json:"kind,omitempty"`
+	Note  string `json:"note,omitempty"`
+	Range *Range `json:"range,omitempty"`
+	Value string `json:"value,omitempty"`
+}
+
+// Funding object
+type Funding struct {
+	AwardNumber          string `json:"award_number,omitempty"`
+	AwardUri             string `json:"award_uri,omitempty"`
+	FunderIdentifier     string `json:"funder_identifier,omitempty"`
+	FunderIdentifierType string `json:"funder_identifier_type,omitempty"`
+	FunderName           string `json:"funder_name,omitempty"`
+}
+
+// Holding object
+type Holding struct {
+	CallNumber string `json:"call_number,omitempty"`
+	Collection string `json:"collection,omitempty"`
+	Format     string `json:"format,omitempty"`
+	Location   string `json:"location,omitempty"`
+	Note       string `json:"notes,omitempty"`
+	Summary    string `json:"summary,omitempty"`
+}
+
+// Identifier object
+type Identifier struct {
+	Kind  string `json:"kind,omitmempty"`
+	Value string `json:"value"`
+}
+
+// Link object
+type Link struct {
+	Kind         string `json:"kind,omitempty"`
+	Restrictions string `json:"restrictions,omitempty"`
+	Text         string `json:"text,omitempty"`
+	Url          string `json:"url"`
+}
+
+// Location object
+type Location struct {
+	Geopoint []float32 `json:"geopoint,omitempty"`
+	Kind     string    `json:"kind,omitempty"`
+	Value    string    `json:"value,omitempty"`
+}
+
+// Note object
+type Note struct {
+	Kind  string   `json:"kind,omitempty"`
 	Value []string `json:"value"`
 }
 
-// Link is a port of a Record
-type Link struct {
-	Kind         string `json:"kind,omitempty"`
-	Text         string `json:"text,omitempty"`
-	URL          string `json:"url"`
-	Restrictions string `json:"restrictions,omitempty"`
+// Range object
+type Range struct {
+	Gt  string `json:"gt,omitempty"`
+	Gte string `json:"gte,omitempty"`
+	Lt  string `json:"lt,omitempty"`
+	Lte string `json:"lte,omitempty"`
 }
 
-// Holding is a port of a Record
-type Holding struct {
-	Location   string `json:"location"`
-	Collection string `json:"collection,omitempty"`
-	CallNumber string `json:"call_number,omitempty"`
-	Summary    string `json:"summary,omitempty"`
-	Notes      string `json:"notes,omitempty"`
-	Format     string `json:"format,omitempty"`
+// RelatedItem object
+type RelatedItem struct {
+	Description  string `json:"description,omitempty"`
+	ItemType     string `json:"item_type,omitempty"`
+	Relationship string `json:"relationship,omitempty"`
+	Uri          string `json:"uri,omitempty"`
+}
+
+// Right object
+type Right struct {
+	Description string `json:"desription,omitempty"`
+	Kind        string `json:"kind,omitempty"`
+	Uri         string `json:"uri,omitempty"`
+}
+
+// Subject object
+type Subject struct {
+	Kind  string   `json:"kind,omitempty"`
+	Value []string `json:"value"`
 }
 
 // Rule defines where the rules are in JSON

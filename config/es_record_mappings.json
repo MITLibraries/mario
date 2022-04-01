@@ -33,33 +33,41 @@
   "mappings": {
     "properties": {
       "alternate_titles": {
-        "type": "text"
+        "type": "nested",
+        "properties": {
+          "kind": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "text",
+            "fields": {
+              "exact_value": {
+                "type": "text",
+                "analyzer": "keyword_no_trailing_punctuation"
+              }
+            }
+          }
+        }
       },
       "call_numbers": {
-        "type": "text"
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "completion": {
+            "type": "completion",
+            "preserve_separators": false
+          }
+        }
       },
       "citation": {
         "type": "text"
       },
       "content_type": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
-      },
-      "collections": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
+        "type": "keyword",
+        "normalizer": "lowercase"
       },
       "contents": {
         "type": "text"
@@ -67,41 +75,102 @@
       "contributors": {
         "type": "nested",
         "properties": {
+          "affiliation": {
+            "type": "text"
+          },
           "kind": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "normalizer": "lowercase",
-                "ignore_above": 256
-              }
-            }
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "identifier": {
+            "type": "text"
+          },
+          "mit_affiliated": {
+            "type": "boolean"
           },
           "value": {
             "type": "text",
             "fields": {
               "keyword": {
                 "type": "keyword",
-                "normalizer": "lowercase",
-                "ignore_above": 256
+                "normalizer": "lowercase"
               }
             }
           }
         }
       },
-      "dois": {
-        "type": "text"
+      "dates": {
+        "type": "nested",
+        "properties": {
+          "kind": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "note": {
+            "type": "text"
+          },
+          "range": {
+            "type": "date_range",
+            "format": "strict_year||strict_year_month||date_optional_time||date||basic_date"
+          },
+          "value": {
+            "type": "text",
+            "fields": {
+              "as_date": {
+                "type": "date",
+                "format": "strict_year||strict_year_month||date_optional_time||date||basic_date"
+              }
+            }
+          }
+        }
       },
       "edition": {
         "type": "text"
       },
+      "file_formats": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
       "format": {
-        "type": "text",
-        "fields": {
-          "keyword": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "funding_information": {
+        "type": "nested",
+        "properties": {
+          "award_number": {
+            "type": "text"
+          },
+          "award_uri": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "funder_identifier": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "funder_identifier_type": {
             "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
+            "normalizer": "lowercase"
+          },
+          "funder_name": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
           }
         }
       },
@@ -115,159 +184,197 @@
             "type": "keyword",
             "normalizer": "lowercase"
           },
+          "format": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
           "location": {
             "type": "keyword",
             "normalizer": "lowercase"
           },
-          "notes": {
-            "type": "text"
-          },
-          "summary": {
-            "type": "text"
-          },
-          "format": {
+          "note": {
             "type": "text"
           }
         }
       },
-      "identifier": {
-        "type": "text"
-      },
-      "imprint": {
-        "type": "text"
-      },
-      "isbns": {
-        "type": "text"
+      "identifiers": {
+        "type": "nested",
+        "properties": {
+          "kind": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "value": {
+            "type": "text"
+          }
+        }
       },
       "languages": {
         "type": "text",
         "fields": {
           "keyword": {
             "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
+            "normalizer": "lowercase"
           }
         }
       },
-      "lccn": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
-      },
-      "literary_form": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
-      },
-      "notes": {
-        "type": "text"
-      },
-      "numbering": {
-        "type": "text"
-      },
-      "oclcs": {
-        "type": "text"
-      },
-      "physical_description": {
-        "type": "text"
-      },
-      "place_of_publication": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
-      },
-      "publication_date": {
-        "type": "text",
-        "fields": {
-          "date": {
-            "type": "text"
-          }
-        }
-      },
-      "publication_frequency": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
-      },
-      "related_items": {
+      "links": {
+        "type": "nested",
         "properties": {
           "kind": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "restrictions": {
             "type": "text",
             "fields": {
               "keyword": {
                 "type": "keyword",
-                "normalizer": "lowercase",
-                "ignore_above": 256
+                "normalizer": "lowercase"
               }
             }
+          },
+          "text": {
+            "type": "text"
+          },
+          "url": {
+            "type": "text"
+          }
+        }
+      },
+      "literary_form": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "locations": {
+        "type": "nested",
+        "properties": {
+          "geopoint": {
+            "type": "geo_point"
+          },
+          "kind": {
+            "type": "keyword",
+            "normalizer": "lowercase"
           },
           "value": {
             "type": "text",
             "fields": {
               "keyword": {
                 "type": "keyword",
-                "normalizer": "lowercase",
-                "ignore_above": 256
+                "normalizer": "lowercase"
               }
             }
           }
         }
       },
-      "related_place": {
+      "notes": {
+        "type": "nested",
+        "properties": {
+          "kind": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
+          },
+          "value": {
+            "type": "text"
+          }
+        }
+      },
+      "numbering": {
+        "type": "text"
+      },
+      "physical_description": {
+        "type": "text",
+        "index": "false"
+      },
+      "publication_frequency": {
         "type": "text",
         "fields": {
           "keyword": {
             "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
+            "normalizer": "lowercase"
+          }
+        }
+      },
+      "publication_information": {
+        "type": "text"
+      },
+      "related_items": {
+        "type": "nested",
+        "properties": {
+          "description": {
+            "type": "text"
+          },
+          "item_type": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "relationship": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "uri": {
+            "type": "text"
+          }
+        }
+      },
+      "rights": {
+        "type": "nested",
+        "properties": {
+          "description": {
+            "type": "text"
+          },
+          "kind": {
+            "type": "keyword",
+            "normalizer": "lowercase"
+          },
+          "uri": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
           }
         }
       },
       "source": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
-          }
-        }
+        "type": "keyword",
+        "normalizer": "lowercase"
       },
       "source_link": {
-        "type": "text"
+        "type": "text",
+        "index": "false"
       },
       "subjects": {
-        "type": "text",
-        "fields": {
-          "keyword": {
+        "type": "nested",
+        "properties": {
+          "kind": {
             "type": "keyword",
-            "normalizer": "lowercase",
-            "ignore_above": 256
+            "normalizer": "lowercase"
+          },
+          "value": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "normalizer": "lowercase"
+              }
+            }
           }
         }
       },
       "summary": {
         "type": "text"
+      },
+      "timdex_record_id": {
+        "type": "text",
+        "index": "false"
       },
       "title": {
         "type": "text",
