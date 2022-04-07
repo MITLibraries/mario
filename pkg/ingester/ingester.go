@@ -54,17 +54,7 @@ type Ingester struct {
 func (i *Ingester) Configure(config Config) error {
 	var err error
 	// Configure generator
-	if config.Source == "alma" {
-		i.generator = &generator.MarcGenerator{Marcfile: i.Stream}
-	} else if config.Source == "aspace" {
-		i.generator = &generator.ArchivesGenerator{Archivefile: i.Stream}
-	} else if config.Source == "dspace" {
-		i.generator = &generator.DspaceGenerator{Dspacefile: i.Stream}
-	} else if config.Source == "mario" {
-		i.generator = &generator.JSONGenerator{File: i.Stream}
-	} else {
-		return errors.New("Unknown source data")
-	}
+	i.generator = &generator.JSONGenerator{File: i.Stream}
 
 	// Configure consumer
 	if config.Consumer == "es" {

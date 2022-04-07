@@ -7,7 +7,7 @@ import (
 )
 
 func TestJsonParser(t *testing.T) {
-	jsonfile, err := os.Open("../../fixtures/alma_samples.json")
+	jsonfile, err := os.Open("../../fixtures/timdex_record_samples.json")
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,13 +22,13 @@ func TestJsonParser(t *testing.T) {
 		chanLength++
 	}
 
-	if chanLength != 358 {
+	if chanLength != 6 {
 		t.Error("Expected match, got", chanLength)
 	}
 }
 
 func TestJsonProcess(t *testing.T) {
-	jsonfile, err := os.Open("../../fixtures/alma_samples.json")
+	jsonfile, err := os.Open("../../fixtures/timdex_record_samples.json")
 	if err != nil {
 		t.Error(err)
 	}
@@ -39,7 +39,7 @@ func TestJsonProcess(t *testing.T) {
 		i++
 	}
 
-	if i != 358 {
+	if i != 6 {
 		t.Error("Expected match, got", i)
 	}
 }
