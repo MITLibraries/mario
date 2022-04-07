@@ -18,16 +18,16 @@ tests: test
 update: ## Update dependencies
 	go get -u ./...
 
-dist: ## Build docker image
-	docker build -t $(ECR_REGISTRY)/timdex-mario:latest \
-		-t $(ECR_REGISTRY)/timdex-mario:`git describe --always` \
+dist-dev: ## Build docker image
+	docker build --platform linux/amd64 -t $(ECR_REGISTRY)/timdex-mario-dev:latest \
+		-t $(ECR_REGISTRY)/timdex-mario-dev:`git describe --always` \
 		-t timdex-mario:latest .
 
-publish: dist ## Build, tag and push
+publish-dev: dist-dev ## Build, tag and push
 	aws --profile default ecr get-login-password --region us-east-1 \
-	| docker login --username AWS --password-stdin $(ECR_REGISTRY)
-	docker push $(ECR_REGISTRY)/timdex-mario:latest
-	docker push $(ECR_REGISTRY)/timdex-mario:`git describe --always`
+	| docker login -u AWS -p $$(aws ecr get-login-password --region us-east-1) $(ECR_REGISTRY)
+	docker push $(ECR_REGISTRY)/timdex-mario-dev:latest
+	docker push $(ECR_REGISTRY)/timdex-mario-dev:`git describe --always`
 
 # TODO: re-write promote command for new AWS account structure, see Github issue #581
 # promote: ## Promote the current staging build to production
