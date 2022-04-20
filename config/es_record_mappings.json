@@ -34,6 +34,7 @@
     "properties": {
       "alternate_titles": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "kind": {
             "type": "keyword"
@@ -74,6 +75,7 @@
       },
       "contributors": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "affiliation": {
             "type": "text"
@@ -101,6 +103,7 @@
       },
       "dates": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "kind": {
             "type": "keyword",
@@ -137,6 +140,7 @@
       },
       "funding_information": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "award_number": {
             "type": "text"
@@ -175,6 +179,8 @@
         }
       },
       "holdings": {
+        "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "call_number": {
             "type": "keyword",
@@ -199,6 +205,7 @@
       },
       "identifiers": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "kind": {
             "type": "keyword",
@@ -248,6 +255,7 @@
       },
       "locations": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "geopoint": {
             "type": "geo_point"
@@ -269,6 +277,7 @@
       },
       "notes": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "kind": {
             "type": "text",
@@ -305,6 +314,7 @@
       },
       "related_items": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "description": {
             "type": "text"
@@ -353,6 +363,7 @@
       },
       "subjects": {
         "type": "nested",
+        "include_in_parent": "true",
         "properties": {
           "kind": {
             "type": "keyword",
