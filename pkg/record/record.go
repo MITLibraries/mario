@@ -43,11 +43,11 @@ type AlternateTitle struct {
 
 // Contributor object
 type Contributor struct {
-	Affiliation   string `json:"affiliation,omitempty"`
-	Kind          string `json:"kind,omitempty"`
-	Identifier    string `json:"identifier,omitempty"`
-	MitAffiliated bool   `json:"mit_affiliated,omitempty"`
-	Value         string `json:"value"`
+	Affiliation   []string `json:"affiliation,omitempty"`
+	Kind          string   `json:"kind,omitempty"`
+	Identifier    []string `json:"identifier,omitempty"`
+	MitAffiliated bool     `json:"mit_affiliated,omitempty"`
+	Value         string   `json:"value"`
 }
 
 // Date object
