@@ -298,21 +298,21 @@
     ],
     "contributors": [
       {
-        "affiliation": "MIT",
+        "affiliation": ["MIT"],
         "kind": "author",
         "mit_affiliated": true,
         "value": "Moon, Intae"
       },
       {
-        "affiliation": "MIT",
+        "affiliation": ["MIT"],
         "kind": "author",
         "mit_affiliated": true,
         "value": "Ranjram, Mike Kavian"
       },
       {
-        "affiliation": "MIT",
+        "affiliation": ["MIT"],
         "kind": "author",
-        "identifier": "https://orcid.org/0000-0002-0746-6191",
+        "identifier": ["https://orcid.org/0000-0002-0746-6191"],
         "mit_affiliated": true,
         "value": "Perreault, David J"
       },
@@ -435,9 +435,9 @@
     ],
     "contributors": [
       {
-        "affiliation": "MIT",
+        "affiliation": ["MIT"],
         "kind": "creator",
-        "identifier": "https://lccn.loc.gov/nr99025157",
+        "identifier": ["https://lccn.loc.gov/nr99025157"],
         "mit_affiliated": true,
         "value": "Connick, Charles J. (Charles Jay)"
       }
