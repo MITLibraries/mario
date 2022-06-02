@@ -1,7 +1,10 @@
 .PHONY: help install test tests update dist publish promote
 SHELL=/bin/bash
-ECR_REGISTRY=222053980223.dkr.ecr.us-east-1.amazonaws.com
 DATETIME:=$(shell date -u +%Y%m%dT%H%M%SZ)
+### This is the Terraform-generated header for mario-dev
+ECR_NAME_DEV:=mario-dev
+ECR_URL_DEV:=222053980223.dkr.ecr.us-east-1.amazonaws.com/mario-dev
+### End of Terraform-generated header ###
 
 help: ## Print this message
 	@awk 'BEGIN { FS = ":.*##"; print "Usage:  make <target>\n\nTargets:" } \
@@ -18,22 +21,14 @@ tests: test
 update: ## Update dependencies
 	go get -u ./...
 
-dist-dev: ## Build docker image
-	docker build --platform linux/amd64 -t $(ECR_REGISTRY)/timdex-mario-dev:latest \
-		-t $(ECR_REGISTRY)/timdex-mario-dev:`git describe --always` \
-		-t timdex-mario:latest .
+### Developer Deploy Commands ###
+dist-dev: ## Build docker container (intended for developer-based manual build)
+	docker build --platform linux/amd64 \
+	    -t $(ECR_URL_DEV):latest \
+		-t $(ECR_URL_DEV):`git describe --always` \
+		-t $(ECR_NAME_DEV):latest .
 
-publish-dev: dist-dev ## Build, tag and push
-	aws --profile default ecr get-login-password --region us-east-1 \
-	| docker login -u AWS -p $$(aws ecr get-login-password --region us-east-1) $(ECR_REGISTRY)
-	docker push $(ECR_REGISTRY)/timdex-mario-dev:latest
-	docker push $(ECR_REGISTRY)/timdex-mario-dev:`git describe --always`
-
-# TODO: re-write promote command for new AWS account structure, see Github issue #581
-# promote: ## Promote the current staging build to production
-# 	docker login -u AWS -p $$(aws ecr get-login-password --region us-east-1) $(ECR_REGISTRY)
-# 	docker pull $(ECR_REGISTRY)/mario-stage:latest
-# 	docker tag $(ECR_REGISTRY)/mario-stage:latest $(ECR_REGISTRY)/mario-prod:latest
-# 	docker tag $(ECR_REGISTRY)/mario-stage:latest $(ECR_REGISTRY)/mario-prod:$(DATETIME)
-# 	docker push $(ECR_REGISTRY)/mario-prod:latest
-# 	docker push $(ECR_REGISTRY)/mario-prod:$(DATETIME)
+publish-dev: dist-dev ## Build, tag and push (intended for developer-based manual publish)
+	docker login -u AWS -p $$(aws ecr get-login-password --region us-east-1) $(ECR_URL_DEV)
+	docker push $(ECR_URL_DEV):latest
+	docker push $(ECR_URL_DEV):`git describe --always`
