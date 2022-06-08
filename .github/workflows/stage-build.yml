@@ -1,0 +1,19 @@
+### This is the Terraform-generated stage-build.yml workflow for the mario-stage app repository ###
+name: stage Build and Deploy Fargate Container
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+
+jobs:
+  deploy:
+    name: stage Deploy Fargate Container
+    uses: mitlibraries/.github/.github/workflows/fargate-shared-deploy-stage.yml@container-flows
+    secrets: inherit
+    with:
+      AWS_REGION: "us-east-1"
+      GHA_ROLE: "mario-gha-stage"
+      ECR: "mario-stage"
