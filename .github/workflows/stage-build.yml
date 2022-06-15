@@ -1,5 +1,5 @@
 ### This is the Terraform-generated stage-build.yml workflow for the mario-stage app repository ###
-name: stage Build and Deploy Fargate Container
+name: Stage Build and Deploy Fargate Container
 on:
   workflow_dispatch:
   push:
@@ -10,8 +10,8 @@ on:
 
 jobs:
   deploy:
-    name: stage Deploy Fargate Container
-    uses: mitlibraries/.github/.github/workflows/fargate-shared-deploy-stage.yml@container-flows
+    name: Stage Deploy Fargate Container
+    uses: mitlibraries/.github/.github/workflows/fargate-shared-deploy-stage.yml@main
     secrets: inherit
     with:
       AWS_REGION: "us-east-1"

@@ -1,5 +1,5 @@
 ### This is the Terraform-generated dev-build.yml workflow for the mario-dev app repository ###
-name: dev Build and Deploy Fargate Container
+name: Dev Build and Deploy Fargate Container
 on:
   workflow_dispatch:
   pull_request:
@@ -10,8 +10,8 @@ on:
 
 jobs:
   deploy:
-    name: dev Deploy Fargate Container
-    uses: mitlibraries/.github/.github/workflows/fargate-shared-deploy-dev.yml@container-flows
+    name: Dev Deploy Fargate Container
+    uses: mitlibraries/.github/.github/workflows/fargate-shared-deploy-dev.yml@main
     secrets: inherit
     with:
       AWS_REGION: "us-east-1"
