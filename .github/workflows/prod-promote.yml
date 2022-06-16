@@ -1,0 +1,18 @@
+### This is the Terraform-generated prod-promote.yml workflow for the mario-prod app repository ###
+name: Prod Promote Fargate Container
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Prod Promote Fargate Container
+    uses: mitlibraries/.github/.github/workflows/fargate-shared-promote-prod.yml@main
+    secrets: inherit
+    with:
+      AWS_REGION: "us-east-1"
+      GHA_ROLE_STAGE: mario-gha-stage
+      GHA_ROLE_PROD: mario-gha-prod
+      ECR_STAGE: "mario-stage"
+      ECR_PROD: "mario-prod"
