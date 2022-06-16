@@ -1,4 +1,4 @@
-.PHONY: help install test tests update dist publish promote
+.PHONY: help install test tests update dist-dev publish-dev
 SHELL=/bin/bash
 DATETIME:=$(shell date -u +%Y%m%dT%H%M%SZ)
 ### This is the Terraform-generated header for mario-dev ###
