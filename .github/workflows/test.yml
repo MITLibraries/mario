@@ -17,4 +17,4 @@ jobs:
       - name: Run tests
         run: make test
       - name: Test docker build
-        run: make dist
+        run: make dist-dev
